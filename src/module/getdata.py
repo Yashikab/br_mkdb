@@ -66,7 +66,8 @@ class OfficialProgram:
             'home': home,
             'birth_place': birth_place,
             'age': age,
-            'weight': weight
+            'weight': weight,
+            'num_F': None
         }
 
         return content_dict
@@ -86,61 +87,40 @@ class GetDataTest(unittest.TestCase):
         player_info1 = op.getplayerinfo2dict(row=1)
         # 2列目
         player_info2 = op.getplayerinfo2dict(row=2)
+
+        def __test_content(ans1, ans2, key):
+            """
+            2行テストする
+
+            Parameters
+            ----------
+                ans1: 1行目の答え
+                ans2: 2行目の答え
+                key: dictのkey
+            """
+            with self.subTest(info=f'row1 {key}'):
+                data1 = player_info1[f'{key}']
+                self.assertEqual(ans1, data1)
+            with self.subTest(info=f'row2 {key}'):
+                data2 = player_info2[f'{key}']
+                self.assertEqual(ans2, data2)
+
         # name
-        with self.subTest(info='row1 name'):
-            name = player_info1['name']
-            self.assertEqual("鈴木裕隆", name)
-        with self.subTest(info='row2 name'):
-            name = player_info2['name']
-            self.assertEqual("小林晋", name)
-
+        __test_content("鈴木裕隆", "小林晋", 'name')
         # 登録番号
-        with self.subTest(info='row1 id'):
-            player_id = player_info1['id']
-            self.assertEqual(4231, player_id)
-        with self.subTest(info='row2 id'):
-            player_id = player_info2['id']
-            self.assertEqual(4026, player_id)
-
+        __test_content(4231, 4026, 'id')
         # 級
-        with self.subTest(info='row1 level'):
-            player_level = player_info1['level']
-            self.assertEqual('B1', player_level)
-        with self.subTest(info='row2 level'):
-            player_level = player_info2['level']
-            self.assertEqual('B1', player_level)
-
+        __test_content('B1', 'B1', 'level')
         # 支部
-        with self.subTest(info='row1 home'):
-            player_home = player_info1['home']
-            self.assertEqual('愛知', player_home)
-        with self.subTest(info='row2 home'):
-            player_home = player_info2['home']
-            self.assertEqual('東京', player_home)
-
+        __test_content('愛知', '東京', 'home')
         # 出身地
-        with self.subTest(info='row1 birth place'):
-            player_bp = player_info1['birth_place']
-            self.assertEqual('愛知', player_bp)
-        with self.subTest(info='row2 birth place'):
-            player_bp = player_info2['birth_place']
-            self.assertEqual('東京', player_bp)
-
+        __test_content('愛知', '東京', 'birth_place')
         # 年齢
-        with self.subTest(info='row1 age'):
-            player_age = player_info1['age']
-            self.assertEqual(36, player_age)
-        with self.subTest(info='row2 age'):
-            player_age = player_info2['age']
-            self.assertEqual(42, player_age)
-
+        __test_content(36, 42, 'age')
         # 体重
-        with self.subTest(info='row1 weight'):
-            player_w = player_info1['weight']
-            self.assertEqual(57.0, player_w)
-        with self.subTest(info='row2 weight'):
-            player_w = player_info2['weight']
-            self.assertEqual(53.9, player_w)
+        __test_content(57.0, 53.9, 'weight')
+        # # F数
+        # __test_content(0, 0, 'num_F')
 
 
 if __name__ == '__main__':
