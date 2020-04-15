@@ -53,6 +53,7 @@ class OfficialProgram:
         home, birth_place = __place.split('/')
         # 年齢:age，体重:weight
         age, weight = __age_weight.split('/')
+        # 数字だけ抜く
         age = re.match(r'[0-9]+', age)
         age = int(age.group(0))
         weight = re.match(r'[0-9]+\.[0-9]', weight)
