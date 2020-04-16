@@ -9,6 +9,15 @@ import re
 
 class OfficialProgram:
     def __init__(self, target_url: str) -> None:
+        """
+        競艇公式サイトの番組表からのデータ取得
+
+        Parameters
+        ----------
+        target_url : str
+            公式サイト番組表のurl
+        """
+
         # htmlをload
         __html_content = urlopen(target_url).read()
         __soup = BeautifulSoup(__html_content, 'html.parser')
@@ -70,6 +79,13 @@ class OfficialProgram:
         num_L = int(re.sub(r'[a-z, A-Z]', '', __flst_list[1]))
         avg_ST = float(re.sub(r'[a-z, A-Z]', '', __flst_list[2]))
 
+        # 全国勝率・連対率は5番目
+        __all_123_rate = __player_info_list[4]
+        __all_123_list = __all_123_rate.text.replace(' ', '')\
+                                            .split('\r\n')[1:-1]
+        all_1rate, all_2rate, all_3rate = \
+            list(map(lambda x: float(x), __all_123_list))
+
         content_dict = {
             'name': name,
             'id': player_id,
@@ -80,7 +96,10 @@ class OfficialProgram:
             'weight': weight,
             'num_F': num_F,
             'num_L': num_L,
-            'avg_ST': avg_ST
+            'avg_ST': avg_ST,
+            'all_1rate': all_1rate,
+            'all_2rate': all_2rate,
+            'all_3rate': all_3rate,
         }
 
         return content_dict
@@ -138,6 +157,12 @@ class GetDataTest(unittest.TestCase):
         __test_content(0, 0, 'num_L')
         # 平均ST
         __test_content(0.21, 0.20, 'avg_ST')
+        # 全国勝率
+        __test_content(4.81, 4.24, 'all_1rate')
+        # 全国2率
+        __test_content(29.47, 20.34, 'all_2rate')
+        # 全国3率
+        __test_content(46.32, 32.20, 'all_3rate')
 
 
 if __name__ == '__main__':
