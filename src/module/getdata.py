@@ -3,7 +3,8 @@
 # from module import const
 import unittest
 from urllib.request import urlopen
-from bs4 import BeautifulSoup
+import bs4
+from bs4 import BeautifulSoup as bs
 import re
 
 
@@ -20,7 +21,7 @@ class OfficialProgram:
 
         # htmlをload
         __html_content = urlopen(target_url).read()
-        __soup = BeautifulSoup(__html_content, 'html.parser')
+        __soup = bs(__html_content, 'html.parser')
         # 番組表を選択 css selectorより
         __target_table_selector = \
             'body > main > div > div > '\
@@ -71,9 +72,7 @@ class OfficialProgram:
 
         # F/L/ST平均は4番目
         __flst = __player_info_list[3]
-        __flst_list = __flst.text.replace(' ', '').split('\r\n')[1:-1]
-        assert len(__flst_list) == 3,\
-            f"lengh is not 3:{len(__flst_list)}"
+        __flst_list = self.__text2list_rn_split(__flst, 3)
         # 数字のみ抜き出してキャスト
         num_F = int(re.sub(r'[a-z, A-Z]', '', __flst_list[0]))
         num_L = int(re.sub(r'[a-z, A-Z]', '', __flst_list[1]))
@@ -81,10 +80,29 @@ class OfficialProgram:
 
         # 全国勝率・連対率は5番目
         __all_123_rate = __player_info_list[4]
-        __all_123_list = __all_123_rate.text.replace(' ', '')\
-                                            .split('\r\n')[1:-1]
+        __all_123_list = self.__text2list_rn_split(__all_123_rate, 3)
         all_1rate, all_2rate, all_3rate = \
             list(map(lambda x: float(x), __all_123_list))
+
+        # 当地勝率・連対率は6番目
+        __local_123_rate = __player_info_list[5]
+        __local_123_list = self.__text2list_rn_split(__local_123_rate, 3)
+        local_1rate, local_2rate, local_3rate = \
+            list(map(lambda x: float(x), __local_123_list))
+
+        # モーター情報は7番目
+        __motor_info = __player_info_list[6]
+        __motor_info_list = self.__text2list_rn_split(__motor_info, 3)
+        motor_no = int(__motor_info_list[0])
+        motor_2rate = float(__motor_info_list[1])
+        motor_3rate = float(__motor_info_list[2])
+
+        # ボート情報は8番目
+        __boat_info = __player_info_list[7]
+        __boat_info_list = self.__text2list_rn_split(__boat_info, 3)
+        boat_no = int(__boat_info_list[0])
+        boat_2rate = float(__boat_info_list[1])
+        boat_3rate = float(__boat_info_list[2])
 
         content_dict = {
             'name': name,
@@ -100,9 +118,42 @@ class OfficialProgram:
             'all_1rate': all_1rate,
             'all_2rate': all_2rate,
             'all_3rate': all_3rate,
+            'local_1rate': local_1rate,
+            'local_2rate': local_2rate,
+            'local_3rate': local_3rate,
+            'motor_no': motor_no,
+            'motor_2rate': motor_2rate,
+            'motor_3rate': motor_3rate,
+            'boat_no': boat_no,
+            'boat_2rate': boat_2rate,
+            'boat_3rate': boat_3rate
         }
 
         return content_dict
+
+    def __text2list_rn_split(self,
+                             input_content: bs4.element.Tag,
+                             expect_length: int) -> list:
+        """
+        スクレイピングしたときスペースと\\r\\nで区切られた文字列をリスト化する
+
+        Parameters
+        ----------
+        input_content : beautifulsoup.element.Tag
+            入力するパースした要素
+        expect_length : int
+            期待する返却リストの長さ
+
+        Return
+        ------
+        output_list : list
+            返却するリスト
+        """
+        output_list = input_content.text.replace(' ', '')\
+                                        .split('\r\n')[1:-1]
+        assert len(output_list) == expect_length,\
+            f"lengh is not {expect_length}:{len(output_list)}"
+        return output_list
 
 
 class GetDataTest(unittest.TestCase):
@@ -163,6 +214,24 @@ class GetDataTest(unittest.TestCase):
         __test_content(29.47, 20.34, 'all_2rate')
         # 全国3率
         __test_content(46.32, 32.20, 'all_3rate')
+        # 当地勝率
+        __test_content(5.00, 4.04, 'local_1rate')
+        # 当地2率
+        __test_content(33.33, 17.39, 'local_2rate')
+        # 当地3率
+        __test_content(60.00, 34.78, 'local_3rate')
+        # モーターNo
+        __test_content(23, 21, 'motor_no')
+        # モーター2率
+        __test_content(54.66, 27.00, 'motor_2rate')
+        # モーター3率
+        __test_content(72.46, 46.84, 'motor_3rate')
+        # ボートNo
+        __test_content(34, 73, 'boat_no')
+        # ボート率
+        __test_content(15.05, 32.32, 'boat_2rate')
+        # ボート3率
+        __test_content(33.33, 52.53, 'boat_3rate')
 
 
 if __name__ == '__main__':
