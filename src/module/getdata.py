@@ -29,7 +29,8 @@ class OfficialProgram:
         # 選手情報は1番目のtr
         __player_info = __player_html.select_one("tr")
         __player_info_list = __player_info.select("td")
-        # 名前，登録番号などの欄は2番目
+
+        # 名前，登録番号などの欄は3番目
         player_name_list = __player_info_list[2].select("div")
         assert len(player_name_list) == 3, \
             f'elements of player name info is not 3: {len(player_name_list)}'
@@ -59,6 +60,16 @@ class OfficialProgram:
         weight = re.match(r'[0-9]+\.[0-9]', weight)
         weight = float(weight.group(0))
 
+        # F/L/ST平均は4番目
+        __flst = __player_info_list[3]
+        __flst_list = __flst.text.replace(' ', '').split('\r\n')[1:-1]
+        assert len(__flst_list) == 3,\
+            f"lengh is not 3:{len(__flst_list)}"
+        # 数字のみ抜き出してキャスト
+        num_F = int(re.sub(r'[a-z, A-Z]', '', __flst_list[0]))
+        num_L = int(re.sub(r'[a-z, A-Z]', '', __flst_list[1]))
+        avg_ST = float(re.sub(r'[a-z, A-Z]', '', __flst_list[2]))
+
         content_dict = {
             'name': name,
             'id': player_id,
@@ -67,7 +78,9 @@ class OfficialProgram:
             'birth_place': birth_place,
             'age': age,
             'weight': weight,
-            'num_F': None
+            'num_F': num_F,
+            'num_L': num_L,
+            'avg_ST': avg_ST
         }
 
         return content_dict
@@ -119,8 +132,12 @@ class GetDataTest(unittest.TestCase):
         __test_content(36, 42, 'age')
         # 体重
         __test_content(57.0, 53.9, 'weight')
-        # # F数
-        # __test_content(0, 0, 'num_F')
+        # F数
+        __test_content(0, 0, 'num_F')
+        # L数
+        __test_content(0, 0, 'num_L')
+        # 平均ST
+        __test_content(0.21, 0.20, 'avg_ST')
 
 
 if __name__ == '__main__':
