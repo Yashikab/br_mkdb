@@ -9,18 +9,29 @@ import re
 
 
 class OfficialProgram:
-    def __init__(self, target_url: str) -> None:
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 day: int) -> None:
         """
         競艇公式サイトの番組表からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
 
         Parameters
         ----------
-        target_url : str
-            公式サイト番組表のurl
+        race_no : int
+            何レース目か
+        jyo_code : int
+            会場コード
+        day : int
+            yyyymmdd形式で入力
+
         """
 
         # htmlをload
-        __html_content = urlopen(target_url).read()
+        base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
+        __target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
+        __html_content = urlopen(__target_url).read()
         __soup = bs(__html_content, 'html.parser')
         # 番組表を選択 css selectorより
         __target_table_selector = \
@@ -161,11 +172,17 @@ class GetDataTest(unittest.TestCase):
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
     番組表
     '''
+
     # 選手情報の取得
     def test_getplayer_info(self):
-        self.sample_url = 'http://boatrace.jp/owpc/pc/race/racelist?'\
-                          'rno=3&jcd=06&hd=20200408'
-        op = OfficialProgram(self.sample_url)
+        # 3R
+        self.race_no = 3
+        # place : hamanako 06
+        self.jyo_code = 6
+        # day 2020/04/08
+        self.day = 20200408
+
+        op = OfficialProgram(self.race_no, self.jyo_code, self.day)
         # 1列目
         player_info1 = op.getplayerinfo2dict(row=1)
         # 2列目
