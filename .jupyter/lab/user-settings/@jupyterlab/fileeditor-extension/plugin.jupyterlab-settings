@@ -1,0 +1,13 @@
+{    "editorConfig": {
+      "autoClosingBrackets": true,
+      "fontFamily": "Ricty Diminished Discord",
+      "fontSize": 14,
+      "lineHeight": null,
+      "lineNumbers": true,
+      "lineWrap": "on",
+      "matchBrackets": true,
+      "readOnly": false,
+      "insertSpaces": true,
+      "tabSize": 4,
+      "wordWrapColumn": 80
+    }}

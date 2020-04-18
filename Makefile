@@ -1,14 +1,13 @@
 # Makefile
 
-pathtodocker = ./docker
-targetdocker = $(pathtodocker)/docker-compose.yml
+targetdocker = docker-compose.yml
 servicename = boatracedocker
 
 start: $(targetdocker)
-	docker-compose -f $(targetdocker) start
+	docker-compose -f $(targetdocker) up -d
 
 bash: $(pathtodocker)
-	cd $(pathtodocker); docker-compose exec $(servicename) bash
+	docker-compose exec $(servicename) bash
 
 stop: $(targetdocker)
 	docker-compose -f $(targetdocker) stop

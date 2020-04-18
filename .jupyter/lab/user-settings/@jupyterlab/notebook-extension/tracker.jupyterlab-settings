@@ -1,0 +1,14 @@
+{    "codeCellConfig": {
+      "autoClosingBrackets": true,
+      "fontFamily": "Ricty Diminished Discord",
+      "fontSize": 16,
+      "lineHeight": null,
+      "lineNumbers": true,
+      "lineWrap": "off",
+      "matchBrackets": true,
+      "readOnly": false,
+      "insertSpaces": true,
+      "tabSize": 4,
+      "wordWrapColumn": 80
+    }
+}
