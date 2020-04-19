@@ -23,6 +23,8 @@ class : OfficialProgram
 
 class : OfficialChokuzen
 
+def : player_chokuzen
+
 - [ ] 各選手の直前情報
   - [ ] 体重・調整重量
     - [ ] 1行目
@@ -32,6 +34,8 @@ class : OfficialChokuzen
     - [ ] 5行目 （F処理）
   - [ ] チルト
   - [ ] スタート展示
+
+def : condition_chokuzen
 
 - [ ] 水面気象情報
   - [ ] 気温

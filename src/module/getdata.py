@@ -250,6 +250,15 @@ class GetDataTest(unittest.TestCase):
         # ボート3率
         __test_content(33.33, 52.53, 'boat_3rate')
 
+    # 直前情報の取得
+    def test_chokuzen_info(self):
+        # 3R
+        self.race_no = 3
+        # place : hamanako 06
+        self.jyo_code = 6
+        # day 2020/04/08
+        self.day = 20200408
+
 
 if __name__ == '__main__':
     unittest.main()
