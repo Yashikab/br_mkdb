@@ -16,7 +16,7 @@ make stop
 
 ## pipenvによる実行
 
-'''sh
+```sh
 pipenv install
 pipenv run python src/hogehoge.py
-'''
+```
