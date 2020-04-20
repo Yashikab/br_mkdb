@@ -237,7 +237,6 @@ class TestGetData:
         ('boat_2rate', 1, 32.32),
         ('boat_3rate', 0, 33.33),
         ('boat_3rate', 1, 52.53)
-
     ])
     def test_name(self, target, idx, expected, programinfo):
         assert programinfo[idx][target] == expected
