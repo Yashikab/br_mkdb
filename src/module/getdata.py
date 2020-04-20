@@ -1,7 +1,7 @@
 # python 3.7.5
 # coding: utf-8
 # from module import const
-import unittest
+import pytest
 from urllib.request import urlopen
 import bs4
 from bs4 import BeautifulSoup as bs
@@ -167,14 +167,15 @@ class OfficialProgram:
         return output_list
 
 
-class GetDataTest(unittest.TestCase):
+class TestGetData:
     '''
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
     番組表
     '''
 
     # 選手情報の取得
-    def test_getplayer_info(self):
+    @pytest.fixture(scope='class')
+    def programinfo(self):
         # 3R
         self.race_no = 3
         # place : hamanako 06
@@ -184,81 +185,68 @@ class GetDataTest(unittest.TestCase):
 
         op = OfficialProgram(self.race_no, self.jyo_code, self.day)
         # 1列目
-        player_info1 = op.getplayerinfo2dict(row=1)
+        sample_info1 = op.getplayerinfo2dict(row=1)
         # 2列目
-        player_info2 = op.getplayerinfo2dict(row=2)
+        sample_info2 = op.getplayerinfo2dict(row=2)
 
-        def __test_content(ans1, ans2, key):
-            """
-            2行テストする
+        return (sample_info1, sample_info2)
 
-            Parameters
-            ----------
-                ans1: 1行目の答え
-                ans2: 2行目の答え
-                key: dictのkey
-            """
-            with self.subTest(info=f'row1 {key}'):
-                data1 = player_info1[f'{key}']
-                self.assertEqual(ans1, data1)
-            with self.subTest(info=f'row2 {key}'):
-                data2 = player_info2[f'{key}']
-                self.assertEqual(ans2, data2)
+    # 公式番組表に関するテスト
+    @pytest.mark.parametrize("target, idx, expected", [
+        ('name', 0, "鈴木裕隆"),
+        ('name', 1, "小林晋"),
+        ('id', 0, 4231),
+        ('id', 1, 4026),
+        ('level', 0, 'B1'),
+        ('level', 1, 'B1'),
+        ('home', 0, '愛知'),
+        ('home', 1, '東京'),
+        ('birth_place', 0, '愛知'),
+        ('birth_place', 1, '東京'),
+        ('age', 0, 36),
+        ('age', 1, 42),
+        ('weight', 0, 57.0),
+        ('weight', 1, 53.9),
+        ('num_F', 0, 0),
+        ('num_F', 1, 0),
+        ('num_L', 0, 0),
+        ('num_L', 1, 0),
+        ('avg_ST', 0, 0.21),
+        ('avg_ST', 1, 0.20),
+        ('all_1rate', 0, 4.81),
+        ('all_1rate', 1, 4.24),
+        ('all_2rate', 0, 29.47),
+        ('all_2rate', 1, 20.34),
+        ('all_3rate', 0, 46.32),
+        ('all_3rate', 1, 32.20),
+        ('local_1rate', 0, 5.00),
+        ('local_1rate', 1, 4.04),
+        ('local_2rate', 0, 33.33),
+        ('local_2rate', 1, 17.39),
+        ('local_3rate', 0, 60.00),
+        ('local_3rate', 1, 34.78),
+        ('motor_no', 0, 23),
+        ('motor_no', 1, 21),
+        ('motor_2rate', 0, 54.66),
+        ('motor_2rate', 1, 27.00),
+        ('motor_3rate', 0, 72.46),
+        ('motor_3rate', 1, 46.84),
+        ('boat_no', 0, 34),
+        ('boat_no', 1, 73),
+        ('boat_2rate', 0, 15.05),
+        ('boat_2rate', 1, 32.32),
+        ('boat_3rate', 0, 33.33),
+        ('boat_3rate', 1, 52.53)
 
-        # name
-        __test_content("鈴木裕隆", "小林晋", 'name')
-        # 登録番号
-        __test_content(4231, 4026, 'id')
-        # 級
-        __test_content('B1', 'B1', 'level')
-        # 支部
-        __test_content('愛知', '東京', 'home')
-        # 出身地
-        __test_content('愛知', '東京', 'birth_place')
-        # 年齢
-        __test_content(36, 42, 'age')
-        # 体重
-        __test_content(57.0, 53.9, 'weight')
-        # F数
-        __test_content(0, 0, 'num_F')
-        # L数
-        __test_content(0, 0, 'num_L')
-        # 平均ST
-        __test_content(0.21, 0.20, 'avg_ST')
-        # 全国勝率
-        __test_content(4.81, 4.24, 'all_1rate')
-        # 全国2率
-        __test_content(29.47, 20.34, 'all_2rate')
-        # 全国3率
-        __test_content(46.32, 32.20, 'all_3rate')
-        # 当地勝率
-        __test_content(5.00, 4.04, 'local_1rate')
-        # 当地2率
-        __test_content(33.33, 17.39, 'local_2rate')
-        # 当地3率
-        __test_content(60.00, 34.78, 'local_3rate')
-        # モーターNo
-        __test_content(23, 21, 'motor_no')
-        # モーター2率
-        __test_content(54.66, 27.00, 'motor_2rate')
-        # モーター3率
-        __test_content(72.46, 46.84, 'motor_3rate')
-        # ボートNo
-        __test_content(34, 73, 'boat_no')
-        # ボート率
-        __test_content(15.05, 32.32, 'boat_2rate')
-        # ボート3率
-        __test_content(33.33, 52.53, 'boat_3rate')
+    ])
+    def test_name(self, target, idx, expected, programinfo):
+        assert programinfo[idx][target] == expected
 
-    # 直前情報の取得
-    def test_chokuzen_info(self):
-        # 3R
-        self.race_no = 3
-        # place : hamanako 06
-        self.jyo_code = 6
-        # day 2020/04/08
-        self.day = 20200408
-
-
-if __name__ == '__main__':
-    unittest.main()
+    # # 直前情報の取得
+    # def test_chokuzen_info(self):
+    #     # 3R
+    #     self.race_no = 3
+    #     # place : hamanako 06
+    #     self.jyo_code = 6
+    #     # day 2020/04/08
+    #     self.day = 20200408
