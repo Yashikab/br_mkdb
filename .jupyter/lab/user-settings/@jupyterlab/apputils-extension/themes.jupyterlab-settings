@@ -14,7 +14,7 @@
 
     // Selected Theme
     // Application-level visual styling theme
-    "theme": "base16-monokai",
+    "theme": "JupyterLab Dark",
 
     // Scrollbar Theming
     // Enable/disable styling of the application scrollbars
