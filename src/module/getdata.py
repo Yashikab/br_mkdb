@@ -176,6 +176,11 @@ class TestGetData:
     # 選手情報の取得
     @pytest.fixture(scope='class')
     def programinfo(self):
+        """
+        テスト用前処理
+        公式サイトの番組表から選手欄の情報を選手毎に抜くテスト
+        2020 4月8日 浜名湖(06) 3レースの情報
+        """
         # 3R
         self.race_no = 3
         # place : hamanako 06
