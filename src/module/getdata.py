@@ -65,8 +65,9 @@ class CommonMethods4Official:
     def rmletter2float(self, in_str: str) -> float:
         """
         文字列から文字を取り除き少数で返す
+        マイナス表記は残す
         """
-        in_str = re.match(r'[0-9]+\.[0-9]', in_str)
+        in_str = re.match(r'-*[0-9]+\.[0-9]+', in_str)
         out_float = float(in_str.group(0))
         return out_float
 
@@ -251,23 +252,43 @@ class OfficialChokuzen(CommonMethods4Official):
         weight = __p_chokuzen_list[3].text
         # 'kg'を取り除く
         weight = super().rmletter2float(weight)
-
+        # 調整体重だけ3番目のtr, 1番目td
+        __p_chokuzen4chosei = __p_html.select("tr")[2]
+        chosei_weight = __p_chokuzen4chosei.select_one("td").text
+        chosei_weight = super().rmletter2float(chosei_weight)
+        # 展示タイムは5番目td (調整体重の方じゃないので注意)
+        tenji_T = __p_chokuzen_list[4].text
+        tenji_T = super().rmletter2float(tenji_T)
+        # チルトは6番目
+        tilt = __p_chokuzen_list[5].text
+        tilt = super().rmletter2float(tilt)
         content_dict = {
             'name': name,
-            'weight': weight
+            'weight': weight,
+            'chosei_weight': chosei_weight,
+            'tenji_T': tenji_T,
+            'tilt': tilt
         }
         return content_dict
 
 
 class TestGetData:
     '''
-    2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
     番組表\n
+    2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
+    直前情報\n
+    枠なりじゃないF処理を見たいので9レースでの実行
     '''
 
-    @pytest.fixture(scope='module')
-    def raceinfo4test(self):
+    # 選手番組情報の取得のための前処理
+    @pytest.fixture(scope='class')
+    def programinfo(self):
+        """
+        テスト用前処理
+        公式サイトの番組表から選手欄の情報を選手毎に抜くテスト
+
+        """
         # 3R
         self.race_no = 3
         # place : hamanako 06
@@ -275,14 +296,6 @@ class TestGetData:
         # day 2020/04/08
         self.day = 20200408
 
-    # 選手番組情報の取得のための前処理
-    @pytest.fixture(scope='class')
-    def programinfo(self, raceinfo4test):
-        """
-        テスト用前処理
-        公式サイトの番組表から選手欄の情報を選手毎に抜くテスト
-
-        """
         op = OfficialProgram(self.race_no, self.jyo_code, self.day)
         # 1行目
         sample_info1 = op.getplayerinfo2dict(row=1)
@@ -293,12 +306,19 @@ class TestGetData:
 
     # 選手直前情報取得のための前処理
     @pytest.fixture(scope='class')
-    def p_chokuzen(self, raceinfo4test):
+    def p_chokuzen(self):
+        # 5R
+        self.race_no = 9
+        # place : hamanako 06
+        self.jyo_code = 6
+        # day 2020/04/08
+        self.day = 20200408
+
         och = OfficialChokuzen(self.race_no, self.jyo_code, self.day)
         # 1行目
         p_chokuzen1 = och.getplayerinfo2dict(row=1)
-        # 2行目
-        p_chokuzen2 = och.getplayerinfo2dict(row=2)
+        # 6行目
+        p_chokuzen2 = och.getplayerinfo2dict(row=6)
 
         return (p_chokuzen1, p_chokuzen2)
 
@@ -353,11 +373,18 @@ class TestGetData:
         assert programinfo[idx][target] == expected
 
     # 直前情報の取得
+    # 1行目と6行目みてるので注意
     @pytest.mark.parametrize("target, idx, expected", [
-        ('name', 0, "鈴木裕隆"),
-        ('name', 1, "小林晋"),
-        ('weight', 0, 57.0),
-        ('weight', 1, 53.9)
+        ('name', 0, "一瀬明"),
+        ('name', 1, "濱本優一"),
+        ('weight', 0, 51.6),
+        ('weight', 1, 49.5),
+        ('chosei_weight', 0, 0.0),
+        ('chosei_weight', 1, 1.5),
+        ('tenji_T', 0, 6.63),
+        ('tenji_T', 1, 6.64),
+        ('tilt', 0, -0.5),
+        ('tilt', 1, -0.5)
     ])
     def test_p_chokuzen(self, target, idx, expected, p_chokuzen):
         assert p_chokuzen[idx][target] == expected
