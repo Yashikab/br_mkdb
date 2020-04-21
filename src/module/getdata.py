@@ -8,7 +8,70 @@ from bs4 import BeautifulSoup as bs
 import re
 
 
-class OfficialProgram:
+class CommonMethods4Official:
+
+    def url2soup(self, url):
+        __html_content = urlopen(url).read()
+        soup = bs(__html_content, 'html.parser')
+        return soup
+
+    def getplayertable2list(self,
+                            soup: bs4.BeautifulSoup,
+                            table_selector: str) -> list:
+        """
+        選手情報のテーブルを抜き出し, 行ごとのリストで返す．
+
+        Parameters
+        ----------
+        soup : bs4.BeautifulSoup
+        table_selector : str
+            bs4用テーブルのセレクタ−
+
+        Returns
+        -------
+        player_html_list : list
+            選手ごとの行のhtmlを格納したリスト
+        """
+        __target_table_html = soup.select_one(table_selector)
+        player_html_list = __target_table_html.select('tbody')
+        assert len(player_html_list) == 6, \
+            f"lengh is not 6:{len(player_html_list)}"
+        return player_html_list
+
+    def text2list_rn_split(self,
+                           input_content: bs4.element.Tag,
+                           expect_length: int) -> list:
+        """
+        スクレイピングしたときスペースと\\r\\nで区切られた文字列をリスト化する
+
+        Parameters
+        ----------
+        input_content : beautifulsoup.element.Tag
+            入力するパースした要素
+        expect_length : int
+            期待する返却リストの長さ
+
+        Return
+        ------
+        output_list : list
+            返却するリスト
+        """
+        output_list = input_content.text.replace(' ', '')\
+                                        .split('\r\n')[1:-1]
+        assert len(output_list) == expect_length,\
+            f"lengh is not {expect_length}:{len(output_list)}"
+        return output_list
+
+    def rmletter2float(self, in_str: str) -> float:
+        """
+        文字列から文字を取り除き少数で返す
+        """
+        in_str = re.match(r'[0-9]+\.[0-9]', in_str)
+        out_float = float(in_str.group(0))
+        return out_float
+
+
+class OfficialProgram(CommonMethods4Official):
     def __init__(self,
                  race_no: int,
                  jyo_code: int,
@@ -30,23 +93,22 @@ class OfficialProgram:
 
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
-        __target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
-        __html_content = urlopen(__target_url).read()
-        __soup = bs(__html_content, 'html.parser')
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
+        self.__soup = super().url2soup(target_url)
+
+    def getplayerinfo2dict(self, row: int) -> dict:
         # 番組表を選択 css selectorより
         __target_table_selector = \
             'body > main > div > div > '\
             'div > div.contentsFrame1_inner > '\
             'div.table1.is-tableFixed__3rdadd > table'
-        self.__target_table_html = __soup.select_one(__target_table_selector)
-
-    def getplayerinfo2dict(self, row: int) -> dict:
-        # 各選手の行を選択 -> list
-        player_info_html_list = self.__target_table_html.select('tbody')
-        assert len(player_info_html_list) == 6, \
-            f"lengh is not 6:{len(player_info_html_list)}"
+        __player_info_html_list = \
+            super().getplayertable2list(
+                self.__soup,
+                __target_table_selector
+            )
         # row は1からなので-1
-        __player_html = player_info_html_list[row - 1]
+        __player_html = __player_info_html_list[row - 1]
         # 選手情報は1番目のtr
         __player_info = __player_html.select_one("tr")
         __player_info_list = __player_info.select("td")
@@ -78,12 +140,11 @@ class OfficialProgram:
         # 数字だけ抜く
         age = re.match(r'[0-9]+', age)
         age = int(age.group(0))
-        weight = re.match(r'[0-9]+\.[0-9]', weight)
-        weight = float(weight.group(0))
+        weight = super().rmletter2float(weight)
 
         # F/L/ST平均は4番目
         __flst = __player_info_list[3]
-        __flst_list = self.__text2list_rn_split(__flst, 3)
+        __flst_list = super().text2list_rn_split(__flst, 3)
         # 数字のみ抜き出してキャスト
         num_F = int(re.sub(r'[a-z, A-Z]', '', __flst_list[0]))
         num_L = int(re.sub(r'[a-z, A-Z]', '', __flst_list[1]))
@@ -91,26 +152,26 @@ class OfficialProgram:
 
         # 全国勝率・連対率は5番目
         __all_123_rate = __player_info_list[4]
-        __all_123_list = self.__text2list_rn_split(__all_123_rate, 3)
+        __all_123_list = super().text2list_rn_split(__all_123_rate, 3)
         all_1rate, all_2rate, all_3rate = \
             list(map(lambda x: float(x), __all_123_list))
 
         # 当地勝率・連対率は6番目
         __local_123_rate = __player_info_list[5]
-        __local_123_list = self.__text2list_rn_split(__local_123_rate, 3)
+        __local_123_list = super().text2list_rn_split(__local_123_rate, 3)
         local_1rate, local_2rate, local_3rate = \
             list(map(lambda x: float(x), __local_123_list))
 
         # モーター情報は7番目
         __motor_info = __player_info_list[6]
-        __motor_info_list = self.__text2list_rn_split(__motor_info, 3)
+        __motor_info_list = super().text2list_rn_split(__motor_info, 3)
         motor_no = int(__motor_info_list[0])
         motor_2rate = float(__motor_info_list[1])
         motor_3rate = float(__motor_info_list[2])
 
         # ボート情報は8番目
         __boat_info = __player_info_list[7]
-        __boat_info_list = self.__text2list_rn_split(__boat_info, 3)
+        __boat_info_list = super().text2list_rn_split(__boat_info, 3)
         boat_no = int(__boat_info_list[0])
         boat_2rate = float(__boat_info_list[1])
         boat_3rate = float(__boat_info_list[2])
@@ -142,45 +203,71 @@ class OfficialProgram:
 
         return content_dict
 
-    def __text2list_rn_split(self,
-                             input_content: bs4.element.Tag,
-                             expect_length: int) -> list:
+
+class OfficialChokuzen(CommonMethods4Official):
+
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 day: int) -> None:
         """
-        スクレイピングしたときスペースと\\r\\nで区切られた文字列をリスト化する
+        競艇公式サイトの直前情報からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
 
         Parameters
         ----------
-        input_content : beautifulsoup.element.Tag
-            入力するパースした要素
-        expect_length : int
-            期待する返却リストの長さ
+        race_no : int
+            何レース目か
+        jyo_code : int
+            会場コード
+        day : int
+            yyyymmdd形式で入力
 
-        Return
-        ------
-        output_list : list
-            返却するリスト
         """
-        output_list = input_content.text.replace(' ', '')\
-                                        .split('\r\n')[1:-1]
-        assert len(output_list) == expect_length,\
-            f"lengh is not {expect_length}:{len(output_list)}"
-        return output_list
+        # htmlをload
+        base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
+        self.__soup = super().url2soup(target_url)
+
+    def getplayerinfo2dict(self, row: int) -> dict:
+        # 選手直前情報を選択 css selectorより
+        __target_table_selector = \
+            'body > main > div > div > div > div.contentsFrame1_inner > '\
+            'div.grid.is-type3.h-clear > div:nth-child(1) > div.table1 > table'
+        __p_chokuzen_html_list = \
+            super().getplayertable2list(
+                self.__soup,
+                __target_table_selector
+            )
+        __p_html = __p_chokuzen_html_list[row - 1]
+        # 選手情報は1番目のtr
+        __p_chokuzen = __p_html.select_one("tr")
+        __p_chokuzen_list = __p_chokuzen.select("td")
+
+        # 名前の欄は3番目
+        name = __p_chokuzen_list[2].text.replace('\u3000', '')
+
+        # 体重は4番目
+        weight = __p_chokuzen_list[3].text
+        # 'kg'を取り除く
+        weight = super().rmletter2float(weight)
+
+        content_dict = {
+            'name': name,
+            'weight': weight
+        }
+        return content_dict
 
 
 class TestGetData:
     '''
+    2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
+    番組表\n
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
-    番組表
     '''
 
-    # 選手情報の取得
-    @pytest.fixture(scope='class')
-    def programinfo(self):
-        """
-        テスト用前処理
-        公式サイトの番組表から選手欄の情報を選手毎に抜くテスト
-        2020 4月8日 浜名湖(06) 3レースの情報
-        """
+    @pytest.fixture(scope='module')
+    def raceinfo4test(self):
         # 3R
         self.race_no = 3
         # place : hamanako 06
@@ -188,13 +275,32 @@ class TestGetData:
         # day 2020/04/08
         self.day = 20200408
 
+    # 選手番組情報の取得のための前処理
+    @pytest.fixture(scope='class')
+    def programinfo(self, raceinfo4test):
+        """
+        テスト用前処理
+        公式サイトの番組表から選手欄の情報を選手毎に抜くテスト
+
+        """
         op = OfficialProgram(self.race_no, self.jyo_code, self.day)
-        # 1列目
+        # 1行目
         sample_info1 = op.getplayerinfo2dict(row=1)
-        # 2列目
+        # 2行目
         sample_info2 = op.getplayerinfo2dict(row=2)
 
         return (sample_info1, sample_info2)
+
+    # 選手直前情報取得のための前処理
+    @pytest.fixture(scope='class')
+    def p_chokuzen(self, raceinfo4test):
+        och = OfficialChokuzen(self.race_no, self.jyo_code, self.day)
+        # 1行目
+        p_chokuzen1 = och.getplayerinfo2dict(row=1)
+        # 2行目
+        p_chokuzen2 = och.getplayerinfo2dict(row=2)
+
+        return (p_chokuzen1, p_chokuzen2)
 
     # 公式番組表に関するテスト
     @pytest.mark.parametrize("target, idx, expected", [
@@ -243,14 +349,15 @@ class TestGetData:
         ('boat_3rate', 0, 33.33),
         ('boat_3rate', 1, 52.53)
     ])
-    def test_name(self, target, idx, expected, programinfo):
+    def test_p_inf_program(self, target, idx, expected, programinfo):
         assert programinfo[idx][target] == expected
 
-    # # 直前情報の取得
-    # def test_chokuzen_info(self):
-    #     # 3R
-    #     self.race_no = 3
-    #     # place : hamanako 06
-    #     self.jyo_code = 6
-    #     # day 2020/04/08
-    #     self.day = 20200408
+    # 直前情報の取得
+    @pytest.mark.parametrize("target, idx, expected", [
+        ('name', 0, "鈴木裕隆"),
+        ('name', 1, "小林晋"),
+        ('weight', 0, 57.0),
+        ('weight', 1, 53.9)
+    ])
+    def test_p_chokuzen(self, target, idx, expected, p_chokuzen):
+        assert p_chokuzen[idx][target] == expected
