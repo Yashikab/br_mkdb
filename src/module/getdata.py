@@ -38,6 +38,30 @@ class CommonMethods4Official:
             f"lengh is not 6:{len(player_html_list)}"
         return player_html_list
 
+    def getSTtable2list(self,
+                        soup: bs4.BeautifulSoup,
+                        table_selector: str) -> list:
+        """
+        スタート情報のテーブルを抜き取り行をリストにして返す
+
+        Parameters
+        ----------
+        soup : bs4.BeautifulSoup
+        table_selector: str
+            スタート情報のテーブル
+
+        Returns
+        -------
+        st_html_list : list
+            テーブルの行ごとのhtmlリスト
+        """
+        __target_table_html = soup.select_one(table_selector)
+        __st_html = __target_table_html.select_one('tbody')
+        st_html_list = __st_html.select('tr')
+        assert len(st_html_list) == 6, \
+            f"lengh is not 6:{len(st_html_list)}"
+        return st_html_list
+
     def text2list_rn_split(self,
                            input_content: bs4.element.Tag,
                            expect_length: int) -> list:
@@ -67,7 +91,7 @@ class CommonMethods4Official:
         文字列から文字を取り除き少数で返す
         マイナス表記は残す
         """
-        in_str = re.match(r'-*[0-9]+\.[0-9]+', in_str)
+        in_str = re.search(r'-*[0-9]*\.[0-9]+', in_str)
         out_float = float(in_str.group(0))
         return out_float
 
@@ -232,14 +256,15 @@ class OfficialChokuzen(CommonMethods4Official):
 
     def getplayerinfo2dict(self, row: int) -> dict:
         # 選手直前情報を選択 css selectorより
-        __target_table_selector = \
+        __target_p_table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner > '\
             'div.grid.is-type3.h-clear > div:nth-child(1) > div.table1 > table'
         __p_chokuzen_html_list = \
             super().getplayertable2list(
                 self.__soup,
-                __target_table_selector
+                __target_p_table_selector
             )
+
         __p_html = __p_chokuzen_html_list[row - 1]
         # 選手情報は1番目のtr
         __p_chokuzen = __p_html.select_one("tr")
@@ -262,12 +287,43 @@ class OfficialChokuzen(CommonMethods4Official):
         # チルトは6番目
         tilt = __p_chokuzen_list[5].text
         tilt = super().rmletter2float(tilt)
+
+        # スタート展示テーブルの選択
+        __target_ST_table_selector = \
+            'body > main > div > div > div > div.contentsFrame1_inner '\
+            '> div.grid.is-type3.h-clear > div:nth-child(2) '\
+            '> div.table1 > table'
+        __tenji_st_html_list = \
+            super().getSTtable2list(
+                self.__soup,
+                __target_ST_table_selector
+            )
+        # コース抜き出し
+        # コースがキーで，号がvalueなので全て抜き出してから逆にする
+        __goutei_list = list(
+            map(lambda x: int(x.select('div > span')[0].text),
+                __tenji_st_html_list))
+        # 0~5のインデックスなので1~6へ変換のため+1
+        __tenji_C_idx = __goutei_list.index(row)
+        tenji_C = __tenji_C_idx + 1
+
+        # 展示ST抜き出し
+        __tenji_st_time_list = list(
+            map(lambda x: x.select('div > span')[2].text,
+                __tenji_st_html_list))
+        # Fをマイナスに変換し，少数化
+        # listのキーはコースであることに注意
+        tenji_ST = __tenji_st_time_list[__tenji_C_idx]
+        tenji_ST = super().rmletter2float(tenji_ST.replace('F', '-'))
+
         content_dict = {
             'name': name,
             'weight': weight,
             'chosei_weight': chosei_weight,
             'tenji_T': tenji_T,
-            'tilt': tilt
+            'tilt': tilt,
+            'tenji_C': tenji_C,
+            'tenji_ST': tenji_ST
         }
         return content_dict
 
@@ -297,12 +353,12 @@ class TestGetData:
         self.day = 20200408
 
         op = OfficialProgram(self.race_no, self.jyo_code, self.day)
-        # 1行目
-        sample_info1 = op.getplayerinfo2dict(row=1)
-        # 2行目
-        sample_info2 = op.getplayerinfo2dict(row=2)
+        # 各行呼び出し可能
+        sample_info = []
+        for i in range(1, 7):
+            sample_info.append(op.getplayerinfo2dict(row=i))
 
-        return (sample_info1, sample_info2)
+        return sample_info
 
     # 選手直前情報取得のための前処理
     @pytest.fixture(scope='class')
@@ -316,11 +372,11 @@ class TestGetData:
 
         och = OfficialChokuzen(self.race_no, self.jyo_code, self.day)
         # 1行目
-        p_chokuzen1 = och.getplayerinfo2dict(row=1)
-        # 6行目
-        p_chokuzen2 = och.getplayerinfo2dict(row=6)
+        p_chokuzen = []
+        for i in range(1, 7):
+            p_chokuzen.append(och.getplayerinfo2dict(row=i))
 
-        return (p_chokuzen1, p_chokuzen2)
+        return p_chokuzen
 
     # 公式番組表に関するテスト
     @pytest.mark.parametrize("target, idx, expected", [
@@ -376,15 +432,19 @@ class TestGetData:
     # 1行目と6行目みてるので注意
     @pytest.mark.parametrize("target, idx, expected", [
         ('name', 0, "一瀬明"),
-        ('name', 1, "濱本優一"),
+        ('name', 5, "濱本優一"),
         ('weight', 0, 51.6),
-        ('weight', 1, 49.5),
+        ('weight', 5, 49.5),
         ('chosei_weight', 0, 0.0),
-        ('chosei_weight', 1, 1.5),
+        ('chosei_weight', 5, 1.5),
         ('tenji_T', 0, 6.63),
-        ('tenji_T', 1, 6.64),
+        ('tenji_T', 5, 6.64),
         ('tilt', 0, -0.5),
-        ('tilt', 1, -0.5)
+        ('tilt', 5, -0.5),
+        ('tenji_C', 0, 1),
+        ('tenji_C', 5, 4),
+        ('tenji_ST', 0, 0.14),
+        ('tenji_ST', 2, -0.04),
     ])
     def test_p_chokuzen(self, target, idx, expected, p_chokuzen):
         assert p_chokuzen[idx][target] == expected

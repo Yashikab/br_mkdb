@@ -25,15 +25,16 @@ class : OfficialChokuzen
 
 def : player_chokuzen
 
-- [ ] 各選手の直前情報
+- [x] 各選手の直前情報
   − [x] 名前
   - [x] 体重
   - [x] 調整重量
   - [x] 展示タイム
   - [x] チルト
-  - [ ] スタート展示
-    - [ ] 1行目
-    - [ ] 5行目 （F処理）
+  - [x] 展示コース
+  - [x] スタート展示
+    - [x] 1行目
+    - [x] 5行目 （F処理）
 def : condition_chokuzen
 
 - [ ] 水面気象情報
