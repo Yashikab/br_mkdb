@@ -327,6 +327,30 @@ class OfficialChokuzen(CommonMethods4Official):
         }
         return content_dict
 
+    def getcondinfo2dict(self) -> dict:
+        """
+        直前情報の水面気象情報を抜き出し，辞書型にする
+        """
+        table_selector = \
+            'body > main > div > div > div > div.contentsFrame1_inner > '\
+            'div.grid.is-type3.h-clear > div:nth-child(2) > div.weather1 > '\
+            'div.weather1_body'
+        __target_table_html = self.__soup.select_one(table_selector)
+        condinfo_html_list = __target_table_html.select('div')
+        assert len(condinfo_html_list) == 12, \
+            f"lengh is not 12:{len(condinfo_html_list)}"
+        # 気温は2番目のdiv
+        __tmp_info_html = condinfo_html_list[1]
+        # spanで情報がとれる (1番目： '気温', 2番目: 数字℃)
+        __tmp_info = __tmp_info_html.select('span')
+        temp = __tmp_info[1].text
+        temp = super().rmletter2float(temp)
+
+        content_dict = {
+            'temp': temp
+        }
+        return content_dict
+
 
 class TestGetData:
     '''
@@ -334,7 +358,8 @@ class TestGetData:
     2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
     直前情報\n
-    枠なりじゃないF処理を見たいので9レースでの実行
+    枠なりじゃないF処理を見たいので9レースでの実行\n
+    http://boatrace.jp/owpc/pc/race/beforeinfo?rno=9&jcd=06&hd=20200408
     '''
 
     # 選手番組情報の取得のための前処理
@@ -361,20 +386,23 @@ class TestGetData:
         return sample_info
 
     # 選手直前情報取得のための前処理
-    @pytest.fixture(scope='class')
-    def p_chokuzen(self):
+    @pytest.fixture(scope='module')
+    def calloch(self):
         # 5R
         self.race_no = 9
         # place : hamanako 06
         self.jyo_code = 6
         # day 2020/04/08
         self.day = 20200408
-
         och = OfficialChokuzen(self.race_no, self.jyo_code, self.day)
+        return och
+
+    @pytest.fixture(scope='class')
+    def p_chokuzen(self, calloch):
         # 1行目
         p_chokuzen = []
         for i in range(1, 7):
-            p_chokuzen.append(och.getplayerinfo2dict(row=i))
+            p_chokuzen.append(calloch.getplayerinfo2dict(row=i))
 
         return p_chokuzen
 
@@ -429,6 +457,7 @@ class TestGetData:
         assert programinfo[idx][target] == expected
 
     # 直前情報の取得
+    # 選手
     # 1行目と6行目みてるので注意
     @pytest.mark.parametrize("target, idx, expected", [
         ('name', 0, "一瀬明"),
@@ -448,3 +477,12 @@ class TestGetData:
     ])
     def test_p_chokuzen(self, target, idx, expected, p_chokuzen):
         assert p_chokuzen[idx][target] == expected
+
+    # 会場コンディション
+    @pytest.mark.parametrize("target, expected", [
+        ('temp', 17.0)
+    ])
+    def test_jyo_chokuzen(self, target, expected, calloch):
+        # cnd_chokuzen = 直前のコンディションの意
+        cnd_chokuzen = calloch.getcondinfo2dict()
+        assert cnd_chokuzen[target] == expected

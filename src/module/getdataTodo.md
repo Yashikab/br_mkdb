@@ -21,6 +21,8 @@ class : OfficialProgram
 
 ## 公式ページの直前情報からのスクレイピング
 
+### 選手に関して
+
 class : OfficialChokuzen
 
 def : player_chokuzen
@@ -35,10 +37,15 @@ def : player_chokuzen
   - [x] スタート展示
     - [x] 1行目
     - [x] 5行目 （F処理）
+
+### 会場状況に関して
+
 def : condition_chokuzen
 
+- 1Rの直前情報が時間により更新されるのかは不明
+- 1Rだけは注意必要
 - [ ] 水面気象情報
-  - [ ] 気温
+  - [x] 気温
   - [ ] 天気
   - [ ] 水温
   - [ ] 風速
