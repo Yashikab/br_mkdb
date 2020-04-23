@@ -91,9 +91,18 @@ class CommonMethods4Official:
         文字列から文字を取り除き少数で返す
         マイナス表記は残す
         """
-        in_str = re.search(r'-*[0-9]*\.[0-9]+', in_str)
+        in_str = re.search(r'-{0,1}[0-9]*\.[0-9]+', in_str)
         out_float = float(in_str.group(0))
         return out_float
+
+    def rmletter2int(self, in_str: str) -> int:
+        """
+        文字列から文字を取り除き整数で返す
+        マイナス表記は残す
+        """
+        in_str = re.search(r'-{0,1}[0-9]+', in_str)
+        out_int = int(in_str.group(0))
+        return out_int
 
 
 class OfficialProgram(CommonMethods4Official):
@@ -345,9 +354,18 @@ class OfficialChokuzen(CommonMethods4Official):
         __tmp_info = __tmp_info_html.select('span')
         temp = __tmp_info[1].text
         temp = super().rmletter2float(temp)
+        # 天気は2番目のdiv
+        __weather_info_html = condinfo_html_list[2]
+        # spanのなか（1個しかない)
+        weather = __weather_info_html.select_one('span').text
+        # 風速は5番目のdiv
+        wind_v = condinfo_html_list[4].select('span')[1].text
+        wind_v = super().rmletter2int(wind_v)
 
         content_dict = {
-            'temp': temp
+            'temp': temp,
+            'weather': weather,
+            'wind_v': wind_v
         }
         return content_dict
 
@@ -480,7 +498,9 @@ class TestGetData:
 
     # 会場コンディション
     @pytest.mark.parametrize("target, expected", [
-        ('temp', 17.0)
+        ('temp', 17.0),
+        ('weather', '晴'),
+        ('wind_v', 4)
     ])
     def test_jyo_chokuzen(self, target, expected, calloch):
         # cnd_chokuzen = 直前のコンディションの意
