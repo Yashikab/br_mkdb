@@ -134,9 +134,10 @@ class TestGetData:
     @pytest.mark.parametrize("target, expected", [
         ('temp', 17.0),
         ('weather', '晴'),
-        ('wind_v', 4),
+        ('wind_v', 4),  # m
         ('w_temp', 16.0),
-        ('w_height', 2)
+        ('wave', 2),  # cm
+        ('wind_dr', 13)
     ])
     def test_jyo_chokuzen(self, target, expected, calloch):
         # cnd_chokuzen = 直前のコンディションの意

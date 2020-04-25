@@ -373,14 +373,21 @@ class OfficialChokuzen(CommonMethods4Official):
         w_temp = super().rmletter2float(w_temp)
 
         # 波高は10番目のdiv
-        w_height = super().choose_2nd_span(condinfo_html_list[9])
-        w_height = super().rmletter2int(w_height)
+        wave = super().choose_2nd_span(condinfo_html_list[9])
+        wave = super().rmletter2int(wave)
+
+        # 風向きは7番目のdiv
+        # 画像のみの情報なので，16方位の数字（画像の名前）を抜く
+        # p中のクラス名2番目にある
+        wind_dr = condinfo_html_list[6].select_one('p')['class'][1]
+        wind_dr = super().rmletter2int(wind_dr)
 
         content_dict = {
             'temp': temp,
             'weather': weather,
             'wind_v': wind_v,
             'w_temp': w_temp,
-            'w_height': w_height
+            'wave': wave,
+            'wind_dr': wind_dr
         }
         return content_dict
