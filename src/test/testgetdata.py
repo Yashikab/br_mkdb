@@ -33,7 +33,7 @@ class TestOfficialProgram:
         # 各行呼び出し可能
         sample_info = []
         for i in range(1, 7):
-            sample_info.append(op.getplayerinfo2dict(row=i))
+            sample_info.append(op.getplayerinfo2dict(waku=i))
 
         return sample_info
 
@@ -113,7 +113,7 @@ class TestOfficialChokuzen:
         # 1行目
         p_chokuzen = []
         for i in range(1, 7):
-            p_chokuzen.append(calloch.getplayerinfo2dict(row=i))
+            p_chokuzen.append(calloch.getplayerinfo2dict(waku=i))
 
         return p_chokuzen
 

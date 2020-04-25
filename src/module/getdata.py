@@ -139,7 +139,7 @@ class OfficialProgram(CommonMethods4Official):
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
         self.__soup = super().url2soup(target_url)
 
-    def getplayerinfo2dict(self, row: int) -> dict:
+    def getplayerinfo2dict(self, waku: int) -> dict:
         # 番組表を選択 css selectorより
         __target_table_selector = \
             'body > main > div > div > '\
@@ -150,8 +150,8 @@ class OfficialProgram(CommonMethods4Official):
                 self.__soup,
                 __target_table_selector
             )
-        # row は1からなので-1
-        __player_html = __player_info_html_list[row - 1]
+        # waku は1からなので-1
+        __player_html = __player_info_html_list[waku - 1]
         # 選手情報は1番目のtr
         __player_info = __player_html.select_one("tr")
         __player_info_list = __player_info.select("td")
@@ -272,7 +272,7 @@ class OfficialChokuzen(CommonMethods4Official):
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
         self.__soup = super().url2soup(target_url)
 
-    def getplayerinfo2dict(self, row: int) -> dict:
+    def getplayerinfo2dict(self, waku: int) -> dict:
         # 選手直前情報を選択 css selectorより
         __target_p_table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner > '\
@@ -283,7 +283,7 @@ class OfficialChokuzen(CommonMethods4Official):
                 __target_p_table_selector
             )
 
-        __p_html = __p_chokuzen_html_list[row - 1]
+        __p_html = __p_chokuzen_html_list[waku - 1]
         # 選手情報は1番目のtr
         __p_chokuzen = __p_html.select_one("tr")
         __p_chokuzen_list = __p_chokuzen.select("td")
@@ -322,7 +322,7 @@ class OfficialChokuzen(CommonMethods4Official):
             map(lambda x: int(x.select('div > span')[0].text),
                 __tenji_st_html_list))
         # 0~5のインデックスなので1~6へ変換のため+1
-        __tenji_C_idx = __goutei_list.index(row)
+        __tenji_C_idx = __goutei_list.index(waku)
         tenji_C = __tenji_C_idx + 1
 
         # 展示ST抜き出し
