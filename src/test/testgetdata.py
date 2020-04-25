@@ -31,11 +31,11 @@ class TestOfficialProgram:
 
         op = OfficialProgram(self.race_no, self.jyo_code, self.day)
         # 各行呼び出し可能
-        sample_info = []
+        programinfo = []
         for i in range(1, 7):
-            sample_info.append(op.getplayerinfo2dict(waku=i))
+            programinfo.append(op.getplayerinfo2dict(waku=i))
 
-        return sample_info
+        return programinfo
 
     # 公式番組表に関するテスト
     @pytest.mark.parametrize("target, idx, expected", [
