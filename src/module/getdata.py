@@ -1,5 +1,9 @@
 # python 3.7.5
 # coding: utf-8
+"""
+HTMLから情報をスクレイピングするためのモジュール
+"""
+
 from urllib.request import urlopen
 import bs4
 from bs4 import BeautifulSoup as bs
