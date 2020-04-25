@@ -4,16 +4,12 @@ import pytest
 from module.getdata import OfficialProgram, OfficialChokuzen
 
 
-class TestGetData:
-    '''
+class TestOfficialProgram:
+    """
     番組表\n
     2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
-    直前情報\n
-    枠なりじゃないF処理を見たいので9レースでの実行\n
-    http://boatrace.jp/owpc/pc/race/beforeinfo?rno=9&jcd=06&hd=20200408
-    '''
-
+    """
     # 選手番組情報の取得のための前処理
     @pytest.fixture(scope='class')
     def programinfo(self):
@@ -36,27 +32,6 @@ class TestGetData:
             sample_info.append(op.getplayerinfo2dict(row=i))
 
         return sample_info
-
-    # 選手直前情報取得のための前処理
-    @pytest.fixture(scope='module')
-    def calloch(self):
-        # 5R
-        self.race_no = 9
-        # place : hamanako 06
-        self.jyo_code = 6
-        # day 2020/04/08
-        self.day = 20200408
-        och = OfficialChokuzen(self.race_no, self.jyo_code, self.day)
-        return och
-
-    @pytest.fixture(scope='class')
-    def p_chokuzen(self, calloch):
-        # 1行目
-        p_chokuzen = []
-        for i in range(1, 7):
-            p_chokuzen.append(calloch.getplayerinfo2dict(row=i))
-
-        return p_chokuzen
 
     # 公式番組表に関するテスト
     @pytest.mark.parametrize("target, idx, expected", [
@@ -107,6 +82,36 @@ class TestGetData:
     ])
     def test_p_inf_program(self, target, idx, expected, programinfo):
         assert programinfo[idx][target] == expected
+
+
+class TestOfficialChokuzen:
+    '''
+    2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
+    直前情報\n
+    枠なりじゃないF処理を見たいので9レースでの実行\n
+    http://boatrace.jp/owpc/pc/race/beforeinfo?rno=9&jcd=06&hd=20200408
+    '''
+
+    # 選手直前情報取得のための前処理
+    @pytest.fixture(scope='module')
+    def calloch(self):
+        # 5R
+        self.race_no = 9
+        # place : hamanako 06
+        self.jyo_code = 6
+        # day 2020/04/08
+        self.day = 20200408
+        och = OfficialChokuzen(self.race_no, self.jyo_code, self.day)
+        return och
+
+    @pytest.fixture(scope='class')
+    def p_chokuzen(self, calloch):
+        # 1行目
+        p_chokuzen = []
+        for i in range(1, 7):
+            p_chokuzen.append(calloch.getplayerinfo2dict(row=i))
+
+        return p_chokuzen
 
     # 直前情報の取得
     # 選手
