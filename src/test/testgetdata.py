@@ -5,7 +5,7 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module.getdata import OfficialProgram, OfficialChokuzen
+from module import getdata
 
 
 class TestOfficialProgram:
@@ -29,7 +29,8 @@ class TestOfficialProgram:
         # day 2020/04/08
         self.day = 20200408
 
-        op = OfficialProgram(self.race_no, self.jyo_code, self.day)
+        op = getdata.OfficialProgram(
+            self.race_no, self.jyo_code, self.day)
         # 各行呼び出し可能
         programinfo = []
         for i in range(1, 7):
@@ -105,7 +106,8 @@ class TestOfficialChokuzen:
         self.jyo_code = 6
         # day 2020/04/08
         self.day = 20200408
-        och = OfficialChokuzen(self.race_no, self.jyo_code, self.day)
+        och = getdata.OfficialChokuzen(
+            self.race_no, self.jyo_code, self.day)
         return och
 
     @pytest.fixture(scope='class')
@@ -152,3 +154,30 @@ class TestOfficialChokuzen:
         # cnd_chokuzen = 直前のコンディションの意
         cnd_chokuzen = calloch.getcondinfo2dict()
         assert cnd_chokuzen[target] == expected
+
+
+class TestOfficialOdds:
+    '''
+    2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
+    http://boatrace.jp/owpc/pc/race/odds3t?rno=9&jcd=06&hd=20200408
+    '''
+
+    # 選手直前情報取得のための前処理
+    @pytest.fixture(scope='class')
+    def odds(self):
+        # 5R
+        self.race_no = 9
+        # place : hamanako 06
+        self.jyo_code = 6
+        # day 2020/04/08
+        self.day = 20200408
+        odds = getdata.OfficialOdds(
+            self.race_no, self.jyo_code, self.day)
+        return odds
+
+    # 3連単
+    @pytest.mark.parametrize("fst, snd, trd, expected", [
+        (1, 2, 3, 6.5)
+    ])
+    def test_threerentan(self, fst, snd, trd, expected, odds):
+        assert odds.three_rentan()[fst][snd][trd] == expected

@@ -395,3 +395,47 @@ class OfficialChokuzen(CommonMethods4Official):
             'wind_dr': wind_dr
         }
         return content_dict
+
+
+class OfficialOdds(CommonMethods4Official):
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 day: int):
+        # 賭け方によりURLが違うので，関数ごとでURLを設定する
+        self.race_no = race_no
+        self.jyo_code = jyo_code
+        self.day = day
+
+    # 3連単を集計
+    def three_rentan(self) -> dict:
+        # htmlをload
+        base_url = 'https://boatrace.jp/owpc/pc/race/odds3t?'
+        target_url = f'{base_url}rno={self.race_no}&' \
+                     f'jcd={self.jyo_code:02}&hd={self.day}'
+        __soup = super().url2soup(target_url)
+        
+        content_dict = {
+            1: {
+                2: {
+                    3: 6.5
+                }
+            }
+        }
+        return content_dict
+
+    # 3連複を集計
+    def three_renfuku(self):
+        pass
+
+    # 2連単・2連複を集計
+    def two_rentanfuku(self):
+        pass
+
+    # 拡連複を集計
+    def kakurenfuku(self):
+        pass
+
+    # 単勝・複勝
+    def tanfuku(self):
+        pass
