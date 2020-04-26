@@ -8,6 +8,7 @@ from urllib.request import urlopen
 import bs4
 from bs4 import BeautifulSoup as bs
 import re
+import numpy as np
 
 
 class CommonMethods4Official:
@@ -414,14 +415,49 @@ class OfficialOdds(CommonMethods4Official):
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.day}'
         __soup = super().url2soup(target_url)
-        
-        content_dict = {
-            1: {
-                2: {
-                    3: 6.5
-                }
-            }
-        }
+        # oddsテーブルの抜き出し
+        __target_table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(6) > '\
+            'table > tbody'
+        odds_table = __soup.select_one(__target_table_selector)
+
+        # 1行ごとのリスト
+        yoko_list = odds_table.select('tr')
+
+        # oddsPointクラスを抜き，要素を少数に変換してリストで返す
+        def getoddsPoint2floatlist(odds_tr):
+            __html_list = odds_tr.select('td.oddsPoint')
+            __text_list = list(map(lambda x: x.text, __html_list))
+            float_list = list(map(
+                lambda x: float(x), __text_list))
+            return float_list
+
+        # 公式の表と同じオッズ行列 要素はfloat型
+        odds_matrix = list(map(
+            lambda x: getoddsPoint2floatlist(x),
+            yoko_list
+        ))
+        # numpy array化
+        odds_matrix = np.array(odds_matrix)
+        assert odds_matrix.shape == (20, 6)
+        # 転置を取り，つなげてリスト化
+        odds_list = list(odds_matrix.T.reshape(120))
+
+        # 辞書で格納する
+        content_dict = {}
+        for fst in range(1, 7):
+            if fst not in content_dict.keys():
+                content_dict[fst] = {}
+            for snd in range(1, 7):
+                if snd != fst:
+                    if snd not in content_dict[fst].keys():
+                        content_dict[fst][snd] = {}
+                    for trd in range(1, 7):
+                        if trd != fst and trd != snd:
+                            content_dict[fst][snd][trd] = \
+                                odds_list.pop(0)
+
         return content_dict
 
     # 3連複を集計

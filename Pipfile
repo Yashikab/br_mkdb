@@ -10,6 +10,7 @@ pytest = "*"
 [packages]
 beautifulsoup4 = "*"
 request = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"

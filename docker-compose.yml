@@ -15,7 +15,7 @@ services:
     working_dir: /home/contuser1
     environment:
       SHELL: /bin/bash
-      PYTHONPATH: /home/contuser1/codes/:/home/contuser1/codes/module
+      PYTHONPATH: /home/contuser1/src/:/home/contuser1/src/module
       HOME: /home/contuser1
       GRANT_SUDO: "yes"
     ports:

@@ -177,7 +177,10 @@ class TestOfficialOdds:
 
     # 3連単
     @pytest.mark.parametrize("fst, snd, trd, expected", [
-        (1, 2, 3, 6.5)
+        (1, 2, 3, 6.5),
+        (3, 4, 5, 1621.0),
+        (4, 5, 6, 2555.0),
+        (6, 5, 4, 810.9)
     ])
     def test_threerentan(self, fst, snd, trd, expected, odds):
         assert odds.three_rentan()[fst][snd][trd] == expected
