@@ -65,94 +65,6 @@ class CommonMethods4Official:
             f"lengh is not 6:{len(st_html_list)}"
         return st_html_list
 
-    def tanfuku_common(self, num: int, kake: str) -> list:
-        """
-        # 2 3連単，3連複共通部分を関数化
-
-        Parameters
-        ---------
-            num: int
-                2 or 3
-            kake : str
-                rentan or renfuku
-
-        Returns
-        -------
-            odds_matrix : list
-                oddsのリスト（htmlのテーブルと同配列）
-                要素は少数型
-        """
-        assert kake in ['rentan', 'renfuku']
-        assert num in [2, 3]
-        # num = 2ならtypeによらずtype='tf'
-        if num == 2:
-            html_type = 'tf'
-        elif kake == 'rentan':
-            html_type = 't'
-        elif kake == 'renfuku':
-            html_type = 'f'
-
-        # htmlをload
-        base_url = f'https://boatrace.jp/owpc/pc/race/'\
-                   f'odds{num}{html_type}?'
-        target_url = f'{base_url}rno={self.race_no}&' \
-                     f'jcd={self.jyo_code:02}&hd={self.day}'
-        __soup = self.url2soup(target_url)
-        # 3連単と共通--------------------
-        # oddsテーブルの抜き出し
-        if num == 2 and kake == 'renfuku':
-            __target_table_selector = \
-                'body > main > div > div > div > '\
-                'div.contentsFrame1_inner > div:nth-child(8) '\
-                '> table > tbody'
-        else:
-            __target_table_selector = \
-                'body > main > div > div > div > '\
-                'div.contentsFrame1_inner > div:nth-child(6) > '\
-                'table > tbody'
-        odds_table = __soup.select_one(__target_table_selector)
-        # 1行ごとのリスト
-        yoko_list = odds_table.select('tr')
-
-        # oddsPointクラスを抜き，要素を少数に変換してリストで返す
-        def getoddsPoint2floatlist(odds_tr):
-            __html_list = odds_tr.select('td.oddsPoint')
-            __text_list = list(map(lambda x: x.text, __html_list))
-            float_list = list(map(
-                lambda x: float(x), __text_list))
-            return float_list
-
-        odds_matrix = list(map(
-            lambda x: getoddsPoint2floatlist(x),
-            yoko_list
-        ))
-        return odds_matrix
-
-    def rentan_matrix2list(self, odds_matrix: list) -> list:
-        """
-        2 3連単用処理
-        """
-        # numpy array化
-        odds_matrix = np.array(odds_matrix)
-        # 転置を取り，つなげてリスト化
-        odds_list = list(odds_matrix.T.reshape(-1))
-        return odds_list
-
-    def renfuku_matrix2list(self, odds_matrix: list) -> list:
-        """
-        連複用処理
-        """
-        # 1番目の要素から抜いていく -1で空を保管し，filterで除く
-        odds_list = []
-        # 最後のリストが空になるまで回す
-        # 要素があれば条件式は真
-        while odds_matrix[-1]:
-            odds_list += list(map(
-                lambda x: x.pop(0) if len(x) != 0 else -1,
-                odds_matrix))
-        odds_list = list(filter(lambda x: x != -1, odds_list))
-        return odds_list
-
     def text2list_rn_split(self,
                            input_content: bs4.element.Tag,
                            expect_length: int) -> list:
@@ -496,6 +408,94 @@ class OfficialOdds(CommonMethods4Official):
         self.jyo_code = jyo_code
         self.day = day
 
+    def _tanfuku_common(self, num: int, kake: str) -> list:
+        """
+        # 2 3連単，3連複共通部分を関数化
+
+        Parameters
+        ---------
+            num: int
+                2 or 3
+            kake : str
+                rentan or renfuku
+
+        Returns
+        -------
+            odds_matrix : list
+                oddsのリスト（htmlのテーブルと同配列）
+                要素は少数型
+        """
+        assert kake in ['rentan', 'renfuku']
+        assert num in [2, 3]
+        # num = 2ならtypeによらずtype='tf'
+        if num == 2:
+            html_type = 'tf'
+        elif kake == 'rentan':
+            html_type = 't'
+        elif kake == 'renfuku':
+            html_type = 'f'
+
+        # htmlをload
+        base_url = f'https://boatrace.jp/owpc/pc/race/'\
+                   f'odds{num}{html_type}?'
+        target_url = f'{base_url}rno={self.race_no}&' \
+                     f'jcd={self.jyo_code:02}&hd={self.day}'
+        __soup = super().url2soup(target_url)
+        # 3連単と共通--------------------
+        # oddsテーブルの抜き出し
+        if num == 2 and kake == 'renfuku':
+            __target_table_selector = \
+                'body > main > div > div > div > '\
+                'div.contentsFrame1_inner > div:nth-child(8) '\
+                '> table > tbody'
+        else:
+            __target_table_selector = \
+                'body > main > div > div > div > '\
+                'div.contentsFrame1_inner > div:nth-child(6) > '\
+                'table > tbody'
+        odds_table = __soup.select_one(__target_table_selector)
+        # 1行ごとのリスト
+        yoko_list = odds_table.select('tr')
+
+        # oddsPointクラスを抜き，要素を少数に変換してリストで返す
+        def _getoddsPoint2floatlist(odds_tr):
+            __html_list = odds_tr.select('td.oddsPoint')
+            __text_list = list(map(lambda x: x.text, __html_list))
+            float_list = list(map(
+                lambda x: float(x), __text_list))
+            return float_list
+
+        odds_matrix = list(map(
+            lambda x: _getoddsPoint2floatlist(x),
+            yoko_list
+        ))
+        return odds_matrix
+
+    def _rentan_matrix2list(self, odds_matrix: list) -> list:
+        """
+        2 3連単用処理
+        """
+        # numpy array化
+        odds_matrix = np.array(odds_matrix)
+        # 転置を取り，つなげてリスト化
+        odds_list = list(odds_matrix.T.reshape(-1))
+        return odds_list
+
+    def _renfuku_matrix2list(self, odds_matrix: list) -> list:
+        """
+        連複用処理
+        """
+        # 1番目の要素から抜いていく -1で空を保管し，filterで除く
+        odds_list = []
+        # 最後のリストが空になるまで回す
+        # 要素があれば条件式は真
+        while odds_matrix[-1]:
+            odds_list += list(map(
+                lambda x: x.pop(0) if len(x) != 0 else -1,
+                odds_matrix))
+        odds_list = list(filter(lambda x: x != -1, odds_list))
+        return odds_list
+
     # 3連単を集計
     def three_rentan(self) -> dict:
         """
@@ -503,8 +503,8 @@ class OfficialOdds(CommonMethods4Official):
         1-2-3のオッズは return_dict[1][2][3]に格納される
         """
         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
-        odds_matrix = super().tanfuku_common(3, 'rentan')
-        odds_list = super().rentan_matrix2list(odds_matrix)
+        odds_matrix = self._tanfuku_common(3, 'rentan')
+        odds_list = self._rentan_matrix2list(odds_matrix)
 
         # 辞書で格納する
         content_dict = {}
@@ -529,8 +529,8 @@ class OfficialOdds(CommonMethods4Official):
         1=2=3のオッズは return_dict[1][2][3]に格納される
         """
         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
-        odds_matrix = super().tanfuku_common(3, 'renfuku')
-        odds_list = super().renfuku_matrix2list(odds_matrix)
+        odds_matrix = self._tanfuku_common(3, 'renfuku')
+        odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
         for fst in range(1, 5):
@@ -548,8 +548,8 @@ class OfficialOdds(CommonMethods4Official):
     # 2連単を集計
     def two_rentan(self):
         # 共通メソッドを使える
-        odds_matrix = super().tanfuku_common(2, 'rentan')
-        odds_list = super().rentan_matrix2list(odds_matrix)
+        odds_matrix = self._tanfuku_common(2, 'rentan')
+        odds_list = self._rentan_matrix2list(odds_matrix)
 
         # 辞書で格納する
         content_dict = {}
@@ -564,8 +564,8 @@ class OfficialOdds(CommonMethods4Official):
 
     # 2連複を集計
     def two_renfuku(self):
-        odds_matrix = super().tanfuku_common(2, 'renfuku')
-        odds_list = super().renfuku_matrix2list(odds_matrix)
+        odds_matrix = self._tanfuku_common(2, 'renfuku')
+        odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
         for fst in range(1, 6):
