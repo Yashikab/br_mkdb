@@ -194,3 +194,13 @@ class TestOfficialOdds:
     ])
     def test_threerenfuku(self, fst, snd, trd, expected, odds):
         assert odds.three_renfuku()[fst][snd][trd] == expected
+
+    # 2連単
+    @pytest.mark.parametrize("fst, snd, expected", [
+        (1, 2, 2.7),
+        (2, 3, 101.3),
+        (3, 4, 238.5),
+        (6, 5, 135.1)
+    ])
+    def test_tworentan(self, fst, snd, expected, odds):
+        assert odds.two_rentan()[fst][snd] == expected
