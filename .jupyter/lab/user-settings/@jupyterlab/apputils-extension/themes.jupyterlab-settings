@@ -14,7 +14,7 @@
 
     // Selected Theme
     // Application-level visual styling theme
-    "theme": "Monokai++",
+    "theme": "JupyterLab Horizon",
 
     // Scrollbar Theming
     // Enable/disable styling of the application scrollbars

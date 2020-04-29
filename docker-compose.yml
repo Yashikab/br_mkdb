@@ -2,7 +2,9 @@ version: '2.3'
 services:
   boatracedocker:
     container_name: 'jupyter4boatrace'
-    image: yashikab/jupyter-gpu
+    build:
+      context: .
+      dockerfile: Dockerfile
     user: 1000:1000
     runtime: nvidia
     volumes:
