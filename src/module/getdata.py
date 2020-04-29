@@ -580,6 +580,28 @@ class OfficialOdds(CommonMethods4Official):
     def kakurenfuku(self):
         pass
 
-    # 単勝・複勝
-    def tanfuku(self):
+    # 単勝
+    def tansho(self):
+        # htmlをload
+        base_url = f'https://boatrace.jp/owpc/pc/race/'\
+                   f'oddstf?'
+        target_url = f'{base_url}rno={self.race_no}&' \
+                     f'jcd={self.jyo_code:02}&hd={self.day}'
+        __soup = super().url2soup(target_url)
+        __target_table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div.grid.is-type2.h-clear '\
+            '> div:nth-child(1) > div.table1 > table'
+        __odds_table = __soup.select_one(__target_table_selector)
+        __odds_html_list = __odds_table.select('tbody tr td.oddsPoint')
+        odds_list = list(map(lambda x: float(x.text), __odds_html_list))
+
+        content_dict = {}
+        for fst in range(1, 7):
+            content_dict[fst] = odds_list.pop(0)
+
+        return content_dict
+
+    # 複勝
+    def fukusho(self):
         pass

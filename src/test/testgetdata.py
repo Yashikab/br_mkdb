@@ -213,3 +213,13 @@ class TestOfficialOdds:
     ])
     def test_tworenfuku(self, fst, snd, expected, odds):
         assert odds.two_renfuku()[fst][snd] == expected
+
+    # 単勝
+    @pytest.mark.parametrize("fst, expected", [
+        (1, 1.0),
+        (2, 6.1),
+        (3, 12.2),
+        (6, 9.1)
+    ])
+    def test_tansho(self, fst, expected, odds):
+        assert odds.tansho()[fst] == expected
