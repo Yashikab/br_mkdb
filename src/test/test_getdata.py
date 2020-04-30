@@ -39,7 +39,7 @@ class TestOfficialProgram:
         return programinfo
 
     # 公式番組表に関するテスト
-    @pytest.mark.parametrize("target, idx, expected", [
+    @pytest.mark.parametrize("waku, idx, expected", [
         ('name', 0, "鈴木裕隆"),
         ('name', 1, "小林晋"),
         ('id', 0, 4231),
@@ -85,8 +85,8 @@ class TestOfficialProgram:
         ('boat_3rate', 0, 33.33),
         ('boat_3rate', 1, 52.53)
     ])
-    def test_p_inf_program(self, target, idx, expected, programinfo):
-        assert programinfo[idx][target] == expected
+    def test_p_inf_program(self, waku, idx, expected, programinfo):
+        assert programinfo[idx][waku] == expected
 
 
 class TestOfficialChokuzen:
@@ -223,3 +223,35 @@ class TestOfficialOdds:
     ])
     def test_tansho(self, fst, expected, odds):
         assert odds.tansho()[fst] == expected
+
+
+class TestOfficialResults:
+    '''
+    2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
+    http://boatrace.jp/owpc/pc/race/raceresult?rno=9&jcd=06&hd=20200408
+    '''
+    # 選手直前情報取得のための前処理
+    @pytest.fixture(scope='class')
+    def racerls(self):
+        # 5R
+        self.race_no = 9
+        # place : hamanako 06
+        self.jyo_code = 6
+        # day 2020/04/08
+        self.day = 20200408
+        ors = getdata.OfficialResults(
+            self.race_no, self.jyo_code, self.day)
+        # 各行呼び出し可能
+        racerls = []
+        for i in range(1, 7):
+            racerls.append(ors.getplayerresult2dict(waku=i))
+        return racerls
+
+    # 名前
+    @pytest.mark.parametrize("waku, target, expected", [
+        (1, 'name', '一瀬明'),
+        (6, 'name', '濱本優一')
+    ])
+    def test_getplayerresult2dict(self, waku, target, expected, racerls):
+        # listなのでwakuが1つずれる
+        assert racerls[waku - 1][target] == expected

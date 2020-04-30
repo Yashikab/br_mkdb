@@ -126,12 +126,12 @@ class OfficialProgram(CommonMethods4Official):
 
         Parameters
         ----------
-        race_no : int
-            何レース目か
-        jyo_code : int
-            会場コード
-        day : int
-            yyyymmdd形式で入力
+            race_no : int
+                何レース目か
+            jyo_code : int
+                会場コード
+            day : int
+                yyyymmdd形式で入力
 
         """
 
@@ -605,3 +605,84 @@ class OfficialOdds(CommonMethods4Official):
     # 複勝
     def fukusho(self):
         pass
+
+
+class OfficialResults(CommonMethods4Official):
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 day: int):
+        """
+        競艇公式サイトの結果からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
+
+        Parameters
+        ----------
+            race_no : int
+                何レース目か
+            jyo_code : int
+                会場コード
+            day : int
+                yyyymmdd形式で入力
+
+        """
+        # htmlをload
+        base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
+        self.__soup = super().url2soup(target_url)
+        # 結果テーブルだけ最初に抜く
+        self.waku_dict = self._getresulttable2dict()
+
+    def getplayerresult2dict(self, waku: int) -> dict:
+        """
+        枠drivenでdictを作成する（サイトは順位drivenなのに注意)
+
+        Parameters
+        ----------
+            waku : int
+                枠
+
+        Returns
+        -------
+            racerls : dict
+        """
+        # 結果テーブルのキーを選択 1~6
+        content_dict = self.waku_dict[waku]
+
+        return content_dict
+
+    def _getresulttable2dict(self) -> dict:
+        """
+        結果テーブルをまとめてdict作成
+        initで呼びだし，テーブル抜きを1回で済ませる
+
+        Returns
+        -------
+            waku_dict : dict
+                枠をキーとしてテーブル情報を抜く
+        """
+        __target_table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
+            'div:nth-child(1) > div > table'
+        player_res_html_list = \
+            super().getplayertable2list(self.__soup, __target_table_selector)
+        # rank_p_html : 各順位の選手情報
+        # waku_dict : 枠をキーとしテーブル内容を入れ替える
+        waku_dict = {}
+        for rank_p_html in player_res_html_list:
+            rank, waku, name, time = \
+                list(map(lambda x: x.text, rank_p_html.select('td')))
+            rank = int(rank)
+            waku = int(waku)
+            name = name.replace('\n', '').replace('\u3000', '').replace(' ', '')
+            no, name = name.split('\r')
+            no = int(no)
+
+            __content_dict = {
+                'rank': rank,
+                'name': name
+            }
+
+            waku_dict[waku] = __content_dict
+        return waku_dict
