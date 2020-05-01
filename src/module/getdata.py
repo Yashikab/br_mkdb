@@ -673,15 +673,23 @@ class OfficialResults(CommonMethods4Official):
         for rank_p_html in player_res_html_list:
             rank, waku, name, time = \
                 list(map(lambda x: x.text, rank_p_html.select('td')))
-            rank = int(rank)
+            # rankはF,L欠などが存在するためエラーハンドルがいる
+            try:
+                rank = int(rank)
+            except ValueError:
+                rank = -1
+
             waku = int(waku)
-            name = name.replace('\n', '').replace('\u3000', '').replace(' ', '')
+            name = name.replace('\n', '')\
+                       .replace('\u3000', '')\
+                       .replace(' ', '')
             no, name = name.split('\r')
             no = int(no)
 
             __content_dict = {
                 'rank': rank,
-                'name': name
+                'name': name,
+                'no': no
             }
 
             waku_dict[waku] = __content_dict
