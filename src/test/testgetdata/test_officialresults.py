@@ -11,7 +11,7 @@ from module import getdata
 class TestOfficialResults:
     '''
     2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
-    http://boatrace.jp/owpc/pc/race/raceresult?rno=9&jcd=06&hd=20200408
+    http://boatrace.jp/owpc/pc/race/raceresult?rno=12&jcd=06&hd=20200410
     '''
     # 選手直前情報取得のための前処理
     @pytest.fixture(scope='class')
@@ -37,7 +37,10 @@ class TestOfficialResults:
         (1, 'no', 3721),
         (6, 'no', 3268),
         (1, 'rank', -1),
-        (6, 'rank', 1)
+        (6, 'rank', 1),
+        (1, 'racetime', -1),
+        (6, 'racetime', 115.8),
+        (2, 'racetime', 118.4)
 
     ])
     def test_getplayerresult2dict(self, waku, target, expected, racerls):

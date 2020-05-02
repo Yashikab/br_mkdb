@@ -9,6 +9,7 @@ import bs4
 from bs4 import BeautifulSoup as bs
 import re
 import numpy as np
+from datetime import datetime, timedelta
 
 
 class CommonMethods4Official:
@@ -671,13 +672,25 @@ class OfficialResults(CommonMethods4Official):
         # waku_dict : 枠をキーとしテーブル内容を入れ替える
         waku_dict = {}
         for rank_p_html in player_res_html_list:
-            rank, waku, name, time = \
+            rank, waku, name, racetime = \
                 list(map(lambda x: x.text, rank_p_html.select('td')))
             # rankはF,L欠などが存在するためエラーハンドルがいる
             try:
                 rank = int(rank)
             except ValueError:
                 rank = -1
+
+            # レースタイムは秒に変換する
+            try:
+                t = datetime.strptime(racetime, '%M\'%S"%f')
+                delta = timedelta(
+                    seconds=t.second,
+                    microseconds=t.microsecond,
+                    minutes=t.minute,
+                )
+                racetime_sec = delta.total_seconds()
+            except ValueError:
+                racetime_sec = -1
 
             waku = int(waku)
             name = name.replace('\n', '')\
@@ -689,7 +702,8 @@ class OfficialResults(CommonMethods4Official):
             __content_dict = {
                 'rank': rank,
                 'name': name,
-                'no': no
+                'no': no,
+                'racetime': racetime_sec
             }
 
             waku_dict[waku] = __content_dict
