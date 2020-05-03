@@ -48,14 +48,14 @@ class TestOfficialChokuzen:
         ('weight', 5, 49.5),
         ('chosei_weight', 0, 0.0),
         ('chosei_weight', 5, 1.5),
-        ('tenji_T', 0, 6.63),
-        ('tenji_T', 5, 6.64),
+        ('tenji_time', 0, 6.63),
+        ('tenji_time', 5, 6.64),
         ('tilt', 0, -0.5),
         ('tilt', 5, -0.5),
-        ('tenji_C', 0, 1),
-        ('tenji_C', 5, 4),
-        ('tenji_ST', 0, 0.14),
-        ('tenji_ST', 2, -0.04),
+        ('tenji_course', 0, 1),
+        ('tenji_course', 5, 4),
+        ('tenji_st', 0, 0.14),
+        ('tenji_st', 2, -0.04),
     ])
     def test_p_chokuzen(self, target, idx, expected, p_chokuzen):
         assert p_chokuzen[idx][target] == expected

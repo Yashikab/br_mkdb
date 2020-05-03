@@ -10,7 +10,7 @@ from module import getdata
 
 class TestOfficialResults:
     '''
-    2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
+    2020 4月10日 浜名湖(06) 12レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/raceresult?rno=12&jcd=06&hd=20200410
     '''
     # 選手直前情報取得のための前処理
@@ -43,6 +43,8 @@ class TestOfficialResults:
         (2, 'racetime', 118.4),
         (1, 'course', 1),
         (6, 'course', 3),
+        (1, 'st_time', 0.16),
+        (6, 'st_time', 0.18)
     ])
     def test_getplayerresult2dict(self, waku, target, expected, racerls):
         # listなのでwakuが1つずれる

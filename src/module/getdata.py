@@ -53,13 +53,15 @@ class CommonMethods4Official:
         Parameters
         ----------
             soup : bs4.BeautifulSoup
-            table_selector: str
+            table_selector : str
                 スタート情報のテーブル
+            waku : int
+                知りたい情報の枠
 
         Returns
         -------
-            st_html_list : list
-                テーブルの行ごとのhtmlリスト
+            course st_time : tuple
+                対象枠のコースとSTタイムをタプルで返す
         """
         __target_table_html = soup.select_one(table_selector)
         __st_html = __target_table_html.select_one('tbody')
@@ -342,10 +344,10 @@ class OfficialChokuzen(CommonMethods4Official):
             'name': name,
             'weight': weight,
             'chosei_weight': chosei_weight,
-            'tenji_T': tenji_T,
+            'tenji_time': tenji_T,
             'tilt': tilt,
-            'tenji_C': tenji_C,
-            'tenji_ST': tenji_ST
+            'tenji_course': tenji_C,
+            'tenji_st': tenji_ST
         }
         return content_dict
 
@@ -651,6 +653,19 @@ class OfficialResults(CommonMethods4Official):
         """
         # 結果テーブルのキーを選択 1~6
         content_dict = self.waku_dict[waku]
+
+        # 結果STテーブルの情報を取得
+        __target_table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > '\
+            'div.grid.is-type2.h-clear.h-mt10 > '\
+            'div:nth-child(2) > div > table'
+        course, st_time = super().getSTtable2tuple(
+            soup=self.__soup,
+            table_selector=__target_table_selector,
+            waku=waku)
+        content_dict['course'] = course
+        content_dict['st_time'] = st_time
 
         return content_dict
 
