@@ -42,11 +42,13 @@ class CommonMethods4Official:
             f"lengh is not 6:{len(player_html_list)}"
         return player_html_list
 
-    def getSTtable2list(self,
-                        soup: bs4.BeautifulSoup,
-                        table_selector: str) -> list:
+    def getSTtable2tuple(self,
+                         soup: bs4.BeautifulSoup,
+                         table_selector: str,
+                         waku: int) -> tuple:
         """
-        スタート情報のテーブルを抜き取り行をリストにして返す
+        スタート情報のテーブルを抜き取り対象枠のコースとSTタイムを
+        タプルにして返す.
 
         Parameters
         ----------
@@ -64,7 +66,24 @@ class CommonMethods4Official:
         st_html_list = __st_html.select('tr')
         assert len(st_html_list) == 6, \
             f"lengh is not 6:{len(st_html_list)}"
-        return st_html_list
+        # コース抜き出し
+        # コースがキーで，号がvalueなので全て抜き出してから逆にする
+        __waku_list = list(
+            map(lambda x: int(x.select('div > span')[0].text),
+                st_html_list))
+        # 0~5のインデックスなので1~6へ変換のため+1
+        __C_idx = __waku_list.index(waku)
+        course = __C_idx + 1
+
+        # 展示ST抜き出し
+        __st_time_list = list(
+            map(lambda x: x.select('div > span')[2].text,
+                st_html_list))
+        # Fをマイナスに変換し，少数化
+        # listのキーはコースであることに注意
+        st_time = __st_time_list[__C_idx]
+        st_time = self.rmletter2float(st_time.replace('F', '-'))
+        return (course, st_time)
 
     def text2list_rn_split(self,
                            input_content: bs4.element.Tag,
@@ -313,28 +332,11 @@ class OfficialChokuzen(CommonMethods4Official):
             'body > main > div > div > div > div.contentsFrame1_inner '\
             '> div.grid.is-type3.h-clear > div:nth-child(2) '\
             '> div.table1 > table'
-        __tenji_st_html_list = \
-            super().getSTtable2list(
-                self.__soup,
-                __target_ST_table_selector
-            )
-        # コース抜き出し
-        # コースがキーで，号がvalueなので全て抜き出してから逆にする
-        __goutei_list = list(
-            map(lambda x: int(x.select('div > span')[0].text),
-                __tenji_st_html_list))
-        # 0~5のインデックスなので1~6へ変換のため+1
-        __tenji_C_idx = __goutei_list.index(waku)
-        tenji_C = __tenji_C_idx + 1
-
-        # 展示ST抜き出し
-        __tenji_st_time_list = list(
-            map(lambda x: x.select('div > span')[2].text,
-                __tenji_st_html_list))
-        # Fをマイナスに変換し，少数化
-        # listのキーはコースであることに注意
-        tenji_ST = __tenji_st_time_list[__tenji_C_idx]
-        tenji_ST = super().rmletter2float(tenji_ST.replace('F', '-'))
+        tenji_C, tenji_ST = super().getSTtable2tuple(
+            self.__soup,
+            __target_ST_table_selector,
+            waku
+        )
 
         content_dict = {
             'name': name,

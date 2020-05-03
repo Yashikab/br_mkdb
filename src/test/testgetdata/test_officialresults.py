@@ -40,8 +40,9 @@ class TestOfficialResults:
         (6, 'rank', 1),
         (1, 'racetime', -1),
         (6, 'racetime', 115.8),
-        (2, 'racetime', 118.4)
-
+        (2, 'racetime', 118.4),
+        (1, 'course', 1),
+        (6, 'course', 3),
     ])
     def test_getplayerresult2dict(self, waku, target, expected, racerls):
         # listなのでwakuが1つずれる
