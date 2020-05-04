@@ -66,7 +66,11 @@ class TestOfficialResults:
         ('wind_v', 6),  # m
         ('w_temp', 16.0),
         ('wave', 4),  # cm
-        ('wind_dr', 3)
+        ('wind_dr', 3),
+        ('henkantei', [1]),
+        ('is_henkan', True),
+        ('kimarite', '恵まれ'),
+        ('biko', '【返還艇あり】')
     ])
     def test_raceresult2dict(self, target, expected, racerls):
         assert racerls[target] == expected

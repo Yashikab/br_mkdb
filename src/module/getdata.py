@@ -10,11 +10,16 @@ from bs4 import BeautifulSoup as bs
 import re
 import numpy as np
 from datetime import datetime, timedelta
+from logging import getLogger
+import sys
 
 
 class CommonMethods4Official:
+    def __init__(self):
+        self.logger = getLogger(self.__class__.__name__)
 
     def url2soup(self, url):
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         __html_content = urlopen(url).read()
         soup = bs(__html_content, 'html.parser')
         return soup
@@ -36,6 +41,7 @@ class CommonMethods4Official:
             player_html_list : list
                 選手ごとの行のhtmlを格納したリスト
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         __target_table_html = soup.select_one(table_selector)
         player_html_list = __target_table_html.select('tbody')
         assert len(player_html_list) == 6, \
@@ -63,6 +69,7 @@ class CommonMethods4Official:
             course st_time : tuple
                 対象枠のコースとSTタイムをタプルで返す
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         __target_table_html = soup.select_one(table_selector)
         __st_html = __target_table_html.select_one('tbody')
         st_html_list = __st_html.select('tr')
@@ -102,6 +109,7 @@ class CommonMethods4Official:
         -------
             content_dict : dict
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         __target_table_html = soup.select_one(table_selector)
         condinfo_html_list = __target_table_html.select('div')
         assert len(condinfo_html_list) == 12, \
@@ -165,6 +173,7 @@ class CommonMethods4Official:
             output_list : list
                 返却するリスト
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         output_list = input_content.text.replace(' ', '')\
                                         .split('\r\n')[1:-1]
         assert len(output_list) == expect_length,\
@@ -176,6 +185,7 @@ class CommonMethods4Official:
         風速・水温・波高ぬきだし用関数\n
         spanの2つめの要素をstr で返却
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         return target_html.select('span')[1].text
 
     def rmletter2float(self, in_str: str) -> float:
@@ -183,8 +193,12 @@ class CommonMethods4Official:
         文字列から文字を取り除き少数で返す
         マイナス表記は残す
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         in_str = re.search(r'-{0,1}[0-9]*\.[0-9]+', in_str)
-        out_float = float(in_str.group(0))
+        if in_str is not None:
+            out_float = float(in_str.group(0))
+        else:
+            out_float = None
         return out_float
 
     def rmletter2int(self, in_str: str) -> int:
@@ -192,8 +206,12 @@ class CommonMethods4Official:
         文字列から文字を取り除き整数で返す
         マイナス表記は残す
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         in_str = re.search(r'-{0,1}[0-9]+', in_str)
-        out_int = int(in_str.group(0))
+        if in_str is not None:
+            out_int = int(in_str.group(0))
+        else:
+            out_int = None
         return out_int
 
 
@@ -216,14 +234,20 @@ class OfficialProgram(CommonMethods4Official):
                 yyyymmdd形式で入力
 
         """
+        # logger設定
+        self.logger = getLogger(self.__class__.__name__)
 
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
+        self.logger.info(f'get html: {target_url}')
         self.__soup = super().url2soup(target_url)
+        self.logger.info('get html completed.')
 
     def getplayerinfo2dict(self, waku: int) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 番組表を選択 css selectorより
+        self.logger.debug('get table html from target url')
         __target_table_selector = \
             'body > main > div > div > '\
             'div > div.contentsFrame1_inner > '\
@@ -233,7 +257,10 @@ class OfficialProgram(CommonMethods4Official):
                 self.__soup,
                 __target_table_selector
             )
+        self.logger.debug('get table html completed.')
+
         # waku は1からなので-1
+        self.logger.debug(f'get target player info (waku : {waku})')
         __player_html = __player_info_html_list[waku - 1]
         # 選手情報は1番目のtr
         __player_info = __player_html.select_one("tr")
@@ -302,6 +329,8 @@ class OfficialProgram(CommonMethods4Official):
         boat_2rate = float(__boat_info_list[1])
         boat_3rate = float(__boat_info_list[2])
 
+        self.logger.debug(f'get target player info completed.')
+
         content_dict = {
             'name': name,
             'id': player_id,
@@ -350,12 +379,14 @@ class OfficialChokuzen(CommonMethods4Official):
             yyyymmdd形式で入力
 
         """
+        self.logger = getLogger(self.__class__.__name__)
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
         self.__soup = super().url2soup(target_url)
 
     def getplayerinfo2dict(self, waku: int) -> dict:
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 選手直前情報を選択 css selectorより
         __target_p_table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner > '\
@@ -415,6 +446,7 @@ class OfficialChokuzen(CommonMethods4Official):
         """
         直前情報の水面気象情報を抜き出し，辞書型にする
         """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner > '\
             'div.grid.is-type3.h-clear > div:nth-child(2) > div.weather1 > '\
@@ -432,6 +464,8 @@ class OfficialOdds(CommonMethods4Official):
                  race_no: int,
                  jyo_code: int,
                  day: int):
+
+        self.logger = getLogger(self.__class__.__name__)
         # 賭け方によりURLが違うので，関数ごとでURLを設定する
         self.race_no = race_no
         self.jyo_code = jyo_code
@@ -454,6 +488,7 @@ class OfficialOdds(CommonMethods4Official):
                 oddsのリスト（htmlのテーブルと同配列）
                 要素は少数型
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         assert kake in ['rentan', 'renfuku']
         assert num in [2, 3]
         # num = 2ならtypeによらずtype='tf'
@@ -504,6 +539,7 @@ class OfficialOdds(CommonMethods4Official):
         """
         2 3連単用処理
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # numpy array化
         odds_matrix = np.array(odds_matrix)
         # 転置を取り，つなげてリスト化
@@ -514,6 +550,7 @@ class OfficialOdds(CommonMethods4Official):
         """
         連複用処理
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 1番目の要素から抜いていく -1で空を保管し，filterで除く
         odds_list = []
         # 最後のリストが空になるまで回す
@@ -531,6 +568,7 @@ class OfficialOdds(CommonMethods4Official):
         3連単オッズを抜き出し辞書型で返す
         1-2-3のオッズは return_dict[1][2][3]に格納される
         """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
         odds_matrix = self._tanfuku_common(3, 'rentan')
         odds_list = self._rentan_matrix2list(odds_matrix)
@@ -557,6 +595,7 @@ class OfficialOdds(CommonMethods4Official):
         3連複オッズを抜き出し辞書型で返す
         1=2=3のオッズは return_dict[1][2][3]に格納される
         """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
         odds_matrix = self._tanfuku_common(3, 'renfuku')
         odds_list = self._renfuku_matrix2list(odds_matrix)
@@ -576,6 +615,7 @@ class OfficialOdds(CommonMethods4Official):
 
     # 2連単を集計
     def two_rentan(self):
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 共通メソッドを使える
         odds_matrix = self._tanfuku_common(2, 'rentan')
         odds_list = self._rentan_matrix2list(odds_matrix)
@@ -593,6 +633,7 @@ class OfficialOdds(CommonMethods4Official):
 
     # 2連複を集計
     def two_renfuku(self):
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         odds_matrix = self._tanfuku_common(2, 'renfuku')
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
@@ -611,6 +652,7 @@ class OfficialOdds(CommonMethods4Official):
 
     # 単勝
     def tansho(self):
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # htmlをload
         base_url = f'https://boatrace.jp/owpc/pc/race/'\
                    f'oddstf?'
@@ -655,6 +697,7 @@ class OfficialResults(CommonMethods4Official):
                 yyyymmdd形式で入力
 
         """
+        self.logger = getLogger(self.__class__.__name__)
         # htmlをload
         base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
@@ -675,6 +718,7 @@ class OfficialResults(CommonMethods4Official):
         -------
             racerls : dict
         """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 結果テーブルのキーを選択 1~6
         content_dict = self.waku_dict[waku]
 
@@ -697,6 +741,7 @@ class OfficialResults(CommonMethods4Official):
         """
         水面気象情報と決まり手，返還挺の有無などの選手以外のレース結果情報
         """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 水面気象情報の取得
         table_selector = \
             'body > main > div > div > div > '\
@@ -708,6 +753,57 @@ class OfficialResults(CommonMethods4Official):
                 soup=self.__soup,
                 table_selector=table_selector
             )
+
+        # 返還テーブルを抜く
+        # 返還挺はリストのまま辞書に入れる
+        # 返還艇がなければ空リスト
+        table_selector = \
+            'body > main > div > div > div > div.contentsFrame1_inner > '\
+            'div:nth-child(5) > div:nth-child(2) > '\
+            'div.grid.is-type6.h-clear > '\
+            'div:nth-child(2) > div:nth-child(1) > '\
+            'table > tbody > tr > td > '\
+            'div > div span.numberSet1_number'
+        __henkantei_html_list = self.__soup.select(table_selector)
+
+        # 返還艇をint型に直す，変なやつはNoneでハンドル（あんまりないけど）
+        def teistr2int(tei_str):
+            tei = re.search(r'[1-6]', tei_str)
+            if tei is not None:
+                return int(tei.group(0))
+            else:
+                return None
+
+        # 返還艇があればリスト長が1以上になる
+        if len(__henkantei_html_list) != 0:
+            henkantei_list = list(map(
+                lambda x: teistr2int(x.text), __henkantei_html_list))
+            is_henkan = True
+        else:
+            henkantei_list = []
+            is_henkan = False
+        content_dict['henkantei'] = henkantei_list
+        content_dict['is_henkan'] = is_henkan
+
+        # 決まりて
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(2) > div.grid.is-type6.h-clear > '\
+            'div:nth-child(2) > div:nth-child(2) > table > tbody > tr > td'
+        kimarite = self.__soup.select_one(table_selector).text
+        content_dict['kimarite'] = kimarite
+
+        # 備考
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(2) > div.table1 > table > tbody > tr > td'
+        biko = self.__soup.select_one(table_selector).text
+        biko = biko.replace('\r', '')\
+                   .replace('\n', '')\
+                   .replace(' ', '')
+        content_dict['biko'] = biko
 
         return content_dict
 
@@ -721,16 +817,17 @@ class OfficialResults(CommonMethods4Official):
             waku_dict : dict
                 枠をキーとしてテーブル情報を抜く
         """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         __target_table_selector = \
             'body > main > div > div > div > '\
             'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
             'div:nth-child(1) > div > table'
-        player_res_html_list = \
+        __player_res_html_list = \
             super().getplayertable2list(self.__soup, __target_table_selector)
         # rank_p_html : 各順位の選手情報
         # waku_dict : 枠をキーとしテーブル内容を入れ替える
         waku_dict = {}
-        for rank_p_html in player_res_html_list:
+        for rank_p_html in __player_res_html_list:
             rank, waku, name, racetime = \
                 list(map(lambda x: x.text, rank_p_html.select('td')))
             # rankはF,L欠などが存在するためエラーハンドルがいる
@@ -741,13 +838,13 @@ class OfficialResults(CommonMethods4Official):
 
             # レースタイムは秒に変換する
             try:
-                t = datetime.strptime(racetime, '%M\'%S"%f')
-                delta = timedelta(
-                    seconds=t.second,
-                    microseconds=t.microsecond,
-                    minutes=t.minute,
+                __t = datetime.strptime(racetime, '%M\'%S"%f')
+                __delta = timedelta(
+                    seconds=__t.second,
+                    microseconds=__t.microsecond,
+                    minutes=__t.minute,
                 )
-                racetime_sec = delta.total_seconds()
+                racetime_sec = __delta.total_seconds()
             except ValueError:
                 racetime_sec = -1
 
