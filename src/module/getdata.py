@@ -87,6 +87,66 @@ class CommonMethods4Official:
         st_time = self.rmletter2float(st_time.replace('F', '-'))
         return (course, st_time)
 
+    def getweatherinfo2dict(self,
+                            soup: bs4.BeautifulSoup,
+                            table_selector: str) -> dict:
+        """
+        水面気象情報テーブルのスクレイパー
+
+        Parameters
+        ----------
+            soup : bs4.BeautifulSoup
+            table_selector : str
+
+        Returns
+        -------
+            content_dict : dict
+        """
+        __target_table_html = soup.select_one(table_selector)
+        condinfo_html_list = __target_table_html.select('div')
+        assert len(condinfo_html_list) == 12, \
+            f"lengh is not 12:{len(condinfo_html_list)}"
+        # 気温は2番目のdiv
+        __tmp_info_html = condinfo_html_list[1]
+        # spanで情報がとれる (1番目： '気温', 2番目: 数字℃)
+        __tmp_info = __tmp_info_html.select('span')
+        temp = __tmp_info[1].text
+        temp = self.rmletter2float(temp)
+        # 天気は2番目のdiv
+        __weather_info_html = condinfo_html_list[2]
+        # spanのなか（1個しかない)
+        weather = __weather_info_html.select_one('span').text
+        weather = weather.replace('\n', '')\
+                         .replace('\r', '')\
+                         .replace(' ', '')
+        # 風速は5番目のdiv
+        wind_v = self.choose_2nd_span(condinfo_html_list[4])
+        wind_v: int = self.rmletter2int(wind_v)
+
+        # 水温は8番目のdiv
+        w_temp = self.choose_2nd_span(condinfo_html_list[7])
+        w_temp = self.rmletter2float(w_temp)
+
+        # 波高は10番目のdiv
+        wave = self.choose_2nd_span(condinfo_html_list[9])
+        wave = self.rmletter2int(wave)
+
+        # 風向きは7番目のdiv
+        # 画像のみの情報なので，16方位の数字（画像の名前）を抜く
+        # p中のクラス名2番目にある
+        wind_dr = condinfo_html_list[6].select_one('p')['class'][1]
+        wind_dr = self.rmletter2int(wind_dr)
+
+        content_dict = {
+            'temp': temp,
+            'weather': weather,
+            'wind_v': wind_v,
+            'w_temp': w_temp,
+            'wave': wave,
+            'wind_dr': wind_dr
+        }
+        return content_dict
+
     def text2list_rn_split(self,
                            input_content: bs4.element.Tag,
                            expect_length: int) -> list:
@@ -359,47 +419,11 @@ class OfficialChokuzen(CommonMethods4Official):
             'body > main > div > div > div > div.contentsFrame1_inner > '\
             'div.grid.is-type3.h-clear > div:nth-child(2) > div.weather1 > '\
             'div.weather1_body'
-        __target_table_html = self.__soup.select_one(table_selector)
-        condinfo_html_list = __target_table_html.select('div')
-        assert len(condinfo_html_list) == 12, \
-            f"lengh is not 12:{len(condinfo_html_list)}"
-        # 気温は2番目のdiv
-        __tmp_info_html = condinfo_html_list[1]
-        # spanで情報がとれる (1番目： '気温', 2番目: 数字℃)
-        __tmp_info = __tmp_info_html.select('span')
-        temp = __tmp_info[1].text
-        temp = super().rmletter2float(temp)
-        # 天気は2番目のdiv
-        __weather_info_html = condinfo_html_list[2]
-        # spanのなか（1個しかない)
-        weather = __weather_info_html.select_one('span').text
+        content_dict = super().getweatherinfo2dict(
+            soup=self.__soup,
+            table_selector=table_selector
+        )
 
-        # 風速は5番目のdiv
-        wind_v = super().choose_2nd_span(condinfo_html_list[4])
-        wind_v: int = super().rmletter2int(wind_v)
-
-        # 水温は8番目のdiv
-        w_temp = super().choose_2nd_span(condinfo_html_list[7])
-        w_temp = super().rmletter2float(w_temp)
-
-        # 波高は10番目のdiv
-        wave = super().choose_2nd_span(condinfo_html_list[9])
-        wave = super().rmletter2int(wave)
-
-        # 風向きは7番目のdiv
-        # 画像のみの情報なので，16方位の数字（画像の名前）を抜く
-        # p中のクラス名2番目にある
-        wind_dr = condinfo_html_list[6].select_one('p')['class'][1]
-        wind_dr = super().rmletter2int(wind_dr)
-
-        content_dict = {
-            'temp': temp,
-            'weather': weather,
-            'wind_v': wind_v,
-            'w_temp': w_temp,
-            'wave': wave,
-            'wind_dr': wind_dr
-        }
         return content_dict
 
 
@@ -666,6 +690,24 @@ class OfficialResults(CommonMethods4Official):
             waku=waku)
         content_dict['course'] = course
         content_dict['st_time'] = st_time
+
+        return content_dict
+
+    def getraceresult2dict(self) -> dict:
+        """
+        水面気象情報と決まり手，返還挺の有無などの選手以外のレース結果情報
+        """
+        # 水面気象情報の取得
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(2) > div.grid.is-type6.h-clear > '\
+            'div:nth-child(1) > div > div.weather1_body.is-type1__3rdadd'
+        content_dict = \
+            super().getweatherinfo2dict(
+                soup=self.__soup,
+                table_selector=table_selector
+            )
 
         return content_dict
 
