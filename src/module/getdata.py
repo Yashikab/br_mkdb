@@ -21,7 +21,9 @@ class CommonMethods4Official:
     def url2soup(self, url):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         __html_content = urlopen(url).read()
+
         soup = bs(__html_content, 'html.parser')
+
         return soup
 
     def getplayertable2list(self,
@@ -354,6 +356,20 @@ class OfficialProgram(CommonMethods4Official):
             'boat_no': boat_no,
             'boat_2rate': boat_2rate,
             'boat_3rate': boat_3rate
+        }
+
+        return content_dict
+
+    def raceinfo(self) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        __table_selector = \
+            'body > main > div > div > div > '\
+            'div.heading2 > div > div.heading2_title'
+        __raceinfo_html = self.__soup.select_one(__table_selector)
+        race_name = __raceinfo_html.select_one('h2').text
+
+        content_dict = {
+            'race_name': race_name
         }
 
         return content_dict

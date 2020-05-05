@@ -14,9 +14,8 @@ class TestOfficialProgram:
     2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
     """
-    # 選手番組情報の取得のための前処理
     @pytest.fixture(scope='class')
-    def programinfo(self):
+    def loadcls(self):
         """
         テスト用前処理
         公式サイトの番組表から選手欄の情報を選手毎に抜くテスト
@@ -31,12 +30,22 @@ class TestOfficialProgram:
 
         op = getdata.OfficialProgram(
             self.race_no, self.jyo_code, self.day)
+        return op
+
+    # 選手番組情報の取得のための前処理
+    @pytest.fixture(scope='class')
+    def programinfo(self, loadcls):
+
         # 各行呼び出し可能
         programinfo = []
         for i in range(1, 7):
-            programinfo.append(op.getplayerinfo2dict(waku=i))
+            programinfo.append(loadcls.getplayerinfo2dict(waku=i))
 
         return programinfo
+
+    @pytest.fixture(scope='class')
+    def raceinfo(self, loadcls):
+        return loadcls.raceinfo()
 
     # 公式番組表に関するテスト
     @pytest.mark.parametrize("waku, idx, expected", [
@@ -87,3 +96,9 @@ class TestOfficialProgram:
     ])
     def test_p_inf_program(self, waku, idx, expected, programinfo):
         assert programinfo[idx][waku] == expected
+
+    @pytest.mark.parametrize("idx, expected", [
+        ('race_name', 'スポーツ報知　ビクトリーカップ')
+    ])
+    def test_raceinfo(self, idx, expected, raceinfo):
+        assert raceinfo[idx] == expected
