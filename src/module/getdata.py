@@ -216,6 +216,13 @@ class CommonMethods4Official:
             out_int = None
         return out_int
 
+    def getonlyzenkaku2str(self, in_str: str) -> str:
+        try:
+            # 全角の抽出
+            return re.search(r'[^\x01-\x7E]+', in_str).group(0)
+        except ValueError:
+            return None
+
 
 class OfficialProgram(CommonMethods4Official):
     def __init__(self,
@@ -374,11 +381,8 @@ class OfficialProgram(CommonMethods4Official):
         # race_type : 予選 優勝戦など
         __race_str = __raceinfo_html.select_one('span').text
         __race_str = __race_str.replace('\u3000', '')
-        try:
-            # 全角の抽出
-            race_type = re.search(r'[^\x01-\x7E]+', __race_str).group(0)
-        except ValueError:
-            race_type = None
+        race_type = super().getonlyzenkaku2str(__race_str)
+
         # レース距離
         try:
             race_kyori = re.search(r'[0-9]+m', __race_str).group(0)
@@ -909,3 +913,47 @@ class OfficialResults(CommonMethods4Official):
 
             waku_dict[waku] = __content_dict
         return waku_dict
+
+
+class GetHoldPlace(CommonMethods4Official):
+    """
+    指定した日付での開催会場を取得する
+    """
+    def __init__(self, target_date):
+        """
+        Parameters
+        ----------
+            target_date : int
+                yyyymmdd型
+        """
+        self.logger = getLogger(self.__class__.__name__)
+        # htmlをload
+        base_url = 'https://www.boatrace.jp/owpc/pc/race/index?'
+        target_url = f'{base_url}hd={target_date}'
+        self.logger.debug(f'access: {target_url}')
+        self.__soup = super().url2soup(target_url)
+
+        # 抜き出すテーブルの選択
+        __target_table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div.table1 > table'
+        __target_table_html = self.__soup.select_one(__target_table_selector)
+        __tbody_list = __target_table_html.select('tbody')
+
+        self.place_name_set = \
+            set(map(lambda x: self._getplacename(x), __tbody_list))
+
+    def holdplace2strset(self):
+        """
+        会場名のままset型で返す
+        """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        return self.place_name_set
+
+    def _getplacename(self, row_html) -> str:
+        """
+        行htmlから会場名を抜き出す
+        """
+        place_name = row_html.select_one('tr > td > a > img')['alt']
+        place_name = super().getonlyzenkaku2str(place_name)
+        return place_name
