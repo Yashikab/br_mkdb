@@ -98,7 +98,11 @@ class TestOfficialProgram:
         assert programinfo[idx][waku] == expected
 
     @pytest.mark.parametrize("idx, expected", [
-        ('race_name', 'スポーツ報知　ビクトリーカップ')
+        ('taikai_name', 'スポーツ報知　ビクトリーカップ'),
+        ('grade', 'is-ippan'),
+        ('race_type', '予選'),
+        ('race_kyori', 1800),
+        ('is_antei', False)
     ])
     def test_raceinfo(self, idx, expected, raceinfo):
         assert raceinfo[idx] == expected

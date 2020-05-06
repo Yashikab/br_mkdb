@@ -366,10 +366,39 @@ class OfficialProgram(CommonMethods4Official):
             'body > main > div > div > div > '\
             'div.heading2 > div > div.heading2_title'
         __raceinfo_html = self.__soup.select_one(__table_selector)
-        race_name = __raceinfo_html.select_one('h2').text
+        taikai_name = __raceinfo_html.select_one('h2').text
+
+        # SG, G1, G2, G3 一般
+        grade = __raceinfo_html['class'][1]
+
+        # race_type : 予選 優勝戦など
+        __race_str = __raceinfo_html.select_one('span').text
+        __race_str = __race_str.replace('\u3000', '')
+        try:
+            # 全角の抽出
+            race_type = re.search(r'[^\x01-\x7E]+', __race_str).group(0)
+        except ValueError:
+            race_type = None
+        # レース距離
+        try:
+            race_kyori = re.search(r'[0-9]+m', __race_str).group(0)
+            race_kyori = int(race_kyori.replace('m', ''))
+        except ValueError:
+            race_kyori = None
+
+        # 安定版の有無
+        anteiban = __raceinfo_html.select_one('span.label2')
+        if anteiban is not None:
+            is_antei = True
+        else:
+            is_antei = False
 
         content_dict = {
-            'race_name': race_name
+            'taikai_name': taikai_name,
+            'grade': grade,
+            'race_type': race_type,
+            'race_kyori': race_kyori,
+            'is_antei': is_antei,
         }
 
         return content_dict
