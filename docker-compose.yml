@@ -8,8 +8,8 @@ services:
     user: 1000:1000
     runtime: nvidia
     volumes:
-      - /mnt/dataset/My Documents/Project/program/BoatRace/src:/home/contuser1/src
-      - /mnt/dataset/My Documents/Project/datasets/BoatRace/:/home/contuser1/data
+      - sourse:/home/contuser1/src
+      # - /mnt/dataset/My Documents/Project/datasets/BoatRace/:/home/contuser1/data
       - ./.jupyter:/home/contuser1/.jupyter  # import jupyter setting
       - ./Pipfile:/home/contuser1/Pipfile
       - ./Pipfile.lock:/home/contuser1/Pipfile.lock
@@ -57,3 +57,10 @@ volumes:
       type: none
       device: mnt/dataset/db4mysql/mysql/db
       o: bind
+
+  sourse:
+    driver_opts: 
+      type: none
+      device: /mnt/dataset/My Documents/Project/program/BoatRace/src
+      o: bind
+
