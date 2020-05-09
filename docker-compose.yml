@@ -15,6 +15,7 @@ services:
       - ./Pipfile.lock:/home/contuser1/Pipfile.lock
 
     working_dir: /home/contuser1
+    env_file: .env
     environment:
       SHELL: /bin/bash
       PYTHONPATH: /home/contuser1/src/:/home/contuser1/src/module
@@ -25,38 +26,7 @@ services:
     command: bash -c "
       pipenv install --system &&
       jupyter-lab --no-browser --port=8840 --ip=0.0.0.0 --allow-root --NotebookApp.password='sha1:408161a8c9a2:c3bc403dfe03f329997889dd5e8e06519f95b408'"
-
-  mysql:
-    image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    env_file: /mnt/dataset/db4mysql/boat/.env
-    environment:
-      TZ: "Asia/Tokyo"
-
-    ports:
-      - 3306:3306
-    volumes:
-      - mysql:/var/lib/mysql
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    restart: always
-    ports:
-      - 8080:80
-    environment:
-      PMA_ARBITRARY: 1
-    env_file: /mnt/dataset/db4mysql/boat/.env
-    depends_on:
-      - mysql
-
 volumes:
-  mysql:
-    driver_opts:
-      type: none
-      device: mnt/dataset/db4mysql/boat/mysql/db
-      o: bind
-
   sourse:
     driver_opts: 
       type: none

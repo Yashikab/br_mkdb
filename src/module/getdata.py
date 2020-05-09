@@ -4,14 +4,20 @@
 HTMLから情報をスクレイピングするためのモジュール
 """
 
+import sys
+
+import re
 from urllib.request import urlopen
+from logging import getLogger
+from datetime import datetime, timedelta
+
 import bs4
 from bs4 import BeautifulSoup as bs
-import re
 import numpy as np
-from datetime import datetime, timedelta
-from logging import getLogger
-import sys
+import pandas as pd
+
+from module.connect import MySQL
+from module import const
 
 
 class CommonMethods4Official:
@@ -949,6 +955,33 @@ class GetHoldPlace(CommonMethods4Official):
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         return self.place_name_set
+
+    def holdplace2cdset(self):
+        """
+        会場コードをset型で返す．
+        """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        # MySQLへ接続
+        self.logger.debug(f'connecting mysql server.')
+        mysql = MySQL(const.MYSQL_CONFIG)
+        self.logger.debug(f'done.')
+        # load jyo master 場マスタのロード
+        self.logger.debug(f'loading table to df.')
+        sql = """
+            SELECT
+                *
+            FROM
+                jyo_master
+        """
+        jyo_master = pd.read_sql(sql, mysql.conn)
+        self.logger.debug(f'loading table to df done.')
+        # 会場名をインデックスにする
+        jyo_master.set_index('jyo_name', inplace=True)
+        # コードへ返還
+        code_name_set = \
+            set(map(
+                lambda x: jyo_master.at[x, 'jyo_code'], self.place_name_set))
+        return code_name_set
 
     def _getplacename(self, row_html) -> str:
         """

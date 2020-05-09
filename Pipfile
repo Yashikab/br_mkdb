@@ -11,6 +11,8 @@ pytest = "*"
 beautifulsoup4 = "*"
 request = "*"
 numpy = "*"
+mysql-connector-python = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.7"

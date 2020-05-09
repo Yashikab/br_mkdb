@@ -11,3 +11,6 @@ bash: $(pathtodocker)
 
 stop: $(targetdocker)
 	docker-compose -f $(targetdocker) stop
+
+restart: $(targetdocker)
+	docker-compose down && docker-compose -f $(targetdocker) up -d
