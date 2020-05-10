@@ -34,25 +34,48 @@ class TestGetHoldPlace:
              '宮島': '-',
              '芦屋': '-',
              '福岡': '-'}
+    possible_dict2 = {
+        '多摩川': list(range(1, 9)),
+        '浜名湖': list(range(1, 13)),
+        '蒲郡': list(range(1, 13)),
+        '常滑': list(range(1, 13)),
+        '津': list(range(1, 13)),
+        '三国': list(range(1, 13)),
+        '住之江': list(range(1, 13)),
+        '丸亀': list(range(1, 13)),
+        '児島': list(range(1, 13)),
+        '宮島': list(range(1, 13)),
+        '芦屋': list(range(1, 13)),
+        '福岡': list(range(1, 13))}
 
+    # @pytest.fixture(scope='class')
+    # def ghp(self):
+    #     return getdata.GetHoldPlasePast()
     @pytest.mark.parametrize("date, expected", [
         (20200408, name_set1),
         (20110311, name_set2)
     ])
     def test_holdplace2strset(self, date, expected):
-        ghp = getdata.GetHoldPlace(date)
+        ghp = getdata.GetHoldPlacePast(date)
         assert ghp.holdplace2strset() == expected
 
     @pytest.mark.parametrize("date, expected", [
         (20110311, code_set2)
     ])
     def test_holdplace2cdset(self, date, expected):
-        ghp = getdata.GetHoldPlace(date)
+        ghp = getdata.GetHoldPlacePast(date)
         assert ghp.holdplace2cdset() == expected
 
     @pytest.mark.parametrize("date, expected", [
         (20110311, dict2)
     ])
-    def test_shinkoinfo2dict(self, date, expected):
-        ghp = getdata.GetHoldPlace(date)
-        assert ghp.shinkoinfo2dict() == expected
+    def test_shinkoinfodict(self, date, expected):
+        ghp = getdata.GetHoldPlacePast(date)
+        assert ghp.shinkoinfodict() == expected
+
+    @pytest.mark.parametrize("date, expected", [
+        (20110311, possible_dict2)
+    ])
+    def test_possibleraces(self, date, expected):
+        ghp = getdata.GetHoldPlacePast(date)
+        assert ghp.holdracedict() == expected

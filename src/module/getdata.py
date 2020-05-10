@@ -921,11 +921,12 @@ class OfficialResults(CommonMethods4Official):
         return waku_dict
 
 
-class GetHoldPlace(CommonMethods4Official):
+class GetHoldPlacePast(CommonMethods4Official):
     """
     指定した日付での開催会場を取得する
+    開催中のレースは無理
     """
-    def __init__(self, target_date):
+    def __init__(self, target_date: int):
         """
         Parameters
         ----------
@@ -985,13 +986,37 @@ class GetHoldPlace(CommonMethods4Official):
                 lambda x: jyo_master.at[x, 'jyo_code'], self.place_name_list))
         return code_name_set
 
-    def shinkoinfo2dict(self) -> dict:
+    def shinkoinfodict(self) -> dict:
         """
         レースの進行状況（中止など)を会場名をキーとしたdictで返す
         """
         shinkoinfo_dict = dict(
             zip(self.place_name_list, self.shinko_info_list))
         return shinkoinfo_dict
+
+    def holdracedict(self) -> dict:
+        """
+        会場名をキーとして，開催されるレース番号リストを出力
+        何もなければ list(range(1,13))
+        中止ならば空リスト
+        xR以降中止ならば[1, , x-1]
+        """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+
+        def possibleraces(msg: str) -> list:
+            if re.search(r'1?[1-9]R以降中止', msg) is not None:
+                end_race = int(re.search(r'1?[1-9]', msg).group(0))
+                race_list = list(range(1, end_race))
+            elif '中止' in msg:
+                race_list = []
+            else:
+                race_list = list(range(1, 13))
+            return race_list
+
+        race_listoflist = list(
+            map(lambda x: possibleraces(x), self.shinko_info_list))
+        possiblerace_dict = dict(zip(self.place_name_list, race_listoflist))
+        return possiblerace_dict
 
     def _getplacename(self, row_html) -> str:
         """
