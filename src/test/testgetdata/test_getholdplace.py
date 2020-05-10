@@ -22,6 +22,19 @@ class TestGetHoldPlace:
                  '宮島', '芦屋', '福岡'}
     code_set2 = {5, 6, 7, 8, 9, 10, 12, 15, 16, 17, 21, 22}
 
+    dict2 = {'多摩川': '9R以降中止',
+             '浜名湖': '-',
+             '蒲郡': '-',
+             '常滑': '-',
+             '津': '-',
+             '三国': '-',
+             '住之江': '-',
+             '丸亀': '-',
+             '児島': '-',
+             '宮島': '-',
+             '芦屋': '-',
+             '福岡': '-'}
+
     @pytest.mark.parametrize("date, expected", [
         (20200408, name_set1),
         (20110311, name_set2)
@@ -36,3 +49,10 @@ class TestGetHoldPlace:
     def test_holdplace2cdset(self, date, expected):
         ghp = getdata.GetHoldPlace(date)
         assert ghp.holdplace2cdset() == expected
+
+    @pytest.mark.parametrize("date, expected", [
+        (20110311, dict2)
+    ])
+    def test_shinkoinfo2dict(self, date, expected):
+        ghp = getdata.GetHoldPlace(date)
+        assert ghp.shinkoinfo2dict() == expected

@@ -946,17 +946,19 @@ class GetHoldPlace(CommonMethods4Official):
         __target_table_html = self.__soup.select_one(__target_table_selector)
         __tbody_list = __target_table_html.select('tbody')
 
-        self.place_name_set = \
-            set(map(lambda x: self._getplacename(x), __tbody_list))
+        self.place_name_list = \
+            list(map(lambda x: self._getplacename(x), __tbody_list))
+        self.shinko_info_list = \
+            list(map(lambda x: self._getshinkoinfo(x), __tbody_list))
 
-    def holdplace2strset(self):
+    def holdplace2strset(self) -> set:
         """
         会場名のままset型で返す
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        return self.place_name_set
+        return set(self.place_name_list)
 
-    def holdplace2cdset(self):
+    def holdplace2cdset(self) -> set:
         """
         会場コードをset型で返す．
         """
@@ -980,8 +982,16 @@ class GetHoldPlace(CommonMethods4Official):
         # コードへ返還
         code_name_set = \
             set(map(
-                lambda x: jyo_master.at[x, 'jyo_code'], self.place_name_set))
+                lambda x: jyo_master.at[x, 'jyo_code'], self.place_name_list))
         return code_name_set
+
+    def shinkoinfo2dict(self) -> dict:
+        """
+        レースの進行状況（中止など)を会場名をキーとしたdictで返す
+        """
+        shinkoinfo_dict = dict(
+            zip(self.place_name_list, self.shinko_info_list))
+        return shinkoinfo_dict
 
     def _getplacename(self, row_html) -> str:
         """
@@ -990,3 +1000,9 @@ class GetHoldPlace(CommonMethods4Official):
         place_name = row_html.select_one('tr > td > a > img')['alt']
         place_name = super().getonlyzenkaku2str(place_name)
         return place_name
+
+    def _getshinkoinfo(self, row_html) -> str:
+        """
+        中止などの情報を抜き出す
+        """
+        return row_html.select('tr > td')[1].text
