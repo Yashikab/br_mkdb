@@ -1,7 +1,8 @@
 docker/
 
-*/.ipynb_checkpoints
+.ipynb_checkpoints
 .docker
 .vscode
 .env
-src/*/__pycache__
+__pycache__
+.pytest_cache
