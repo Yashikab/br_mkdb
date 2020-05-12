@@ -1031,3 +1031,43 @@ class GetHoldPlacePast(CommonMethods4Official):
         中止などの情報を抜き出す
         """
         return row_html.select('tr > td')[1].text
+
+
+class DateList:
+    """
+    ある日付からある日付までのyyyymmdd型の日付リストを返す
+    """
+    def datelist(self,
+                 st_year: int,
+                 st_month: int,
+                 st_day: int,
+                 ed_year: int,
+                 ed_month: int,
+                 ed_day: int) -> list:
+        """
+        開始日から終了日までの日付リストを返す
+
+        Parameters
+        ----------
+        st_year : int
+            開始年
+        st_month : int
+            開始月
+        st_day : int
+            開始日
+        st_year : int
+            終了年
+        st_month : int
+            終了月
+        st_day : int
+            終了日
+        """
+        __st_date = datetime(st_year, st_month, st_day)
+        __ed_date = datetime(ed_year, ed_month, ed_day)
+        date_list = []
+        # +1することでeddateも含める
+        for n in range((__ed_date - __st_date).days + 1):
+            __ap_date = __st_date + timedelta(n)
+            __ap_date_int = int(__ap_date.strftime('%Y%m%d'))
+            date_list.append(__ap_date_int)
+        return date_list
