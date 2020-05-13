@@ -396,12 +396,16 @@ class OfficialProgram(CommonMethods4Official):
         except ValueError:
             race_kyori = None
 
-        # 安定版の有無
-        anteiban = __raceinfo_html.select_one('span.label2')
-        if anteiban is not None:
+        # 安定版or進入固定の有無
+        other_labels_list = __raceinfo_html.select('span.label2')
+        if '安定板使用' in other_labels_list:
             is_antei = True
         else:
             is_antei = False
+        if '進入固定' in other_labels_list:
+            is_shinnyukotei = True
+        else:
+            is_shinnyukotei = False
 
         content_dict = {
             'taikai_name': taikai_name,
@@ -409,6 +413,7 @@ class OfficialProgram(CommonMethods4Official):
             'race_type': race_type,
             'race_kyori': race_kyori,
             'is_antei': is_antei,
+            'is_shinnyukotei': is_shinnyukotei
         }
 
         return content_dict

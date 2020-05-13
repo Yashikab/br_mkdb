@@ -5,7 +5,7 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module import dt2mysql
+from module import getdata
 
 
 class TestJyoData2Mysql:
