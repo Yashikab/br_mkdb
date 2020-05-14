@@ -26,9 +26,9 @@ class CommonMethods4Official:
 
     def url2soup(self, url):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        __html_content = urlopen(url).read()
+        html_content = urlopen(url).read()
 
-        soup = bs(__html_content, 'html.parser')
+        soup = bs(html_content, 'html.parser')
 
         return soup
 
@@ -50,8 +50,8 @@ class CommonMethods4Official:
                 選手ごとの行のhtmlを格納したリスト
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        __target_table_html = soup.select_one(table_selector)
-        player_html_list = __target_table_html.select('tbody')
+        target_table_html = soup.select_one(table_selector)
+        player_html_list = target_table_html.select('tbody')
         assert len(player_html_list) == 6, \
             f"lengh is not 6:{len(player_html_list)}"
         return player_html_list
@@ -78,27 +78,27 @@ class CommonMethods4Official:
                 対象枠のコースとSTタイムをタプルで返す
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        __target_table_html = soup.select_one(table_selector)
-        __st_html = __target_table_html.select_one('tbody')
-        st_html_list = __st_html.select('tr')
+        target_table_html = soup.select_one(table_selector)
+        st_html = target_table_html.select_one('tbody')
+        st_html_list = st_html.select('tr')
         assert len(st_html_list) == 6, \
             f"lengh is not 6:{len(st_html_list)}"
         # コース抜き出し
         # コースがキーで，号がvalueなので全て抜き出してから逆にする
-        __waku_list = list(
+        waku_list = list(
             map(lambda x: int(x.select('div > span')[0].text),
                 st_html_list))
         # 0~5のインデックスなので1~6へ変換のため+1
-        __C_idx = __waku_list.index(waku)
-        course = __C_idx + 1
+        course_idx = waku_list.index(waku)
+        course = course_idx + 1
 
         # 展示ST抜き出し
-        __st_time_list = list(
+        st_time_list = list(
             map(lambda x: x.select('div > span')[2].text,
                 st_html_list))
         # Fをマイナスに変換し，少数化
         # listのキーはコースであることに注意
-        st_time = __st_time_list[__C_idx]
+        st_time = st_time_list[course_idx]
         st_time = self.rmletter2float(st_time.replace('F', '-'))
         return (course, st_time)
 
@@ -118,20 +118,20 @@ class CommonMethods4Official:
             content_dict : dict
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        __target_table_html = soup.select_one(table_selector)
-        condinfo_html_list = __target_table_html.select('div')
+        target_table_html = soup.select_one(table_selector)
+        condinfo_html_list = target_table_html.select('div')
         assert len(condinfo_html_list) == 12, \
             f"lengh is not 12:{len(condinfo_html_list)}"
         # 気温は2番目のdiv
-        __tmp_info_html = condinfo_html_list[1]
+        tmp_info_html = condinfo_html_list[1]
         # spanで情報がとれる (1番目： '気温', 2番目: 数字℃)
-        __tmp_info = __tmp_info_html.select('span')
-        temp = __tmp_info[1].text
+        tmp_info = tmp_info_html.select('span')
+        temp = tmp_info[1].text
         temp = self.rmletter2float(temp)
         # 天気は2番目のdiv
-        __weather_info_html = condinfo_html_list[2]
+        weather_info_html = condinfo_html_list[2]
         # spanのなか（1個しかない)
-        weather = __weather_info_html.select_one('span').text
+        weather = weather_info_html.select_one('span').text
         weather = weather.replace('\n', '')\
                          .replace('\r', '')\
                          .replace(' ', '')
@@ -263,86 +263,86 @@ class OfficialProgram(CommonMethods4Official):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 番組表を選択 css selectorより
         self.logger.debug('get table html from target url')
-        __target_table_selector = \
+        target_table_selector = \
             'body > main > div > div > '\
             'div > div.contentsFrame1_inner > '\
             'div.table1.is-tableFixed__3rdadd > table'
-        __player_info_html_list = \
+        player_info_html_list = \
             super().getplayertable2list(
                 self.__soup,
-                __target_table_selector
+                target_table_selector
             )
         self.logger.debug('get table html completed.')
 
         # waku は1からなので-1
         self.logger.debug(f'get target player info (waku : {waku})')
-        __player_html = __player_info_html_list[waku - 1]
+        player_html = player_info_html_list[waku - 1]
         # 選手情報は1番目のtr
-        __player_info = __player_html.select_one("tr")
-        __player_info_list = __player_info.select("td")
+        player_info = player_html.select_one("tr")
+        player_info_list = player_info.select("td")
 
         # 名前，登録番号などの欄は3番目
-        player_name_list = __player_info_list[2].select("div")
+        player_name_list = player_info_list[2].select("div")
         assert len(player_name_list) == 3, \
             f'elements of player name info is not 3: {len(player_name_list)}'
         # list 登録番号・級，名前，出身・年齢，体重
-        __player_no_level, name, __place_age_weight = \
+        player_no_level, name, place_age_weight = \
             list(map(lambda elements: elements.text, player_name_list))
         # 名前の取り出し
         name = name.replace('\n', '').replace('\u3000', '')
-        player_id, player_level = __player_no_level.replace('\r', '')\
-                                                   .replace('\n', '')\
-                                                   .replace(' ', '')\
-                                                   .split('/')
+        player_id, player_level = player_no_level.replace('\r', '')\
+                                                 .replace('\n', '')\
+                                                 .replace(' ', '')\
+                                                 .split('/')
         # 登録番号の取り出し
         player_id = int(player_id)
 
         # 出身地, 年齢, 体重の取り出し
-        __place, __age_weight = __place_age_weight.replace(' ', '')\
-                                                  .replace('\r', '')\
-                                                  .split('\n')[1:-1]
+        place, age_weight = place_age_weight.replace(' ', '')\
+                                            .replace('\r', '')\
+                                            .split('\n')[1:-1]
         # 支部：home, 出身地: birth_place
-        home, birth_place = __place.split('/')
+        home, birth_place = place.split('/')
         # 年齢:age，体重:weight
-        age, weight = __age_weight.split('/')
+        age, weight = age_weight.split('/')
         # 数字だけ抜く
         age = re.match(r'[0-9]+', age)
         age = int(age.group(0))
         weight = super().rmletter2float(weight)
 
         # F/L/ST平均は4番目
-        __flst = __player_info_list[3]
-        __flst_list = super().text2list_rn_split(__flst, 3)
+        flst = player_info_list[3]
+        flst_list = super().text2list_rn_split(flst, 3)
         # 数字のみ抜き出してキャスト
-        num_F = int(re.sub(r'[a-z, A-Z]', '', __flst_list[0]))
-        num_L = int(re.sub(r'[a-z, A-Z]', '', __flst_list[1]))
-        avg_ST = float(re.sub(r'[a-z, A-Z]', '', __flst_list[2]))
+        num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
+        num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
+        avg_ST = float(re.sub(r'[a-z, A-Z]', '', flst_list[2]))
 
         # 全国勝率・連対率は5番目
-        __all_123_rate = __player_info_list[4]
-        __all_123_list = super().text2list_rn_split(__all_123_rate, 3)
+        all_123_rate = player_info_list[4]
+        all_123_list = super().text2list_rn_split(all_123_rate, 3)
         all_1rate, all_2rate, all_3rate = \
-            list(map(lambda x: float(x), __all_123_list))
+            list(map(lambda x: float(x), all_123_list))
 
         # 当地勝率・連対率は6番目
-        __local_123_rate = __player_info_list[5]
-        __local_123_list = super().text2list_rn_split(__local_123_rate, 3)
+        local_123_rate = player_info_list[5]
+        local_123_list = super().text2list_rn_split(local_123_rate, 3)
         local_1rate, local_2rate, local_3rate = \
-            list(map(lambda x: float(x), __local_123_list))
+            list(map(lambda x: float(x), local_123_list))
 
         # モーター情報は7番目
-        __motor_info = __player_info_list[6]
-        __motor_info_list = super().text2list_rn_split(__motor_info, 3)
-        motor_no = int(__motor_info_list[0])
-        motor_2rate = float(__motor_info_list[1])
-        motor_3rate = float(__motor_info_list[2])
+        motor_info = player_info_list[6]
+        motor_info_list = super().text2list_rn_split(motor_info, 3)
+        motor_no = int(motor_info_list[0])
+        motor_2rate = float(motor_info_list[1])
+        motor_3rate = float(motor_info_list[2])
 
         # ボート情報は8番目
-        __boat_info = __player_info_list[7]
-        __boat_info_list = super().text2list_rn_split(__boat_info, 3)
-        boat_no = int(__boat_info_list[0])
-        boat_2rate = float(__boat_info_list[1])
-        boat_3rate = float(__boat_info_list[2])
+        boat_info = player_info_list[7]
+        boat_info_list = super().text2list_rn_split(boat_info, 3)
+        boat_no = int(boat_info_list[0])
+        boat_2rate = float(boat_info_list[1])
+        boat_3rate = float(boat_info_list[2])
 
         self.logger.debug(f'get target player info completed.')
 
@@ -375,29 +375,29 @@ class OfficialProgram(CommonMethods4Official):
 
     def raceinfo(self) -> dict:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        __table_selector = \
+        table_selector = \
             'body > main > div > div > div > '\
             'div.heading2 > div > div.heading2_title'
-        __raceinfo_html = self.__soup.select_one(__table_selector)
-        taikai_name = __raceinfo_html.select_one('h2').text
+        raceinfo_html = self.__soup.select_one(table_selector)
+        taikai_name = raceinfo_html.select_one('h2').text
 
         # SG, G1, G2, G3 一般
-        grade = __raceinfo_html['class'][1]
+        grade = raceinfo_html['class'][1]
 
         # race_type : 予選 優勝戦など
-        __race_str = __raceinfo_html.select_one('span').text
-        __race_str = __race_str.replace('\u3000', '')
-        race_type = super().getonlyzenkaku2str(__race_str)
+        race_str = raceinfo_html.select_one('span').text
+        race_str = race_str.replace('\u3000', '')
+        race_type = super().getonlyzenkaku2str(race_str)
 
         # レース距離
         try:
-            race_kyori = re.search(r'[0-9]+m', __race_str).group(0)
+            race_kyori = re.search(r'[0-9]+m', race_str).group(0)
             race_kyori = int(race_kyori.replace('m', ''))
         except ValueError:
             race_kyori = None
 
         # 安定版or進入固定の有無
-        other_labels_list = __raceinfo_html.select('span.label2')
+        other_labels_list = raceinfo_html.select('span.label2')
         if '安定板使用' in other_labels_list:
             is_antei = True
         else:
@@ -448,46 +448,46 @@ class OfficialChokuzen(CommonMethods4Official):
     def getplayerinfo2dict(self, waku: int) -> dict:
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 選手直前情報を選択 css selectorより
-        __target_p_table_selector = \
+        target_p_table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner > '\
             'div.grid.is-type3.h-clear > div:nth-child(1) > div.table1 > table'
-        __p_chokuzen_html_list = \
+        p_chokuzen_html_list = \
             super().getplayertable2list(
                 self.__soup,
-                __target_p_table_selector
+                target_p_table_selector
             )
 
-        __p_html = __p_chokuzen_html_list[waku - 1]
+        p_html = p_chokuzen_html_list[waku - 1]
         # 選手情報は1番目のtr
-        __p_chokuzen = __p_html.select_one("tr")
-        __p_chokuzen_list = __p_chokuzen.select("td")
+        p_chokuzen = p_html.select_one("tr")
+        p_chokuzen_list = p_chokuzen.select("td")
 
         # 名前の欄は3番目
-        name = __p_chokuzen_list[2].text.replace('\u3000', '')
+        name = p_chokuzen_list[2].text.replace('\u3000', '')
 
         # 体重は4番目
-        weight = __p_chokuzen_list[3].text
+        weight = p_chokuzen_list[3].text
         # 'kg'を取り除く
         weight = super().rmletter2float(weight)
         # 調整体重だけ3番目のtr, 1番目td
-        __p_chokuzen4chosei = __p_html.select("tr")[2]
-        chosei_weight = __p_chokuzen4chosei.select_one("td").text
+        p_chokuzen4chosei = p_html.select("tr")[2]
+        chosei_weight = p_chokuzen4chosei.select_one("td").text
         chosei_weight = super().rmletter2float(chosei_weight)
         # 展示タイムは5番目td (調整体重の方じゃないので注意)
-        tenji_T = __p_chokuzen_list[4].text
+        tenji_T = p_chokuzen_list[4].text
         tenji_T = super().rmletter2float(tenji_T)
         # チルトは6番目
-        tilt = __p_chokuzen_list[5].text
+        tilt = p_chokuzen_list[5].text
         tilt = super().rmletter2float(tilt)
 
         # スタート展示テーブルの選択
-        __target_ST_table_selector = \
+        target_ST_table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner '\
             '> div.grid.is-type3.h-clear > div:nth-child(2) '\
             '> div.table1 > table'
         tenji_C, tenji_ST = super().getSTtable2tuple(
             self.__soup,
-            __target_ST_table_selector,
+            target_ST_table_selector,
             waku
         )
 
@@ -564,29 +564,29 @@ class OfficialOdds(CommonMethods4Official):
                    f'odds{num}{html_type}?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.day}'
-        __soup = super().url2soup(target_url)
+        soup = super().url2soup(target_url)
         # 3連単と共通--------------------
         # oddsテーブルの抜き出し
         if num == 2 and kake == 'renfuku':
-            __target_table_selector = \
+            target_table_selector = \
                 'body > main > div > div > div > '\
                 'div.contentsFrame1_inner > div:nth-child(8) '\
                 '> table > tbody'
         else:
-            __target_table_selector = \
+            target_table_selector = \
                 'body > main > div > div > div > '\
                 'div.contentsFrame1_inner > div:nth-child(6) > '\
                 'table > tbody'
-        odds_table = __soup.select_one(__target_table_selector)
+        odds_table = soup.select_one(target_table_selector)
         # 1行ごとのリスト
         yoko_list = odds_table.select('tr')
 
         # oddsPointクラスを抜き，要素を少数に変換してリストで返す
         def _getoddsPoint2floatlist(odds_tr):
-            __html_list = odds_tr.select('td.oddsPoint')
-            __text_list = list(map(lambda x: x.text, __html_list))
+            html_list = odds_tr.select('td.oddsPoint')
+            text_list = list(map(lambda x: x.text, html_list))
             float_list = list(map(
-                lambda x: float(x), __text_list))
+                lambda x: float(x), text_list))
             return float_list
 
         odds_matrix = list(map(
@@ -718,14 +718,14 @@ class OfficialOdds(CommonMethods4Official):
                    f'oddstf?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.day}'
-        __soup = super().url2soup(target_url)
-        __target_table_selector = \
+        soup = super().url2soup(target_url)
+        target_table_selector = \
             'body > main > div > div > div > '\
             'div.contentsFrame1_inner > div.grid.is-type2.h-clear '\
             '> div:nth-child(1) > div.table1 > table'
-        __odds_table = __soup.select_one(__target_table_selector)
-        __odds_html_list = __odds_table.select('tbody tr td.oddsPoint')
-        odds_list = list(map(lambda x: float(x.text), __odds_html_list))
+        odds_table = soup.select_one(target_table_selector)
+        odds_html_list = odds_table.select('tbody tr td.oddsPoint')
+        odds_list = list(map(lambda x: float(x.text), odds_html_list))
 
         content_dict = {}
         for fst in range(1, 7):
@@ -783,14 +783,14 @@ class OfficialResults(CommonMethods4Official):
         content_dict = self.waku_dict[waku]
 
         # 結果STテーブルの情報を取得
-        __target_table_selector = \
+        target_table_selector = \
             'body > main > div > div > div > '\
             'div.contentsFrame1_inner > '\
             'div.grid.is-type2.h-clear.h-mt10 > '\
             'div:nth-child(2) > div > table'
         course, st_time = super().getSTtable2tuple(
             soup=self.__soup,
-            table_selector=__target_table_selector,
+            table_selector=target_table_selector,
             waku=waku)
         content_dict['course'] = course
         content_dict['st_time'] = st_time
@@ -824,7 +824,7 @@ class OfficialResults(CommonMethods4Official):
             'div:nth-child(2) > div:nth-child(1) > '\
             'table > tbody > tr > td > '\
             'div > div span.numberSet1_number'
-        __henkantei_html_list = self.__soup.select(table_selector)
+        henkantei_html_list = self.__soup.select(table_selector)
 
         # 返還艇をint型に直す，変なやつはNoneでハンドル（あんまりないけど）
         def teistr2int(tei_str):
@@ -835,9 +835,9 @@ class OfficialResults(CommonMethods4Official):
                 return None
 
         # 返還艇があればリスト長が1以上になる
-        if len(__henkantei_html_list) != 0:
+        if len(henkantei_html_list) != 0:
             henkantei_list = list(map(
-                lambda x: teistr2int(x.text), __henkantei_html_list))
+                lambda x: teistr2int(x.text), henkantei_html_list))
             is_henkan = True
         else:
             henkantei_list = []
@@ -878,16 +878,16 @@ class OfficialResults(CommonMethods4Official):
                 枠をキーとしてテーブル情報を抜く
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        __target_table_selector = \
+        target_table_selector = \
             'body > main > div > div > div > '\
             'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
             'div:nth-child(1) > div > table'
-        __player_res_html_list = \
-            super().getplayertable2list(self.__soup, __target_table_selector)
+        player_res_html_list = \
+            super().getplayertable2list(self.__soup, target_table_selector)
         # rank_p_html : 各順位の選手情報
         # waku_dict : 枠をキーとしテーブル内容を入れ替える
         waku_dict = {}
-        for rank_p_html in __player_res_html_list:
+        for rank_p_html in player_res_html_list:
             rank, waku, name, racetime = \
                 list(map(lambda x: x.text, rank_p_html.select('td')))
             # rankはF,L欠などが存在するためエラーハンドルがいる
@@ -898,13 +898,13 @@ class OfficialResults(CommonMethods4Official):
 
             # レースタイムは秒に変換する
             try:
-                __t = datetime.strptime(racetime, '%M\'%S"%f')
-                __delta = timedelta(
-                    seconds=__t.second,
-                    microseconds=__t.microsecond,
-                    minutes=__t.minute,
+                t = datetime.strptime(racetime, '%M\'%S"%f')
+                delta = timedelta(
+                    seconds=t.second,
+                    microseconds=t.microsecond,
+                    minutes=t.minute,
                 )
-                racetime_sec = __delta.total_seconds()
+                racetime_sec = delta.total_seconds()
             except ValueError:
                 racetime_sec = -1
 
@@ -915,14 +915,14 @@ class OfficialResults(CommonMethods4Official):
             no, name = name.split('\r')
             no = int(no)
 
-            __content_dict = {
+            content_dict = {
                 'rank': rank,
                 'name': name,
                 'no': no,
                 'racetime': racetime_sec
             }
 
-            waku_dict[waku] = __content_dict
+            waku_dict[waku] = content_dict
         return waku_dict
 
 
@@ -946,16 +946,16 @@ class GetHoldPlacePast(CommonMethods4Official):
         self.__soup = super().url2soup(target_url)
 
         # 抜き出すテーブルの選択
-        __target_table_selector = \
+        target_table_selector = \
             'body > main > div > div > div > '\
             'div.contentsFrame1_inner > div.table1 > table'
-        __target_table_html = self.__soup.select_one(__target_table_selector)
-        __tbody_list = __target_table_html.select('tbody')
+        target_table_html = self.__soup.select_one(target_table_selector)
+        tbody_list = target_table_html.select('tbody')
 
         self.place_name_list = \
-            list(map(lambda x: self._getplacename(x), __tbody_list))
+            list(map(lambda x: self._getplacename(x), tbody_list))
         self.shinko_info_list = \
-            list(map(lambda x: self._getshinkoinfo(x), __tbody_list))
+            list(map(lambda x: self._getshinkoinfo(x), tbody_list))
 
     def holdplace2strset(self) -> set:
         """
@@ -1058,7 +1058,7 @@ class DateList:
         date_list = []
         # +1することでeddateも含める
         for n in range((ed_date - st_date).days + 1):
-            __ap_date = st_date + timedelta(n)
-            __ap_date_int = int(__ap_date.strftime('%Y%m%d'))
-            date_list.append(__ap_date_int)
+            ap_date = st_date + timedelta(n)
+            ap_date_int = int(ap_date.strftime('%Y%m%d'))
+            date_list.append(ap_date_int)
         return date_list
