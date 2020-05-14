@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup as bs
 import numpy as np
 import pandas as pd
 
-from module.connect import MySQL
+import mysql.connector
 from module import const
 
 
@@ -971,7 +971,7 @@ class GetHoldPlacePast(CommonMethods4Official):
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # MySQLへ接続
         self.logger.debug(f'connecting mysql server.')
-        mysql = MySQL(const.MYSQL_CONFIG)
+        conn = mysql.connector.connect(**const.MYSQL_CONFIG)
         self.logger.debug(f'done.')
         # load jyo master 場マスタのロード
         self.logger.debug(f'loading table to df.')
@@ -981,7 +981,9 @@ class GetHoldPlacePast(CommonMethods4Official):
             FROM
                 jyo_master
         """
-        jyo_master = pd.read_sql(sql, mysql.conn)
+        jyo_master = pd.read_sql(sql, conn)
+        conn.close()
+        self.logger.debug(f'mysql connection closed.')
         self.logger.debug(f'loading table to df done.')
         # 会場名をインデックスにする
         jyo_master.set_index('jyo_name', inplace=True)

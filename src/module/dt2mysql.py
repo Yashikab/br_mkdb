@@ -5,31 +5,60 @@
 最新データ取得用プログラムではない．
 スクレイピングを行い, mysqlにデータを格納
 """
+import sys
+from abc import ABCMeta, abstractmethod
 from logging import getLogger
-from datetime import datetime
+# from datetime import datetime
+from pathlib import Path
 
-from module.getdata import DateList as dtl
-from module.getdata import GetHoldPlacePast
+from module import const
+import mysql.connector
+# from module.getdata import DateList as dtl
+# from module.getdata import GetHoldPlacePast
 
 
-logger = getLogger(__name__)
+class Data2MysqlTemplate(metaclass=ABCMeta):
+
+    @abstractmethod
+    def create_table_if_not_exists(self):
+        '''
+        テーブルがなければ作成する
+        '''
+        pass
+
+    @abstractmethod
+    def insert2table(self):
+        '''
+        データを挿入する
+        '''
+        pass
 
 
-def main():
-    # TODO: データを取得する期間を決める
-    # オッズデータが存在する最初の日
-    start_date = datetime(2017, 3, 8)
-    # とりあえず2年間
-    end_date = datetime(2019, 3, 8)
-    # 日付リスト取得
-    datelist = dtl.datelist(start_date, end_date)
+class JyoData2Mysql(Data2MysqlTemplate):
 
-    for target_date in datelist:
-        # TODO: 対象日のレース情報を取得
-        ghpp = GetHoldPlacePast(target_date)
-        holdplace_name_set = ghpp.holdplace2strset()
-        holdplace_code_set = ghpp.holdplace2cdset()
+    def __init__(self):
+        self.logger = getLogger(__class__.__name__)
 
-    # TODO: 各会場，レースにおける情報の取得
-    # TODO: 取得した情報をMYSQLに格納する
-    pass
+    def create_table_if_not_exists(self):
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        conn = mysql.connector.connect(**const.MYSQL_CONFIG)
+        cursor = conn.cursor(buffered=True)
+        try:
+            # holdjyo_tbを作るクエリを読み込む
+            # このファイルからの相対パスを実行ファイルの絶対パスに変換する
+            self.logger.debug(f'creating table.')
+            sql_path = \
+                Path(__file__).parent\
+                              .joinpath('query', 'jyodata_create_tb.sql')\
+                              .resolve()
+            with open(sql_path, 'r') as f:
+                sql = f.read()
+                cursor.execute(sql)
+            self.logger.debug('created table successfully!')
+        except FileExistsError:
+            self.logger.warning(f'table is already exists.')
+        cursor.close()
+        conn.close()
+
+    def insert2table(self):
+        pass
