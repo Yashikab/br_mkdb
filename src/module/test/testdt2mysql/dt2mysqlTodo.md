@@ -20,15 +20,16 @@
 
 - テーブル名: holdjyo_tb
 - カラム
-  - datejyo_id: yyyymmdd{jyo_code: %2d} primary key
-  - holddate: yyyymmdd
-  - jyo_cd: 会場コード
-  - jyo_name: 会場名
-
-- [x] クラスの作成
-- [ ] quaryフォルダからcreate_holdplace_table.sqlを読む
-  - [ ] MySQLにテーブルが存在することを確認
-  - [ ] カラムが存在することを確認
+  - [x] datejyo_id: yyyymmdd{jyo_code: %2d} primary key
+  - [x] holddate: yyyymmdd
+  - [x] jyo_cd: 会場コード
+  - [x] jyo_name: 会場名
+  - [ ] shinko: 進行状況
+  - [ ] ed_race_no: 最終レースの番号（中止の場合は0)
+- [x] テーブルの作成
+  - [x] quaryフォルダからcreate_holdplace_table.sqlを読む
+    - [x] MySQLにテーブルが存在することを確認
+    - [] カラムが存在することを確認
 
 ## レース情報データ
 

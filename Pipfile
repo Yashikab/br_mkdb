@@ -12,8 +12,8 @@ pytest-cov = "*"
 beautifulsoup4 = "*"
 request = "*"
 numpy = "*"
-mysql-connector-python = "*"
 pandas = "*"
+mysql-connector = "*"
 
 [requires]
 python_version = "3.7"

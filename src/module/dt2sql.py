@@ -34,16 +34,16 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
         pass
 
 
-class JyoData2Mysql(Data2MysqlTemplate):
+class JyoData2sql:
 
     def __init__(self):
-        self.logger = getLogger(__class__.__name__)
+        self.logger = getLogger(self.__class__.__name__)
 
     def create_table_if_not_exists(self):
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        conn = mysql.connector.connect(**const.MYSQL_CONFIG)
-        cursor = conn.cursor(buffered=True)
         try:
+            conn = mysql.connector.connect(**const.MYSQL_CONFIG)
+            cursor = conn.cursor()
             # holdjyo_tbを作るクエリを読み込む
             # このファイルからの相対パスを実行ファイルの絶対パスに変換する
             self.logger.debug(f'creating table.')
@@ -55,10 +55,11 @@ class JyoData2Mysql(Data2MysqlTemplate):
                 sql = f.read()
                 cursor.execute(sql)
             self.logger.debug('created table successfully!')
-        except FileExistsError:
+        except mysql.connector.errors.ProgrammingError:
             self.logger.warning(f'table is already exists.')
-        cursor.close()
-        conn.close()
+        finally:
+            cursor.close()
+            conn.close()
 
     def insert2table(self):
         pass
