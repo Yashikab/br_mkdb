@@ -1,25 +1,21 @@
 # python 3.7.5
 # coding: utf-8
-import mysql.connector
+'''
+mysql.connector をwith構文で使えるようにする
+'''
 
 
-class MySQL():
+class MysqlConnector(object):
     def __init__(self, config):
-        u"""
-        :param config: 接続設定を格納した辞書
-        """
         self.config = config
-        self.conn = None
-        if config is not None:
-            self.connect()
 
-    def connect(self, config=None):
-        u"""
-        MySQLに接続する。
-        :return:
-        """
-        if config is None:
-            config = self.config
-        conn = mysql.connector.connect(**config)
-        self.conn = conn
-        return conn
+    def __enter__(self):
+        import mysql.connector
+        self.connect = mysql.connector.connect(
+            **self.config
+        )
+        return self.connect
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        self.connect.commit()
+        self.connect.close()

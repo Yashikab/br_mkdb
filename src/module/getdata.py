@@ -957,14 +957,14 @@ class GetHoldPlacePast(CommonMethods4Official):
         self.shinko_info_list = \
             list(map(lambda x: self._getshinkoinfo(x), tbody_list))
 
-    def holdplace2strset(self) -> set:
+    def holdplace2strlist(self) -> list:
         """
         会場名のままset型で返す
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        return set(self.place_name_list)
+        return self.place_name_list
 
-    def holdplace2cdset(self) -> set:
+    def holdplace2cdlist(self) -> list:
         """
         会場コードをset型で返す．
         """
@@ -988,10 +988,10 @@ class GetHoldPlacePast(CommonMethods4Official):
         # 会場名をインデックスにする
         jyo_master.set_index('jyo_name', inplace=True)
         # コードへ返還
-        code_name_set = \
-            set(map(
+        code_name_list = \
+            list(map(
                 lambda x: jyo_master.at[x, 'jyo_code'], self.place_name_list))
-        return code_name_set
+        return code_name_list
 
     def shinkoinfodict(self) -> dict:
         """
