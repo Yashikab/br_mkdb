@@ -11,8 +11,6 @@ CREATE TABLE raceinfo_tb
     race_kyori INT,
     is_antei BOOLEAN,
     is_shinnyukotei BOOLEAN,
-    FOREIGN KEY (jyo_cd)
-    REFERENCES jyo_master (jyo_code),
     FOREIGN KEY (datejyo_id)
     REFERENCES holdjyo_tb (datejyo_id)
 )
