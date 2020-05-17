@@ -373,7 +373,7 @@ class OfficialProgram(CommonMethods4Official):
 
         return content_dict
 
-    def raceinfo(self) -> dict:
+    def raceinfo2dict(self) -> dict:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         table_selector = \
             'body > main > div > div > div > '\

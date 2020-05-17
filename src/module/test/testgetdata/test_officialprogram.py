@@ -45,7 +45,7 @@ class TestOfficialProgram:
 
     @pytest.fixture(scope='class')
     def raceinfo(self, loadcls):
-        return loadcls.raceinfo()
+        return loadcls.raceinfo2dict()
 
     # 公式番組表に関するテスト
     @pytest.mark.parametrize("waku, idx, expected", [

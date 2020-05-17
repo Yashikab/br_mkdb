@@ -36,9 +36,30 @@
 
 ## レース情報データ
 
-- 対象日+会場コード+レース番を主キーとする
+どちらもgetdata.OfficialProgramにあるので,
+共通のクラスで各メソッドif分岐で設計（リファクタいるかも)
 
-## 番組表データ
+### レース共通データ
+
+- if分岐用の名前: 'raceinfo'
+
+- テーブル名: raceinfo_tb
+- カラム名:
+  - ri_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: Primary key
+  - datejyo_id: yyyymmdd{jyo_cd:02}: 外部キー 設定参照： holdjyo_tb.datejyo_id
+  - holddate DATE: yyyymmdd
+  - jyo_cd INT: 会場コード 外部キー 設定参照： jyo_master.jyo_code
+  - race_no INT: レース番号
+  - taikai_name varchar(400): 大会名
+  - grade varchar(100): G1G2G3,一般がある そのまま格納
+  - race_type varchar(100): 予選, 準優勝戦など そのまま格納
+  - race_kyori INT: レースの距離基本は1800mと思われる
+  - is_antei BOOL: 安定板使用の有無
+  - is_shinnyukotei BOOL: 進入固定レースの有無
+- [x] テーブルの作成
+- [ ] データ挿入部の作成
+
+### 番組表データ
 
 - 対象日+会場コード+レース番+枠番を主キーとする
 

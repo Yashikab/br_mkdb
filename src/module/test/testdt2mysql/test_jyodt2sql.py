@@ -9,7 +9,7 @@ from module.connect import MysqlConnector
 
 
 class TestJyoData2sql:
-    # クラスのcreate_table_if_not_existsを読んでから
+
     __jd2sql = JyoData2sql()
 
     def test_exist_table(self):
