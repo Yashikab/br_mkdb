@@ -32,6 +32,60 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
         '''
         pass
 
+    def _run_query(self, query: str) -> int:
+        """
+        クエリを実行する
+
+        Parameters
+        ----------
+            query :str
+                クエリ文
+
+        Return
+        ------
+            status :int
+                成功したら0，失敗したら1
+        """
+        try:
+            self.logger.debug(f'connecteng Mysql.')
+            with MysqlConnector(const.MYSQL_CONFIG) as conn:
+                cursor = conn.cursor()
+                self.logger.debug(f'run query.')
+                cursor.execute(query)
+                cursor.close()
+                self.logger.debug('query run successfully!')
+            status = 0
+        except Exception as e:
+            self.logger.error(f'{e}')
+            status = 1
+        return status
+
+    def _run_query_from_path(self, filename: str) -> int:
+        """
+        queryフォルダ内のファイル名を指定してクエリを実行する
+
+        Parameters
+        ----------
+            filename : str
+                クエリのファイル名
+
+        Returns
+        -------
+            status : int
+                成功したら0，失敗したら1
+        """
+        # パスの指定
+        query_filepath = \
+            Path(__file__).parent\
+                          .joinpath('query', filename)\
+                          .resolve()
+        self.logger.debug(f'run query from {query_filepath}')
+        with open(query_filepath, 'r') as f:
+            query = f.read()
+            status = self._run_query(query)
+
+        return status
+
 
 class JyoData2sql(Data2MysqlTemplate):
 
@@ -40,24 +94,13 @@ class JyoData2sql(Data2MysqlTemplate):
 
     def create_table_if_not_exists(self) -> None:
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        try:
-            self.logger.debug(f'connecteng Mysql.')
-            with MysqlConnector(const.MYSQL_CONFIG) as conn:
-                cursor = conn.cursor()
-                # holdjyo_tbを作るクエリを読み込む
-                # このファイルからの相対パスを実行ファイルの絶対パスに変換する
-                self.logger.debug(f'creating table.')
-                sql_path = \
-                    Path(__file__).parent\
-                                  .joinpath('query', 'create_jyodata_db.sql')\
-                                  .resolve()
-                with open(sql_path, 'r') as f:
-                    sql = f.read()
-                    cursor.execute(sql)
-                cursor.close()
-                self.logger.debug('created table successfully!')
-        except Exception as e:
-            self.logger.error(f'{e}')
+
+        status = super()._run_query_from_path('create_jyodata_tb.sql')
+        if status == 0:
+            self.logger.debug(f'creating table succeeded!')
+        else:
+            self.logger.debug(
+                f'creating table failed or table has already exists.')
 
     def insert2table(self, date: int) -> None:
         """
@@ -88,17 +131,13 @@ class JyoData2sql(Data2MysqlTemplate):
                            f"'{hp_s}', '{shinko}', {ed_race_no})"
             insert_value_list.append(insert_value)
         total_insert_value = ', '.join(insert_value_list)
-        sql = ''.join([sql, total_insert_value])
-
-        try:
-            self.logger.debug('Connect to MySQL')
-            with MysqlConnector(const.MYSQL_CONFIG) as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql)
-                cursor.close()
-        except Exception as e:
-            self.logger.error(f'{e}')
-            self.logger.warning('Insert was unsucceeded')
+        query = ''.join([sql, total_insert_value])
+        # 作成したクエリの実行
+        status = super()._run_query(query)
+        if status == 0:
+            self.logger.debug('insert was succeeded!')
+        else:
+            self.logger.error('insert was failed.')
 
 
 class RaceData2sql(Data2MysqlTemplate):
@@ -107,30 +146,22 @@ class RaceData2sql(Data2MysqlTemplate):
         self.logger = getLogger(self.__class__.__name__)
 
     def create_table_if_not_exists(self, tb_type: str) -> None:
+        """
+        外部キーの関係でholdjyo_tbがないとエラーになる
+        """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         if tb_type == 'raceinfo':
-            sql_filename = 'create_raceinfo_tb.sql'
+            filename = 'create_raceinfo_tb.sql'
         else:
-            self.logger.error(f'tb_type {tb_type} is not available.')
+            self.logger.error(f'tb_type: {tb_type} is not available.')
             return None
-        try:
-            self.logger.debug(f'connecteng Mysql.')
-            with MysqlConnector(const.MYSQL_CONFIG) as conn:
-                cursor = conn.cursor()
-                # holdjyo_tbを作るクエリを読み込む
-                # このファイルからの相対パスを実行ファイルの絶対パスに変換する
-                self.logger.debug(f'creating table.')
-                sql_path = \
-                    Path(__file__).parent\
-                                  .joinpath('query', sql_filename)\
-                                  .resolve()
-                with open(sql_path, 'r') as f:
-                    sql = f.read()
-                    cursor.execute(sql)
-                cursor.close()
-                self.logger.debug('created table successfully!')
-        except Exception as e:
-            self.logger.error(f'{e}')
+
+        status = super()._run_query_from_path(filename)
+        if status == 0:
+            self.logger.debug(f'creating table succeeded!')
+        else:
+            self.logger.debug(
+                f'creating table failed or table has already exists.')
 
     def insert2table(self, date: int) -> None:
         pass
