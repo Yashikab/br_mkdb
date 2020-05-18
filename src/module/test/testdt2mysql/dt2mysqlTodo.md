@@ -34,7 +34,7 @@
     - [x] カラムが存在することを確認
 - [x] データ挿入部を作成
   - [x] 日付をyyyymmdd形式で取得し,getholdplaceから情報を取得
-  - [x] データを挿入，重複は更新する
+  - [x] データを挿入，重複は何もしない
 
 ## レース情報データ
 
@@ -47,7 +47,7 @@
 
 - テーブル名: raceinfo_tb
 - カラム名:
-  - ri_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: Primary key
+  - raceinfo_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: Primary key
   - datejyo_id: yyyymmdd{jyo_cd:02}: 外部キー 設定参照： holdjyo_tb.datejyo_id
   - holddate DATE: yyyymmdd
   - jyo_cd INT: 会場コード 外部キー 設定参照： jyo_master.jyo_code
@@ -59,7 +59,9 @@
   - is_antei BOOL: 安定板使用の有無
   - is_shinnyukotei BOOL: 進入固定レースの有無
 - [x] テーブルの作成
-- [ ] データ挿入部の作成
+- [x] データ挿入部の作成
+  - 引数は日付，場コード，レース番号
+  - getdata.OfficialProgram.raceinfo2dictからデータを取得
 
 ### 番組表データ
 

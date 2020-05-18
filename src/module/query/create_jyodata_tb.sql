@@ -7,5 +7,5 @@ CREATE TABLE holdjyo_tb
     shinko VARCHAR(100),
     ed_race_no INT,
     FOREIGN KEY (jyo_cd)
-    REFERENCES jyo_master (jyo_code)
+    REFERENCES jyo_master (jyo_cd)
 )

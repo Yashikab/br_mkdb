@@ -26,10 +26,10 @@ class TestOfficialProgram:
         # place : hamanako 06
         self.jyo_code = 6
         # day 2020/04/08
-        self.day = 20200408
+        self.date = 20200408
 
         op = getdata.OfficialProgram(
-            self.race_no, self.jyo_code, self.day)
+            self.race_no, self.jyo_code, self.date)
         return op
 
     # 選手番組情報の取得のための前処理

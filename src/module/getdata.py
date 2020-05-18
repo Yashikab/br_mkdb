@@ -234,7 +234,7 @@ class OfficialProgram(CommonMethods4Official):
     def __init__(self,
                  race_no: int,
                  jyo_code: int,
-                 day: int) -> None:
+                 date: int) -> None:
         """
         競艇公式サイトの番組表からのデータ取得
         レース番，場コード，日付を入力し公式サイトへアクセス
@@ -254,7 +254,7 @@ class OfficialProgram(CommonMethods4Official):
 
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
-        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.logger.info(f'get html: {target_url}')
         self.__soup = super().url2soup(target_url)
         self.logger.info('get html completed.')
@@ -990,7 +990,7 @@ class GetHoldPlacePast(CommonMethods4Official):
         # コードへ返還
         code_name_list = \
             list(map(
-                lambda x: jyo_master.at[x, 'jyo_code'], self.place_name_list))
+                lambda x: jyo_master.at[x, 'jyo_cd'], self.place_name_list))
         return code_name_list
 
     def shinkoinfodict(self) -> dict:

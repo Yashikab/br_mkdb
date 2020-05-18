@@ -31,35 +31,47 @@ class TestRaceInfo2sql:
                         'is_antei', 'is_shinnyukotei'}
         assert get_set == expected_set
 
-    # def test_insert2table(self):
-    #     target_date = 20200512
-    #     jyo_cd = 20
-    #     # 指定日の情報を挿入する
-    #     self.__jd2sql.insert2table(date=target_date)
-    #     # idの情報を一つ取ってきて調べる
-    #     try:
-    #         with MysqlConnector(const.MYSQL_CONFIG) as conn:
-    #             cursor = conn.cursor()
-    #             sql = f'''
-    #                 select
-    #                   datejyo_id,
-    #                   jyo_cd,
-    #                   shinko,
-    #                   ed_race_no
-    #                 from
-    #                   holdjyo_tb
-    #                 where
-    #                   datejyo_id = {target_date}{jyo_cd:02}
-    #             '''
-    #             cursor.execute(sql)
-    #             res_list = cursor.fetchall()
-    #             res_tpl = res_list[0]
-    #     except Exception:
-    #         res_tpl = None
-    #     expected_tpl = (
-    #         int(f'{target_date}{jyo_cd:02}'),
-    #         jyo_cd,
-    #         '中止順延',
-    #         0
-    #     )
-    #     assert res_tpl == expected_tpl
+    def test_insert2table(self):
+        target_date = 20200512
+        jyo_cd = 21
+        race_no = 1
+        # 指定日の情報を挿入する
+        self.__rd2sql.insert2table(
+            date=target_date,
+            jyo_cd=jyo_cd,
+            race_no=race_no)
+        # idの情報を一つ取ってきて調べる
+        try:
+            with MysqlConnector(const.MYSQL_CONFIG) as conn:
+                cursor = conn.cursor()
+                sql = f'''
+                    select
+                      raceinfo_id,
+                      datejyo_id,
+                      taikai_name,
+                      grade,
+                      race_type,
+                      race_kyori,
+                      is_antei,
+                      is_shinnyukotei
+                    from
+                      raceinfo_tb
+                    where
+                      raceinfo_id = {target_date}{jyo_cd:02}{race_no:02}
+                '''
+                cursor.execute(sql)
+                res_list = cursor.fetchall()
+                res_tpl = res_list[0]
+        except Exception:
+            res_tpl = None
+        expected_tpl = (
+            int(f'{target_date}{jyo_cd:02}{race_no:02}'),
+            int(f'{target_date}{jyo_cd:02}'),
+            '読売新聞社杯　全日本王座決定戦　開設６８周年記念',
+            'is-G1b',
+            '予選',
+            1800,
+            0,
+            0
+        )
+        assert res_tpl == expected_tpl
