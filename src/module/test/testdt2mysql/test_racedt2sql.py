@@ -1,35 +1,42 @@
 # python 3.7.5
 # coding: utf-8
 """
-getdataモジュール用単体テスト
+dt2sqlモジュール用単体テスト
 """
+import pytest
+
 from module.dt2sql import RaceData2sql
 from module import const
 from module.connect import MysqlConnector
+from .common import CommonMethod
 
 
-class TestRaceInfo2sql:
+class TestRaceInfo2sql(CommonMethod):
 
     __rd2sql = RaceData2sql()
 
-    def test_exist_table(self):
-        self.__rd2sql.create_table_if_not_exists(tb_type='raceinfo')
-        # カラム名の一致でテスト
-        try:
-            with MysqlConnector(const.MYSQL_CONFIG) as conn:
-                cursor = conn.cursor()
-                sql = 'show columns from raceinfo_tb'
-                cursor.execute(sql)
-                get_set = set(map(lambda x: x[0], cursor.fetchall()))
-                cursor.close()
-        except Exception:
-            get_set = {}
+    ri_col_set = {'raceinfo_id', 'datejyo_id', 'holddate',
+                  'jyo_cd', 'race_no', 'taikai_name',
+                  'grade', 'race_type', 'race_kyori',
+                  'is_antei', 'is_shinnyukotei'}
+    pr_col_set = {'wakuinfo_id', 'raceinfo_id',
+                  'p_name', 'p_id', 'p_level', 'p_home',
+                  'p_birthplace', 'p_age', 'p_weight',
+                  'p_num_f', 'p_num_l', 'p_avg_st',
+                  'p_all_1rate', 'p_all_2rate', 'p_all_3rate',
+                  'p_local_1rate', 'p_local_2rate', 'p_local_3rate',
+                  'motor_no', 'motor_2rate', 'motor_3rate',
+                  'boat_no', 'boat_2rate', 'boat_3rate'}
 
-        expected_set = {'raceinfo_id', 'datejyo_id', 'holddate',
-                        'jyo_cd', 'race_no', 'taikai_name',
-                        'grade', 'race_type', 'race_kyori',
-                        'is_antei', 'is_shinnyukotei'}
-        assert get_set == expected_set
+    @pytest.mark.parametrize("tb_type, tb_name, col_set", [
+        ('raceinfo', 'raceinfo_tb', ri_col_set),
+        ('program', 'program_tb', pr_col_set)
+    ])
+    def test_exist_table_raceinfo(self, tb_type, tb_name, col_set):
+        self.__rd2sql.create_table_if_not_exists(tb_type=tb_type)
+        # カラム名の一致でテスト
+        get_set = super().get_columns2set(tb_name)
+        assert get_set == col_set
 
     def test_insert2table(self):
         target_date = 20200512

@@ -1,5 +1,4 @@
-CREATE TABLE raceinfo_tb
-(
+CREATE TABLE raceinfo_tb(
     raceinfo_id BIGINT PRIMARY KEY,
     datejyo_id INT,
     holddate DATE,

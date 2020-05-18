@@ -165,6 +165,8 @@ class RaceData2sql(Data2MysqlTemplate):
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         if tb_type == 'raceinfo':
             filename = 'create_raceinfo_tb.sql'
+        elif tb_type == 'program':
+            filename = 'create_program_tb.sql'
         else:
             self.logger.error(f'tb_type: {tb_type} is not available.')
             return None

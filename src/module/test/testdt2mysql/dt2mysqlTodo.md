@@ -67,6 +67,39 @@
 
 - 対象日+会場コード+レース番+枠番を主キーとする
 
+- if分岐用の名前: 'program'
+
+- テーブル名: program_tb
+- カラム名:
+  - wakuinfo_id: yyyymmdd{jyo_cd:02}{race_no:02}{waku} BIGINT: Primary key
+  - raceinfo_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: 外部キー 設定参照： raceinfo_tb.raceinfo_id
+  - p_name VARCHAR(100): 選手名
+  - p_id INT: 選手登録番号
+  - p_level VARCHAR(30): 選手級
+  - p_home VARCHAR(30): 支部
+  - p_birthplace: VARCHAR(30): 出身地
+  - p_age INT: 年齢
+  - p_weight FLOAT: 体重
+  - p_num_f INT: F数
+  - p_num_l INT: L数
+  - p_avg_st FLOAT: 平均ST
+  - p_all_1rate FLOAT: 全国勝率
+  - p_all_2rate FLOAT: 全国2連対率
+  - p_all_3rate FLOAT: 全国3連対率
+  - p_local_1rate FLOAT: 当地勝率
+  - p_local_2rate FLOAT: 当地2連対率
+  - p_local_3rate FLOAT: 当地3連対率
+  - motor_no INT: モーター番号
+  - motor_2rate FLOAT: モーター2連対率
+  - motor_3rate FLOAT: モーター3連対率
+  - boat_no INT: ボート番号
+  - boat_2rate FLOAT: ボート2連対率
+  - boat_3rate FLOAT: ボート3連対率
+- [x] テーブルの作成
+- [ ] データ挿入部の作成
+  - 引数は日付，場コード，レース番号
+  - getdata.OfficialProgram.raceinfo2dictからデータを取得
+
 ## 直前情報データ
 
 - 対象日+会場コード+レース番+枠番を主キーとする

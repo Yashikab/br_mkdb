@@ -1,7 +1,7 @@
 # python 3.7.5
 # coding: utf-8
 """
-getdataモジュール用単体テスト
+dt2sqlモジュール用単体テスト
 """
 from module.dt2sql import JyoData2sql
 from module import const
@@ -15,15 +15,7 @@ class TestJyoData2sql:
     def test_exist_table(self):
         self.__jd2sql.create_table_if_not_exists()
         # カラム名の一致でテスト
-        try:
-            with MysqlConnector(const.MYSQL_CONFIG) as conn:
-                cursor = conn.cursor()
-                sql = 'show columns from holdjyo_tb'
-                cursor.execute(sql)
-                get_set = set(map(lambda x: x[0], cursor.fetchall()))
-                cursor.close()
-        except Exception:
-            get_set = {}
+        get_set = super().get_columns2set('holdjyo_tb')
 
         expected_set = {'datejyo_id', 'holddate', 'jyo_cd',
                         'jyo_name', 'shinko', 'ed_race_no'}
