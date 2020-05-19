@@ -1,5 +1,5 @@
 docker/
-
+.coverage
 .ipynb_checkpoints
 .docker
 .vscode
