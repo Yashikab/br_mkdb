@@ -123,6 +123,7 @@ class TestRaceInfo2sql(CommonMethod):
             6.72,
             18.18
         )
+        assert res_tpl == expected_tpl
 
 
 class TestChokuzenInfo2sql(CommonMethod):
