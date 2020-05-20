@@ -33,8 +33,8 @@ class CommonMethods4Official:
         return soup
 
     def _getplayertable2list(self,
-                            soup: bs4.BeautifulSoup,
-                            table_selector: str) -> list:
+                             soup: bs4.BeautifulSoup,
+                             table_selector: str) -> list:
         """
         選手情報のテーブルを抜き出し, 行ごとのリストで返す．
 
@@ -57,9 +57,9 @@ class CommonMethods4Official:
         return player_html_list
 
     def _getSTtable2tuple(self,
-                         soup: bs4.BeautifulSoup,
-                         table_selector: str,
-                         waku: int) -> tuple:
+                          soup: bs4.BeautifulSoup,
+                          table_selector: str,
+                          waku: int) -> tuple:
         """
         スタート情報のテーブルを抜き取り対象枠のコースとSTタイムを
         タプルにして返す.
@@ -103,8 +103,8 @@ class CommonMethods4Official:
         return (course, st_time)
 
     def _getweatherinfo2dict(self,
-                            soup: bs4.BeautifulSoup,
-                            table_selector: str) -> dict:
+                             soup: bs4.BeautifulSoup,
+                             table_selector: str) -> dict:
         """
         水面気象情報テーブルのスクレイパー
 
@@ -164,8 +164,8 @@ class CommonMethods4Official:
         return content_dict
 
     def _text2list_rn_split(self,
-                           input_content: bs4.element.Tag,
-                           expect_length: int) -> list:
+                            input_content: bs4.element.Tag,
+                            expect_length: int) -> list:
         """
         スクレイピングしたときスペースと\\r\\nで区切られた文字列をリスト化する
 

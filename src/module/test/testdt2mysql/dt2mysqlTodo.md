@@ -47,7 +47,7 @@
 
 - テーブル名: raceinfo_tb
 - カラム名:
-  - raceinfo_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: Primary key
+  - race_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: Primary key
   - datejyo_id: yyyymmdd{jyo_cd:02}: 外部キー 設定参照： holdjyo_tb.datejyo_id
   - holddate DATE: yyyymmdd
   - jyo_cd INT: 会場コード 外部キー 設定参照： jyo_master.jyo_code
@@ -71,8 +71,8 @@
 
 - テーブル名: program_tb
 - カラム名:
-  - wakuinfo_id: yyyymmdd{jyo_cd:02}{race_no:02}{waku} BIGINT: Primary key
-  - raceinfo_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: 外部キー 設定参照： raceinfo_tb.raceinfo_id
+  - waku_id: yyyymmdd{jyo_cd:02}{race_no:02}{waku} BIGINT: Primary key
+  - race_id: yyyymmdd{jyo_cd:02}{race_no:02} INT: 外部キー 設定参照： raceinfo_tb.raceinfo_id
   - p_name VARCHAR(100): 選手名
   - p_id INT: 選手登録番号
   - p_level VARCHAR(30): 選手級
@@ -96,10 +96,30 @@
   - boat_2rate FLOAT: ボート2連対率
   - boat_3rate FLOAT: ボート3連対率
 - [x] テーブルの作成
-- [ ] データ挿入部の作成
+- [x] データ挿入部の作成
   - 引数は日付，場コード，レース番号
   - getdata.OfficialProgram.raceinfo2dictからデータを取得
 
 ## 直前情報データ
 
-- 対象日+会場コード+レース番+枠番を主キーとする
+### 会場コンディション（共通データ）
+
+- 対象日+会場コード+レース番を主キーとする
+
+- if分岐：condition
+
+- テーブル名: chokuzen_cond_tb
+- カラム名:
+  - race_id BIGINT: PRIMAR KEY
+  - datejyo_id INT: 外部キー 参照元：holdjyo_tb
+  - temp FLOAT: 気温
+  - weather VARCHAR(10): 天気
+  - wind_v INT: 風速
+  - w_temp FLOAT: 水温
+  - wave INT: 波高
+  - wind_dr INT: 風向
+
+- [x] テーブルの作成
+- [ ] データ挿入部の作成
+  - 引数は日付，場コード
+  - getdata.OfficialChokuzen.getcondinfo2dictからデータを取得

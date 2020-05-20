@@ -1,5 +1,5 @@
 CREATE TABLE raceinfo_tb(
-    raceinfo_id BIGINT PRIMARY KEY,
+    race_id BIGINT PRIMARY KEY,
     datejyo_id INT,
     holddate DATE,
     jyo_cd INT,

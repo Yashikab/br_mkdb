@@ -33,7 +33,7 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
         '''
         pass
 
-    def run_query(self, query: str) -> int:
+    def _run_query(self, query: str) -> int:
         """
         クエリを実行する
 
@@ -61,7 +61,7 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
             status = 1
         return status
 
-    def run_query_from_path(self, filename: str) -> int:
+    def _run_query_from_path(self, filename: str) -> int:
         """
         queryフォルダ内のファイル名を指定してクエリを実行する
 
@@ -83,9 +83,48 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
         self.logger.debug(f'run query from {query_filepath}')
         with open(query_filepath, 'r') as f:
             query = f.read()
-            status = self.run_query(query)
+            status = self._run_query(query)
 
         return status
+
+    def _info2insertvalue(self,
+                          id_list: list,
+                          info_dict: dict,
+                          ommit_list: list = []) -> str:
+        """
+        選手の情報の辞書からsqlへインサートするvalueを作成する
+        注意：テーブルのカラムの順番とinfo_dict.keys()の順番が一致していること
+
+        Parameters
+        ----------
+            id_list : list
+                insertするidたち
+            info_dict: dict
+                getdataから得られたdict
+            ommit_list: list = []
+                insertしない要素
+
+        Returns
+        -------
+            insert_value : str
+        """
+        # idを格納する
+        insert_value_list = list(map(lambda x: f"{x}", id_list))
+        # python3.7から辞書型で順序を保持する
+        for i_key in info_dict.keys():
+            i_value = info_dict[i_key]
+            if type(i_value) is str:
+                # ''で囲む
+                i_value = f"'{i_value}'"
+            else:
+                # "hoge" ならそれで統一する
+                i_value = f"{i_value}"
+            if i_value not in ommit_list:
+                insert_value_list.append(i_value)
+
+        insert_value_content = ', '.join(insert_value_list)
+        insert_value = "(" + insert_value_content + ")"
+        return insert_value
 
 
 class JyoData2sql(Data2MysqlTemplate):
@@ -104,7 +143,7 @@ class JyoData2sql(Data2MysqlTemplate):
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
 
-        status = super().run_query_from_path('create_jyodata_tb.sql')
+        status = super()._run_query_from_path('create_jyodata_tb.sql')
         return status
 
     def insert2table(self, date: int) -> int:
@@ -144,7 +183,7 @@ class JyoData2sql(Data2MysqlTemplate):
         total_insert_value = ', '.join(insert_value_list)
         query = ' '.join([sql, total_insert_value])
         # 作成したクエリの実行
-        status = super().run_query(query)
+        status = super()._run_query(query)
         return status
 
 
@@ -153,7 +192,7 @@ class RaceData2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
 
-    def create_table_if_not_exists(self, tb_type: str) -> int:
+    def create_table_if_not_exists(self, tb_type: str = 'all') -> int:
         """
         外部キーの関係でholdjyo_tbがないとエラーになる
 
@@ -163,15 +202,17 @@ class RaceData2sql(Data2MysqlTemplate):
                 成功したら0, 失敗したら1
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        if tb_type == 'raceinfo':
-            filename = 'create_raceinfo_tb.sql'
-        elif tb_type == 'program':
-            filename = 'create_program_tb.sql'
+        filename_list = []
+        if tb_type == 'raceinfo' or 'all':
+            filename_list.append('create_raceinfo_tb.sql')
+        elif tb_type == 'program' or 'all':
+            filename_list.append('create_program_tb.sql')
         else:
             self.logger.error(f'tb_type: {tb_type} is not available.')
             return None
 
-        status = super().run_query_from_path(filename)
+        for filename in filename_list:
+            status = super()._run_query_from_path(filename)
         return status
 
     def insert2table(self, date: int, jyo_cd: int, race_no: int) -> int:
@@ -205,13 +246,13 @@ class RaceData2sql(Data2MysqlTemplate):
         datejyo_id = int(f"{date}{jyo_cd:02}")
         # 重複時は無視する
         sql = "INSERT IGNORE INTO raceinfo_tb VALUES"
-        insert_value = self._info2insertvalue(
+        insert_value = super()._info2insertvalue(
             id_list=[raceinfo_id, datejyo_id, date, jyo_cd, race_no],
             info_dict=op.raceinfo2dict()
         )
         query = ' '.join([sql, insert_value])
         # 作成したクエリの実行
-        status = super().run_query(query)
+        status = super()._run_query(query)
         self.logger.debug(f'insert raceinfo done.')
 
         self.logger.debug(f'start insert program info.')
@@ -220,52 +261,45 @@ class RaceData2sql(Data2MysqlTemplate):
         for waku in range(1, 7):
             wakuinfo_id = int(f"{raceinfo_id}{waku}")
             try:
-                insert_value = self._info2insertvalue(
+                insert_value = super()._info2insertvalue(
                     id_list=[wakuinfo_id, raceinfo_id],
                     info_dict=op.getplayerinfo2dict(waku)
                 )
                 query = ' '.join([sql, insert_value])
-                super().run_query(query)
+                super()._run_query(query)
             except Exception as e:
                 self.logger.error(f'waku[{waku}]: {e}')
 
         return status
 
-    def _info2insertvalue(self,
-                          id_list: list,
-                          info_dict: dict,
-                          ommit_list: list = []) -> str:
-        """
-        選手の情報の辞書からsqlへインサートするvalueを作成する
-        注意：テーブルのカラムの順番とinfo_dict.keys()の順番が一致していること
 
-        Parameters
-        ----------
-            id_list : list
-                insertするidたち
-            info_dict: dict
-                getdataから得られたdict
-            ommit_list: list = []
-                insertしない要素
+class ChokuzenData2sql(Data2MysqlTemplate):
+    """大部分がRaceInfoと似ているが，
+    リアルタムデータ取得時のため別クラスにする"""
+
+    def __init__(self):
+        self.logger = getLogger(self.__class__.__name__)
+
+    def create_table_if_not_exists(self, tb_type: str = 'all') -> int:
+        """
+        外部キーの関係でholdjyo_tbがないとエラーになる
 
         Returns
         -------
-            insert_value : str
+            status: int
+                成功したら0, 失敗したら1
         """
-        # idを格納する
-        insert_value_list = list(map(lambda x: f"{x}", id_list))
-        # python3.7から辞書型で順序を保持する
-        for i_key in info_dict.keys():
-            i_value = info_dict[i_key]
-            if type(i_value) is str:
-                # ''で囲む
-                i_value = f"'{i_value}'"
-            else:
-                # "hoge" ならそれで統一する
-                i_value = f"{i_value}"
-            if i_value not in ommit_list:
-                insert_value_list.append(i_value)
-        print(insert_value_list)
-        insert_value_content = ', '.join(insert_value_list)
-        insert_value = "(" + insert_value_content + ")"
-        return insert_value
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        filename_list = []
+        if tb_type == 'condition' or 'all':
+            filename_list.append('create_chokuzen_cond_tb.sql')
+        else:
+            self.logger.error(f'tb_type: {tb_type} is not available.')
+            return None
+
+        for filename in filename_list:
+            status = super()._run_query_from_path(filename)
+        return status
+
+    def insert2table(self):
+        pass

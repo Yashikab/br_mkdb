@@ -7,9 +7,10 @@ dt2sqlモジュール用単体テスト
 import pytest
 
 from module.dt2sql import JyoData2sql
+from module.dt2sql import RaceData2sql
+from module.dt2sql import ChokuzenData2sql
 from module import const
 from module.connect import MysqlConnector
-from module.dt2sql import RaceData2sql
 from .common import CommonMethod
 
 
@@ -64,11 +65,11 @@ class TestRaceInfo2sql(CommonMethod):
 
     __rd2sql = RaceData2sql()
 
-    ri_col_set = {'raceinfo_id', 'datejyo_id', 'holddate',
+    ri_col_set = {'race_id', 'datejyo_id', 'holddate',
                   'jyo_cd', 'race_no', 'taikai_name',
                   'grade', 'race_type', 'race_kyori',
                   'is_antei', 'is_shinnyukotei'}
-    pr_col_set = {'wakuinfo_id', 'raceinfo_id',
+    pr_col_set = {'waku_id', 'race_id',
                   'p_name', 'p_id', 'p_level', 'p_home',
                   'p_birthplace', 'p_age', 'p_weight',
                   'p_num_f', 'p_num_l', 'p_avg_st',
@@ -102,14 +103,14 @@ class TestRaceInfo2sql(CommonMethod):
                 cursor = conn.cursor()
                 sql = f'''
                     select
-                      wakuinfo_id,
+                      waku_id,
                       p_id,
                       p_all_1rate,
                       boat_2rate
                     from
                       program_tb
                     where
-                      wakuinfo_id = {target_date}{jyo_cd:02}{race_no:02}1
+                      waku_id = {target_date}{jyo_cd:02}{race_no:02}1
                 '''
                 cursor.execute(sql)
                 res_list = cursor.fetchall()
@@ -122,4 +123,19 @@ class TestRaceInfo2sql(CommonMethod):
             6.72,
             18.18
         )
-        assert res_tpl == expected_tpl
+
+
+class TestChokuzenInfo2sql(CommonMethod):
+    __ci2sql = ChokuzenData2sql()
+    cc_col_set = {'race_id', 'datejyo_id',
+                  'temp', 'weather', 'wind_v',
+                  'w_temp', 'wave', 'wind_dr'}
+
+    @pytest.mark.parametrize("tb_type, tb_name, col_set", [
+        ('chokuzen_cond', 'chokuzen_cond_tb', cc_col_set),
+    ])
+    def test_exist_table_raceinfo(self, tb_type, tb_name, col_set):
+        self.__ci2sql.create_table_if_not_exists(tb_type=tb_type)
+        # カラム名の一致でテスト
+        get_set = super().get_columns2set(tb_name)
+        assert get_set == col_set

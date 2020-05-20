@@ -1,6 +1,6 @@
 CREATE TABLE program_tb(
-    wakuinfo_id BIGINT PRIMARY KEY,
-    raceinfo_id BIGINT,
+    waku_id BIGINT PRIMARY KEY,
+    race_id BIGINT,
     p_name VARCHAR(100),
     p_id INT,
     p_level VARCHAR(30),
@@ -23,6 +23,6 @@ CREATE TABLE program_tb(
     boat_no INT,
     boat_2rate FLOAT,
     boat_3rate FLOAT,
-    FOREIGN KEY (raceinfo_id)
-    REFERENCES raceinfo_tb (raceinfo_id)
+    FOREIGN KEY (race_id)
+    REFERENCES raceinfo_tb (race_id)
 )
