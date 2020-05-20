@@ -197,23 +197,75 @@ class RaceData2sql(Data2MysqlTemplate):
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
+        self.logger.debug(f'start insert raceinfo')
         op = OfficialProgram(race_no=race_no, jyo_code=jyo_cd, date=date)
-        raceinfo_dict = op.raceinfo2dict()
+
         # 各種id
         raceinfo_id = int(f"{date}{jyo_cd:02}{race_no:02}")
         datejyo_id = int(f"{date}{jyo_cd:02}")
         # 重複時は無視する
         sql = "INSERT IGNORE INTO raceinfo_tb VALUES"
-        insert_value = f"({raceinfo_id}, {datejyo_id}, {date}, "\
-                       f"{jyo_cd}, {race_no}, "\
-                       f"'{raceinfo_dict['taikai_name']}', "\
-                       f"'{raceinfo_dict['grade']}', "\
-                       f"'{raceinfo_dict['race_type']}', "\
-                       f"{raceinfo_dict['race_kyori']}, "\
-                       f"{raceinfo_dict['is_antei']}, "\
-                       f"{raceinfo_dict['is_shinnyukotei']})"
+        insert_value = self._info2insertvalue(
+            id_list=[raceinfo_id, datejyo_id, date, jyo_cd, race_no],
+            info_dict=op.raceinfo2dict()
+        )
         query = ' '.join([sql, insert_value])
-
         # 作成したクエリの実行
         status = super().run_query(query)
+        self.logger.debug(f'insert raceinfo done.')
+
+        self.logger.debug(f'start insert program info.')
+        # 1~6枠でループ，データ取得でエラーの場合はインサートされない
+        sql = "INSERT IGNORE INTO program_tb VALUES"
+        for waku in range(1, 7):
+            wakuinfo_id = int(f"{raceinfo_id}{waku}")
+            try:
+                insert_value = self._info2insertvalue(
+                    id_list=[wakuinfo_id, raceinfo_id],
+                    info_dict=op.getplayerinfo2dict(waku)
+                )
+                query = ' '.join([sql, insert_value])
+                super().run_query(query)
+            except Exception as e:
+                self.logger.error(f'waku[{waku}]: {e}')
+
         return status
+
+    def _info2insertvalue(self,
+                          id_list: list,
+                          info_dict: dict,
+                          ommit_list: list = []) -> str:
+        """
+        選手の情報の辞書からsqlへインサートするvalueを作成する
+        注意：テーブルのカラムの順番とinfo_dict.keys()の順番が一致していること
+
+        Parameters
+        ----------
+            id_list : list
+                insertするidたち
+            info_dict: dict
+                getdataから得られたdict
+            ommit_list: list = []
+                insertしない要素
+
+        Returns
+        -------
+            insert_value : str
+        """
+        # idを格納する
+        insert_value_list = list(map(lambda x: f"{x}", id_list))
+        # python3.7から辞書型で順序を保持する
+        for i_key in info_dict.keys():
+            i_value = info_dict[i_key]
+            if type(i_value) is str:
+                # ''で囲む
+                i_value = f"'{i_value}'"
+            else:
+                # "hoge" ならそれで統一する
+                i_value = f"{i_value}"
+            if i_value not in ommit_list:
+                insert_value_list.append(i_value)
+        print(insert_value_list)
+        insert_value_content = ', '.join(insert_value_list)
+        insert_value = "(" + insert_value_content + ")"
+        return insert_value

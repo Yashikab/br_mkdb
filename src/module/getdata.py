@@ -24,7 +24,7 @@ class CommonMethods4Official:
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
 
-    def url2soup(self, url):
+    def _url2soup(self, url):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         html_content = urlopen(url).read()
 
@@ -32,7 +32,7 @@ class CommonMethods4Official:
 
         return soup
 
-    def getplayertable2list(self,
+    def _getplayertable2list(self,
                             soup: bs4.BeautifulSoup,
                             table_selector: str) -> list:
         """
@@ -56,7 +56,7 @@ class CommonMethods4Official:
             f"lengh is not 6:{len(player_html_list)}"
         return player_html_list
 
-    def getSTtable2tuple(self,
+    def _getSTtable2tuple(self,
                          soup: bs4.BeautifulSoup,
                          table_selector: str,
                          waku: int) -> tuple:
@@ -99,10 +99,10 @@ class CommonMethods4Official:
         # Fをマイナスに変換し，少数化
         # listのキーはコースであることに注意
         st_time = st_time_list[course_idx]
-        st_time = self.rmletter2float(st_time.replace('F', '-'))
+        st_time = self._rmletter2float(st_time.replace('F', '-'))
         return (course, st_time)
 
-    def getweatherinfo2dict(self,
+    def _getweatherinfo2dict(self,
                             soup: bs4.BeautifulSoup,
                             table_selector: str) -> dict:
         """
@@ -127,7 +127,7 @@ class CommonMethods4Official:
         # spanで情報がとれる (1番目： '気温', 2番目: 数字℃)
         tmp_info = tmp_info_html.select('span')
         temp = tmp_info[1].text
-        temp = self.rmletter2float(temp)
+        temp = self._rmletter2float(temp)
         # 天気は2番目のdiv
         weather_info_html = condinfo_html_list[2]
         # spanのなか（1個しかない)
@@ -136,22 +136,22 @@ class CommonMethods4Official:
                          .replace('\r', '')\
                          .replace(' ', '')
         # 風速は5番目のdiv
-        wind_v = self.choose_2nd_span(condinfo_html_list[4])
-        wind_v: int = self.rmletter2int(wind_v)
+        wind_v = self._choose_2nd_span(condinfo_html_list[4])
+        wind_v: int = self._rmletter2int(wind_v)
 
         # 水温は8番目のdiv
-        w_temp = self.choose_2nd_span(condinfo_html_list[7])
-        w_temp = self.rmletter2float(w_temp)
+        w_temp = self._choose_2nd_span(condinfo_html_list[7])
+        w_temp = self._rmletter2float(w_temp)
 
         # 波高は10番目のdiv
-        wave = self.choose_2nd_span(condinfo_html_list[9])
-        wave = self.rmletter2int(wave)
+        wave = self._choose_2nd_span(condinfo_html_list[9])
+        wave = self._rmletter2int(wave)
 
         # 風向きは7番目のdiv
         # 画像のみの情報なので，16方位の数字（画像の名前）を抜く
         # p中のクラス名2番目にある
         wind_dr = condinfo_html_list[6].select_one('p')['class'][1]
-        wind_dr = self.rmletter2int(wind_dr)
+        wind_dr = self._rmletter2int(wind_dr)
 
         content_dict = {
             'temp': temp,
@@ -163,7 +163,7 @@ class CommonMethods4Official:
         }
         return content_dict
 
-    def text2list_rn_split(self,
+    def _text2list_rn_split(self,
                            input_content: bs4.element.Tag,
                            expect_length: int) -> list:
         """
@@ -188,7 +188,7 @@ class CommonMethods4Official:
             f"lengh is not {expect_length}:{len(output_list)}"
         return output_list
 
-    def choose_2nd_span(self, target_html: str) -> str:
+    def _choose_2nd_span(self, target_html: str) -> str:
         """
         風速・水温・波高ぬきだし用関数\n
         spanの2つめの要素をstr で返却
@@ -196,7 +196,7 @@ class CommonMethods4Official:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         return target_html.select('span')[1].text
 
-    def rmletter2float(self, in_str: str) -> float:
+    def _rmletter2float(self, in_str: str) -> float:
         """
         文字列から文字を取り除き少数で返す
         マイナス表記は残す
@@ -209,7 +209,7 @@ class CommonMethods4Official:
             out_float = None
         return out_float
 
-    def rmletter2int(self, in_str: str) -> int:
+    def _rmletter2int(self, in_str: str) -> int:
         """
         文字列から文字を取り除き整数で返す
         マイナス表記は残す
@@ -222,7 +222,7 @@ class CommonMethods4Official:
             out_int = None
         return out_int
 
-    def getonlyzenkaku2str(self, in_str: str) -> str:
+    def _getonlyzenkaku2str(self, in_str: str) -> str:
         try:
             # 全角の抽出
             return re.search(r'[^\x01-\x7E]+', in_str).group(0)
@@ -256,7 +256,7 @@ class OfficialProgram(CommonMethods4Official):
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.logger.info(f'get html: {target_url}')
-        self.__soup = super().url2soup(target_url)
+        self.__soup = super()._url2soup(target_url)
         self.logger.info('get html completed.')
 
     def getplayerinfo2dict(self, waku: int) -> dict:
@@ -268,7 +268,7 @@ class OfficialProgram(CommonMethods4Official):
             'div > div.contentsFrame1_inner > '\
             'div.table1.is-tableFixed__3rdadd > table'
         player_info_html_list = \
-            super().getplayertable2list(
+            super()._getplayertable2list(
                 self.__soup,
                 target_table_selector
             )
@@ -308,11 +308,11 @@ class OfficialProgram(CommonMethods4Official):
         # 数字だけ抜く
         age = re.match(r'[0-9]+', age)
         age = int(age.group(0))
-        weight = super().rmletter2float(weight)
+        weight = super()._rmletter2float(weight)
 
         # F/L/ST平均は4番目
         flst = player_info_list[3]
-        flst_list = super().text2list_rn_split(flst, 3)
+        flst_list = super()._text2list_rn_split(flst, 3)
         # 数字のみ抜き出してキャスト
         num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
         num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
@@ -320,26 +320,26 @@ class OfficialProgram(CommonMethods4Official):
 
         # 全国勝率・連対率は5番目
         all_123_rate = player_info_list[4]
-        all_123_list = super().text2list_rn_split(all_123_rate, 3)
+        all_123_list = super()._text2list_rn_split(all_123_rate, 3)
         all_1rate, all_2rate, all_3rate = \
             list(map(lambda x: float(x), all_123_list))
 
         # 当地勝率・連対率は6番目
         local_123_rate = player_info_list[5]
-        local_123_list = super().text2list_rn_split(local_123_rate, 3)
+        local_123_list = super()._text2list_rn_split(local_123_rate, 3)
         local_1rate, local_2rate, local_3rate = \
             list(map(lambda x: float(x), local_123_list))
 
         # モーター情報は7番目
         motor_info = player_info_list[6]
-        motor_info_list = super().text2list_rn_split(motor_info, 3)
+        motor_info_list = super()._text2list_rn_split(motor_info, 3)
         motor_no = int(motor_info_list[0])
         motor_2rate = float(motor_info_list[1])
         motor_3rate = float(motor_info_list[2])
 
         # ボート情報は8番目
         boat_info = player_info_list[7]
-        boat_info_list = super().text2list_rn_split(boat_info, 3)
+        boat_info_list = super()._text2list_rn_split(boat_info, 3)
         boat_no = int(boat_info_list[0])
         boat_2rate = float(boat_info_list[1])
         boat_3rate = float(boat_info_list[2])
@@ -387,7 +387,7 @@ class OfficialProgram(CommonMethods4Official):
         # race_type : 予選 優勝戦など
         race_str = raceinfo_html.select_one('span').text
         race_str = race_str.replace('\u3000', '')
-        race_type = super().getonlyzenkaku2str(race_str)
+        race_type = super()._getonlyzenkaku2str(race_str)
 
         # レース距離
         try:
@@ -443,7 +443,7 @@ class OfficialChokuzen(CommonMethods4Official):
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
-        self.__soup = super().url2soup(target_url)
+        self.__soup = super()._url2soup(target_url)
 
     def getplayerinfo2dict(self, waku: int) -> dict:
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
@@ -452,7 +452,7 @@ class OfficialChokuzen(CommonMethods4Official):
             'body > main > div > div > div > div.contentsFrame1_inner > '\
             'div.grid.is-type3.h-clear > div:nth-child(1) > div.table1 > table'
         p_chokuzen_html_list = \
-            super().getplayertable2list(
+            super()._getplayertable2list(
                 self.__soup,
                 target_p_table_selector
             )
@@ -468,24 +468,24 @@ class OfficialChokuzen(CommonMethods4Official):
         # 体重は4番目
         weight = p_chokuzen_list[3].text
         # 'kg'を取り除く
-        weight = super().rmletter2float(weight)
+        weight = super()._rmletter2float(weight)
         # 調整体重だけ3番目のtr, 1番目td
         p_chokuzen4chosei = p_html.select("tr")[2]
         chosei_weight = p_chokuzen4chosei.select_one("td").text
-        chosei_weight = super().rmletter2float(chosei_weight)
+        chosei_weight = super()._rmletter2float(chosei_weight)
         # 展示タイムは5番目td (調整体重の方じゃないので注意)
         tenji_T = p_chokuzen_list[4].text
-        tenji_T = super().rmletter2float(tenji_T)
+        tenji_T = super()._rmletter2float(tenji_T)
         # チルトは6番目
         tilt = p_chokuzen_list[5].text
-        tilt = super().rmletter2float(tilt)
+        tilt = super()._rmletter2float(tilt)
 
         # スタート展示テーブルの選択
         target_ST_table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner '\
             '> div.grid.is-type3.h-clear > div:nth-child(2) '\
             '> div.table1 > table'
-        tenji_C, tenji_ST = super().getSTtable2tuple(
+        tenji_C, tenji_ST = super()._getSTtable2tuple(
             self.__soup,
             target_ST_table_selector,
             waku
@@ -511,7 +511,7 @@ class OfficialChokuzen(CommonMethods4Official):
             'body > main > div > div > div > div.contentsFrame1_inner > '\
             'div.grid.is-type3.h-clear > div:nth-child(2) > div.weather1 > '\
             'div.weather1_body'
-        content_dict = super().getweatherinfo2dict(
+        content_dict = super()._getweatherinfo2dict(
             soup=self.__soup,
             table_selector=table_selector
         )
@@ -564,7 +564,7 @@ class OfficialOdds(CommonMethods4Official):
                    f'odds{num}{html_type}?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.day}'
-        soup = super().url2soup(target_url)
+        soup = super()._url2soup(target_url)
         # 3連単と共通--------------------
         # oddsテーブルの抜き出し
         if num == 2 and kake == 'renfuku':
@@ -718,7 +718,7 @@ class OfficialOdds(CommonMethods4Official):
                    f'oddstf?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.day}'
-        soup = super().url2soup(target_url)
+        soup = super()._url2soup(target_url)
         target_table_selector = \
             'body > main > div > div > div > '\
             'div.contentsFrame1_inner > div.grid.is-type2.h-clear '\
@@ -761,7 +761,7 @@ class OfficialResults(CommonMethods4Official):
         # htmlをload
         base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
-        self.__soup = super().url2soup(target_url)
+        self.__soup = super()._url2soup(target_url)
         # 結果テーブルだけ最初に抜く
         self.waku_dict = self._getresulttable2dict()
 
@@ -788,7 +788,7 @@ class OfficialResults(CommonMethods4Official):
             'div.contentsFrame1_inner > '\
             'div.grid.is-type2.h-clear.h-mt10 > '\
             'div:nth-child(2) > div > table'
-        course, st_time = super().getSTtable2tuple(
+        course, st_time = super()._getSTtable2tuple(
             soup=self.__soup,
             table_selector=target_table_selector,
             waku=waku)
@@ -809,7 +809,7 @@ class OfficialResults(CommonMethods4Official):
             'div:nth-child(2) > div.grid.is-type6.h-clear > '\
             'div:nth-child(1) > div > div.weather1_body.is-type1__3rdadd'
         content_dict = \
-            super().getweatherinfo2dict(
+            super()._getweatherinfo2dict(
                 soup=self.__soup,
                 table_selector=table_selector
             )
@@ -883,7 +883,7 @@ class OfficialResults(CommonMethods4Official):
             'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
             'div:nth-child(1) > div > table'
         player_res_html_list = \
-            super().getplayertable2list(self.__soup, target_table_selector)
+            super()._getplayertable2list(self.__soup, target_table_selector)
         # rank_p_html : 各順位の選手情報
         # waku_dict : 枠をキーとしテーブル内容を入れ替える
         waku_dict = {}
@@ -943,7 +943,7 @@ class GetHoldPlacePast(CommonMethods4Official):
         base_url = 'https://www.boatrace.jp/owpc/pc/race/index?'
         target_url = f'{base_url}hd={target_date}'
         self.logger.debug(f'access: {target_url}')
-        self.__soup = super().url2soup(target_url)
+        self.__soup = super()._url2soup(target_url)
 
         # 抜き出すテーブルの選択
         target_table_selector = \
@@ -1030,7 +1030,7 @@ class GetHoldPlacePast(CommonMethods4Official):
         行htmlから会場名を抜き出す
         """
         place_name = row_html.select_one('tr > td > a > img')['alt']
-        place_name = super().getonlyzenkaku2str(place_name)
+        place_name = super()._getonlyzenkaku2str(place_name)
         return place_name
 
     def _getshinkoinfo(self, row_html) -> str:
