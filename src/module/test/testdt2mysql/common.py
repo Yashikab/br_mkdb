@@ -32,3 +32,23 @@ class CommonMethod:
             get_set = {}
         finally:
             return get_set
+
+    def getdata2tuple(self, tb_name: str, id_name: str,
+                      target_id: int, col_list: list) -> tuple:
+        """
+        idのcol_listのデータを取得しタプルで返す
+        """
+        insert_col_value = ','.join(col_list)
+        sql_list = ["select", insert_col_value, "from",
+                    tb_name, "where", f"{id_name}={target_id}"]
+        sql = ' '.join(sql_list)
+        try:
+            with MysqlConnector(const.MYSQL_CONFIG) as conn:
+                cursor = conn.cursor()
+                cursor.execute(sql)
+                res_list = cursor.fetchall()
+                res_tpl = res_list[0]
+        except Exception:
+            res_tpl = None
+        finally:
+            return res_tpl

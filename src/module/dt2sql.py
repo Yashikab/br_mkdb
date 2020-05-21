@@ -191,8 +191,10 @@ class RaceData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
+        self.__filename_list = \
+            ['create_raceinfo_tb.sql', 'create_program_tb.sql']
 
-    def create_table_if_not_exists(self, tb_type: str = 'all') -> int:
+    def create_table_if_not_exists(self) -> int:
         """
         外部キーの関係でholdjyo_tbがないとエラーになる
 
@@ -202,16 +204,7 @@ class RaceData2sql(Data2MysqlTemplate):
                 成功したら0, 失敗したら1
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        filename_list = []
-        if tb_type == 'raceinfo' or 'all':
-            filename_list.append('create_raceinfo_tb.sql')
-        elif tb_type == 'program' or 'all':
-            filename_list.append('create_program_tb.sql')
-        else:
-            self.logger.error(f'tb_type: {tb_type} is not available.')
-            return None
-
-        for filename in filename_list:
+        for filename in self.__filename_list:
             status = super()._run_query_from_path(filename)
         return status
 
@@ -279,6 +272,7 @@ class ChokuzenData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
+        self.__filename_list = ['create_chokuzen_cond_tb.sql']
 
     def create_table_if_not_exists(self, tb_type: str = 'all') -> int:
         """
@@ -289,15 +283,7 @@ class ChokuzenData2sql(Data2MysqlTemplate):
             status: int
                 成功したら0, 失敗したら1
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        filename_list = []
-        if tb_type == 'condition' or 'all':
-            filename_list.append('create_chokuzen_cond_tb.sql')
-        else:
-            self.logger.error(f'tb_type: {tb_type} is not available.')
-            return None
-
-        for filename in filename_list:
+        for filename in self.__filename_list:
             status = super()._run_query_from_path(filename)
         return status
 

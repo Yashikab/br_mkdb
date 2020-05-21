@@ -15,11 +15,13 @@ from .common import CommonMethod
 
 
 class TestJyoData2sql(CommonMethod):
-
+    __target_date = 20200512
+    __jyo_cd = 20
     __jd2sql = JyoData2sql()
+    __jd2sql.create_table_if_not_exists()
+    __jd2sql.insert2table(date=__target_date)
 
     def test_exist_table(self):
-        self.__jd2sql.create_table_if_not_exists()
         # カラム名の一致でテスト
         get_set = super().get_columns2set('holdjyo_tb')
 
@@ -28,33 +30,20 @@ class TestJyoData2sql(CommonMethod):
         assert get_set == expected_set
 
     def test_insert2table(self):
-        target_date = 20200512
-        jyo_cd = 20
-        # 指定日の情報を挿入する
-        self.__jd2sql.insert2table(date=target_date)
         # idの情報を一つ取ってきて調べる
-        try:
-            with MysqlConnector(const.MYSQL_CONFIG) as conn:
-                cursor = conn.cursor()
-                sql = f'''
-                    select
-                      datejyo_id,
-                      jyo_cd,
-                      shinko,
-                      ed_race_no
-                    from
-                      holdjyo_tb
-                    where
-                      datejyo_id = {target_date}{jyo_cd:02}
-                '''
-                cursor.execute(sql)
-                res_list = cursor.fetchall()
-                res_tpl = res_list[0]
-        except Exception:
-            res_tpl = None
+        tb_name = "holdjyo_tb"
+        id_name = "datejyo_id"
+        target_id = f"{self.__target_date}{self.__jyo_cd:02}"
+        col_list = ["datejyo_id", "jyo_cd", "shinko", "ed_race_no"]
+        res_tpl = super().getdata2tuple(
+            tb_name,
+            id_name,
+            target_id,
+            col_list
+        )
         expected_tpl = (
-            int(f'{target_date}{jyo_cd:02}'),
-            jyo_cd,
+            int(target_id),
+            self.__jyo_cd,
             '中止順延',
             0
         )
@@ -62,8 +51,16 @@ class TestJyoData2sql(CommonMethod):
 
 
 class TestRaceInfo2sql(CommonMethod):
-
+    # 先に実行する
+    target_date = 20200512
+    jyo_cd = 21
+    race_no = 1
     __rd2sql = RaceData2sql()
+    __rd2sql.create_table_if_not_exists()
+    __rd2sql.insert2table(
+        date=target_date,
+        jyo_cd=jyo_cd,
+        race_no=race_no)
 
     ri_col_set = {'race_id', 'datejyo_id', 'holddate',
                   'jyo_cd', 'race_no', 'taikai_name',
@@ -78,56 +75,49 @@ class TestRaceInfo2sql(CommonMethod):
                   'motor_no', 'motor_2rate', 'motor_3rate',
                   'boat_no', 'boat_2rate', 'boat_3rate'}
 
-    @pytest.mark.parametrize("tb_type, tb_name, col_set", [
-        ('raceinfo', 'raceinfo_tb', ri_col_set),
-        ('program', 'program_tb', pr_col_set)
+    @pytest.mark.parametrize("tb_name, col_set", [
+        ('raceinfo_tb', ri_col_set),
+        ('program_tb', pr_col_set)
     ])
-    def test_exist_table_raceinfo(self, tb_type, tb_name, col_set):
-        self.__rd2sql.create_table_if_not_exists(tb_type=tb_type)
+    def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト
         get_set = super().get_columns2set(tb_name)
         assert get_set == col_set
 
-    def test_insert2table(self):
-        target_date = 20200512
-        jyo_cd = 21
-        race_no = 1
-        # 指定日の情報を挿入する
-        self.__rd2sql.insert2table(
-            date=target_date,
-            jyo_cd=jyo_cd,
-            race_no=race_no)
-        # idの情報を一つ取ってきて調べる
-        try:
-            with MysqlConnector(const.MYSQL_CONFIG) as conn:
-                cursor = conn.cursor()
-                sql = f'''
-                    select
-                      waku_id,
-                      p_id,
-                      p_all_1rate,
-                      boat_2rate
-                    from
-                      program_tb
-                    where
-                      waku_id = {target_date}{jyo_cd:02}{race_no:02}1
-                '''
-                cursor.execute(sql)
-                res_list = cursor.fetchall()
-                res_tpl = res_list[0]
-        except Exception:
-            res_tpl = None
-        expected_tpl = (
-            int(f'{target_date}{jyo_cd:02}{race_no:02}1'),
+    race_id = f"{target_date}{jyo_cd:02}{race_no:02}"
+    race_col_list = ["race_id", "jyo_cd", "grade", "race_kyori"]
+    race_expected = (
+        int(race_id),
+        jyo_cd,
+        'is-G1b',
+        1800
+    )
+    waku_id = f"{target_date}{jyo_cd:02}{race_no:02}1"
+    waku_col_list = ["waku_id", "p_id", "p_all_1rate", "boat_2rate"]
+    waku_expected = (
+            int(waku_id),
             4713,
             6.72,
             18.18
         )
-        assert res_tpl == expected_tpl
+
+    @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
+        ("raceinfo_tb", "race_id", race_id, race_col_list, race_expected),
+        ("program_tb", "waku_id", waku_id, waku_col_list, waku_expected)
+    ])
+    def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
+        res_tpl = super().getdata2tuple(
+            tb_nm,
+            id_nm,
+            t_id,
+            col_list
+        )
+        assert res_tpl == expected
 
 
 class TestChokuzenInfo2sql(CommonMethod):
     __ci2sql = ChokuzenData2sql()
+    __ci2sql.create_table_if_not_exists()
     cc_col_set = {'race_id', 'datejyo_id',
                   'temp', 'weather', 'wind_v',
                   'w_temp', 'wave', 'wind_dr'}
@@ -136,7 +126,6 @@ class TestChokuzenInfo2sql(CommonMethod):
         ('chokuzen_cond', 'chokuzen_cond_tb', cc_col_set),
     ])
     def test_exist_table_raceinfo(self, tb_type, tb_name, col_set):
-        self.__ci2sql.create_table_if_not_exists(tb_type=tb_type)
         # カラム名の一致でテスト
         get_set = super().get_columns2set(tb_name)
         assert get_set == col_set
