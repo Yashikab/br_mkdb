@@ -9,8 +9,6 @@ import pytest
 from module.dt2sql import JyoData2sql
 from module.dt2sql import RaceData2sql
 from module.dt2sql import ChokuzenData2sql
-from module import const
-from module.connect import MysqlConnector
 from .common import CommonMethod
 
 
