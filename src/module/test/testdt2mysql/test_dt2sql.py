@@ -114,6 +114,9 @@ class TestRaceInfo2sql(CommonMethod):
 
 
 class TestChokuzenInfo2sql(CommonMethod):
+    target_date = 20200512
+    jyo_cd = 21
+    race_no = 1
     __ci2sql = ChokuzenData2sql()
     __ci2sql.create_table_if_not_exists()
     cc_col_set = {'race_id', 'datejyo_id',
@@ -127,3 +130,33 @@ class TestChokuzenInfo2sql(CommonMethod):
         # カラム名の一致でテスト
         get_set = super().get_columns2set(tb_name)
         assert get_set == col_set
+
+    race_id = f"{target_date}{jyo_cd:02}{race_no:02}"
+    cond_col_list = ["race_id", "temp", "weather", "wave"]
+    cond_expected = (
+        int(race_id),
+        24.0,
+        '晴',
+        5
+    )
+    # waku_id = f"{target_date}{jyo_cd:02}{race_no:02}1"
+    # waku_col_list = ["waku_id", "p_id", "p_all_1rate", "boat_2rate"]
+    # waku_expected = (
+    #         int(waku_id),
+    #         4713,
+    #         6.72,
+    #         18.18
+    #     )
+
+    @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
+        ("chokuzen_cond_tb", "race_id", race_id, cond_col_list, cond_expected),
+        # ("program_tb", "waku_id", waku_id, waku_col_list, waku_expected)
+    ])
+    def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
+        res_tpl = super().getdata2tuple(
+            tb_nm,
+            id_nm,
+            t_id,
+            col_list
+        )
+        assert res_tpl == expected

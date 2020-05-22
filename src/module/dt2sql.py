@@ -209,7 +209,8 @@ class RaceData2sql(Data2MysqlTemplate):
         return status
 
     def insert2table(self, date: int, jyo_cd: int, race_no: int) -> int:
-        """
+        """番組表をSQLへ
+
         日付，会場コード，レース番号を受取る \n
         レース情報を挿入し続けて，番組表情報を挿入する \n
         create_tableのようにタイプ分けはしない
@@ -287,5 +288,25 @@ class ChokuzenData2sql(Data2MysqlTemplate):
             status = super()._run_query_from_path(filename)
         return status
 
-    def insert2table(self):
-        pass
+    def insert2table(self, date: int, jyo_cd: int, race_no: int) -> int:
+        """直前情報をSQLへ
+
+        日付，会場コード，レース番号を受取る \n
+        レース情報を挿入し続けて，直前情報を挿入する \n
+        create_tableのようにタイプ分けはしない
+        （opを一回の読み込みで終わらせたい）
+
+        Parameters
+        ----------
+            date: int
+                日付，yyyymmdd型
+            jyo_cd : int
+                会場コード
+            race_no : int
+                レース番号
+
+        Returns
+        -------
+            status: int
+                成功したら0, 失敗したら1
+        """
