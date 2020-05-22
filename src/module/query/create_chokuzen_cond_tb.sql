@@ -7,6 +7,6 @@ CREATE TABLE chokuzen_cond_tb(
     w_temp FLOAT,
     wave INT,
     wind_dr INT,
-    FOREIGN KEY (datejyo_id)
-    REFERENCES holdjyo_tb (datejyo_id)
+    FOREIGN KEY (race_id)
+    REFERENCES raceinfo_tb (race_id)
 )
