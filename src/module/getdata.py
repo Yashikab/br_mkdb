@@ -424,7 +424,7 @@ class OfficialChokuzen(CommonMethods4Official):
     def __init__(self,
                  race_no: int,
                  jyo_code: int,
-                 day: int) -> None:
+                 date: int) -> None:
         """
         競艇公式サイトの直前情報からのデータ取得
         レース番，場コード，日付を入力し公式サイトへアクセス
@@ -435,14 +435,14 @@ class OfficialChokuzen(CommonMethods4Official):
             何レース目か
         jyo_code : int
             会場コード
-        day : int
+        date : int
             yyyymmdd形式で入力
 
         """
         self.logger = getLogger(self.__class__.__name__)
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
-        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.__soup = super()._url2soup(target_url)
 
     def getplayerinfo2dict(self, waku: int) -> dict:

@@ -119,6 +119,7 @@ class TestChokuzenInfo2sql(CommonMethod):
     race_no = 1
     __ci2sql = ChokuzenData2sql()
     __ci2sql.create_table_if_not_exists()
+    __ci2sql.insert2table(target_date, jyo_cd, race_no)
     cc_col_set = {'race_id', 'datejyo_id',
                   'temp', 'weather', 'wind_v',
                   'w_temp', 'wave', 'wind_dr'}

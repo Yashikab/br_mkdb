@@ -24,9 +24,9 @@ class TestOfficialChokuzen:
         # place : hamanako 06
         self.jyo_code = 6
         # day 2020/04/08
-        self.day = 20200408
+        self.date = 20200408
         och = getdata.OfficialChokuzen(
-            self.race_no, self.jyo_code, self.day)
+            self.race_no, self.jyo_code, self.date)
         return och
 
     @pytest.fixture(scope='class')

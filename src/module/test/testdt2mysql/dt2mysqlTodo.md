@@ -120,6 +120,6 @@
   - wind_dr INT: 風向
 
 - [x] テーブルの作成
-- [ ] データ挿入部の作成
+- [x] データ挿入部の作成
   - 引数は日付，場コード
   - getdata.OfficialChokuzen.getcondinfo2dictからデータを取得
