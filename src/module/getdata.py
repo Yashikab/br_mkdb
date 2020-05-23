@@ -993,37 +993,33 @@ class GetHoldPlacePast(CommonMethods4Official):
                 lambda x: jyo_master.at[x, 'jyo_cd'], self.place_name_list))
         return code_name_list
 
-    def shinkoinfodict(self) -> dict:
-        """
-        レースの進行状況（中止など)を会場名をキーとしたdictで返す
-        """
-        shinkoinfo_dict = dict(
-            zip(self.place_name_list, self.shinko_info_list))
-        return shinkoinfo_dict
+    def holdinfo2dict(self, hp_name: str) -> dict:
+        """開催場の情報を辞書型で返す
 
-    def holdracedict(self) -> dict:
+        Parameters
+        ----------
+            hp_name: str
+                開催場名
         """
-        会場名をキーとして，開催されるレース番号リストを出力
-        何もなければ list(range(1,13))
-        中止ならば空リスト
-        xR以降中止ならば[1, , x-1]
-        """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        shinko = self.shinko_info_list[self.place_name_list.index(hp_name)]
+        ed_race_no = self._get_end_raceno(shinko)
 
-        def possibleraces(msg: str) -> list:
-            if re.search(r'1?[1-9]R以降中止', msg) is not None:
-                end_race = int(re.search(r'1?[1-9]', msg).group(0))
-                race_list = list(range(1, end_race))
-            elif '中止' in msg:
-                race_list = []
-            else:
-                race_list = list(range(1, 13))
-            return race_list
+        content_dict = {
+            'shinko': shinko,
+            'ed_race_no': ed_race_no
+        }
+        return content_dict
 
-        race_listoflist = list(
-            map(lambda x: possibleraces(x), self.shinko_info_list))
-        possiblerace_dict = dict(zip(self.place_name_list, race_listoflist))
-        return possiblerace_dict
+    def _get_end_raceno(self, msg: str) -> int:
+        """進行情報の欄をみて，その日の最終レースを返す"""
+        if re.search(r'1?[1-9]R以降中止', msg) is not None:
+            end_race = int(re.search(r'1?[1-9]', msg).group(0))
+        elif '中止' in msg:
+            end_race = 0
+        else:
+            # 通常
+            end_race = 12
+        return end_race
 
     def _getplacename(self, row_html) -> str:
         """

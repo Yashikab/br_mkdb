@@ -106,8 +106,6 @@
 
 - 対象日+会場コード+レース番を主キーとする
 
-- if分岐：condition
-
 - テーブル名: chokuzen_cond_tb
 - カラム名:
   - race_id BIGINT: PRIMAR KEY
@@ -123,3 +121,11 @@
 - [x] データ挿入部の作成
   - 引数は日付，場コード
   - getdata.OfficialChokuzen.getcondinfo2dictからデータを取得
+
+### 枠別直前データ（wakuごと)
+
+- 対象日+会場コード+レース番を主キーとする
+- テーブル名:
+- カラム名:
+- [ ] テーブルの作成
+- [ ] データ挿入部の作成

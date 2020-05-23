@@ -22,35 +22,6 @@ class TestGetHoldPlace:
                   '宮島', '芦屋', '福岡']
     code_list2 = [5, 6, 7, 8, 9, 10, 12, 15, 16, 17, 21, 22]
 
-    dict2 = {'多摩川': '9R以降中止',
-             '浜名湖': '-',
-             '蒲郡': '-',
-             '常滑': '-',
-             '津': '-',
-             '三国': '-',
-             '住之江': '-',
-             '丸亀': '-',
-             '児島': '-',
-             '宮島': '-',
-             '芦屋': '-',
-             '福岡': '-'}
-    possible_dict2 = {
-        '多摩川': list(range(1, 9)),
-        '浜名湖': list(range(1, 13)),
-        '蒲郡': list(range(1, 13)),
-        '常滑': list(range(1, 13)),
-        '津': list(range(1, 13)),
-        '三国': list(range(1, 13)),
-        '住之江': list(range(1, 13)),
-        '丸亀': list(range(1, 13)),
-        '児島': list(range(1, 13)),
-        '宮島': list(range(1, 13)),
-        '芦屋': list(range(1, 13)),
-        '福岡': list(range(1, 13))}
-
-    # @pytest.fixture(scope='class')
-    # def ghp(self):
-    #     return getdata.GetHoldPlasePast()
     @pytest.mark.parametrize("date, expected", [
         (20200408, name_list1),
         (20110311, name_list2)
@@ -66,16 +37,19 @@ class TestGetHoldPlace:
         ghp = getdata.GetHoldPlacePast(date)
         assert ghp.holdplace2cdlist() == expected
 
-    @pytest.mark.parametrize("date, expected", [
-        (20110311, dict2)
-    ])
-    def test_shinkoinfodict(self, date, expected):
-        ghp = getdata.GetHoldPlacePast(date)
-        assert ghp.shinkoinfodict() == expected
+    tama_info = {
+        'shinko': '9R以降中止',
+        'ed_race_no': 9
+    }
+    hama_info = {
+        'shinko': '-',
+        'ed_race_no': 12
+    }
 
-    @pytest.mark.parametrize("date, expected", [
-        (20110311, possible_dict2)
+    @pytest.mark.parametrize("date, hp_name, expected", [
+        (20110311, '多摩川', tama_info),
+        (20110311, '浜名湖', hama_info)
     ])
-    def test_possibleraces(self, date, expected):
+    def test_holdinfo2dict(self, date, hp_name, expected):
         ghp = getdata.GetHoldPlacePast(date)
-        assert ghp.holdracedict() == expected
+        assert ghp.holdinfo2dict(hp_name) == expected

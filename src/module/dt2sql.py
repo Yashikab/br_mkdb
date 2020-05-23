@@ -155,26 +155,15 @@ class JyoData2sql(Data2MysqlTemplate):
         ghp = GetHoldPlacePast(target_date=date)
         hp_str_list = ghp.holdplace2strlist()
         hp_cd_list = ghp.holdplace2cdlist()
-        shinkoinfo_dict = ghp.shinkoinfodict()
-        holdrace_dict = ghp.holdracedict()
-        # 重複時は無視する
-        sql = "INSERT IGNORE INTO holdjyo_tb VALUES"
-        insert_value_list = []
+
         for hp_s, hp_c in zip(hp_str_list, hp_cd_list):
-            primary_key = int(f'{date}{hp_c:02}')
-            shinko = shinkoinfo_dict[hp_s]
-            holdrace_list = holdrace_dict[hp_s]
-            if not holdrace_list:
-                ed_race_no = 0
-            else:
-                ed_race_no = holdrace_list[-1]
-            insert_value = f"({primary_key}, {date}, {hp_c}, "\
-                           f"'{hp_s}', '{shinko}', {ed_race_no})"
-            insert_value_list.append(insert_value)
-        total_insert_value = ', '.join(insert_value_list)
-        query = ' '.join([sql, total_insert_value])
-        # 作成したクエリの実行
-        super()._run_query(query)
+            datejyo_id = int(f'{date}{hp_c:02}')
+            super()._info_insert(
+                tb_name='holdjyo_tb',
+                id_list=[datejyo_id, date, hp_c, f"'{hp_s}'"],
+                info_dict=ghp.holdinfo2dict(hp_s)
+            )
+
         return None
 
 
