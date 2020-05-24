@@ -865,7 +865,34 @@ class OfficialResults(CommonMethods4Official):
                    .replace(' ', '')
         content_dict['biko'] = biko
 
+        # 払い戻し，人気
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(1) > div > table'
+        pay_pop_tb = self.__soup.select_one(table_selector)
+        pay_pop_tb_list = pay_pop_tb.select('tbody')
+        content_dict['payout_3tan'], content_dict['popular_3tan'] = \
+            self._get_paypop(pay_pop_tb_list[0])
+        content_dict['payout_3fuku'], content_dict['popular_3fuku'] = \
+            self._get_paypop(pay_pop_tb_list[1])
+        content_dict['payout_2tan'], content_dict['popular_2tan'] = \
+            self._get_paypop(pay_pop_tb_list[2])
+        content_dict['payout_2fuku'], content_dict['popular_2fuku'] = \
+            self._get_paypop(pay_pop_tb_list[3])
+        content_dict['payout_1tan'], _ = \
+            self._get_paypop(pay_pop_tb_list[5])
+
         return content_dict
+
+    def _get_paypop(self, element_tag: bs4.element.Tag) -> tuple:
+        """払い戻し金額と人気を取得"""
+        payout = element_tag.select_one('span.is-payout1').text
+        payout = int(payout.replace('¥', '').replace(',', ''))
+        popular = \
+            element_tag.select_one('tr:nth-child(1) > td:nth-child(4)').text
+        popular = super()._rmletter2int(popular)
+        return (payout, popular)
 
     def _getresulttable2dict(self) -> dict:
         """
