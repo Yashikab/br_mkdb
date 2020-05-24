@@ -9,8 +9,8 @@ from module.connect import MysqlConnector
 
 
 class CommonMethod:
-    def __init__(self):
-        self.logger = getLogger(self.__class__.__name__)
+    logger = getLogger(__name__)
+
     def get_columns2set(self, tb_name: str) -> set:
         """テーブル名のカラムを取得
 

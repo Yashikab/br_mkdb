@@ -148,7 +148,7 @@ class TestChokuzenInfo2sql(CommonMethod):
     waku_id = f"{target_date}{jyo_cd:02}{race_no:02}1"
     waku_col_list = ["waku_id", "p_chosei_weight", "p_tenji_time",
                      "p_tilt", "p_tenji_course", "p_tenji_st"]
-    waku_expected = (
+    waku_ex = (
             int(waku_id),
             0.0,
             6.91,
@@ -159,7 +159,7 @@ class TestChokuzenInfo2sql(CommonMethod):
 
     @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
         ("chokuzen_cond_tb", "race_id", race_id, cond_col_list, cond_expected),
-        ("chokuzen_player_tb", "waku_id", waku_id, waku_col_list, waku_expected)
+        ("chokuzen_player_tb", "waku_id", waku_id, waku_col_list, waku_ex)
     ])
     def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
         res_tpl = super().getdata2tuple(

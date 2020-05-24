@@ -10,6 +10,7 @@ from abc import ABCMeta, abstractmethod
 from logging import getLogger
 # from datetime import datetime
 from pathlib import Path
+from typing import Callable
 
 from module import const
 from module.connect import MysqlConnector
@@ -130,6 +131,34 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
 
         return None
 
+    def _waku_all_insert(self,
+                         tb_name: str,
+                         base_id: int,
+                         callback_func: Callable[['function'], dict],
+                         ommit_list: list = []) -> None:
+        """1~6枠の情報をインサートするメソッド
+
+        Parameters
+        ----------
+            tb_naem: str
+            base_id: int
+                waku_id = {base_id}{waku}になる
+            info_dict_func: Callable[['function'], dict]
+                waku情報を取得する関数メソッド
+            ommit_list: list
+                _info_insertを参照
+        """
+        self.logger.debug(f'start insert to {tb_name}.')
+        # 1~6枠でループ，データ取得でエラーの場合はインサートされない
+        for waku in range(1, 7):
+            waku_id = int(f"{base_id}{waku}")
+            self._info_insert(
+                tb_name=tb_name,
+                id_list=[waku_id, base_id],
+                info_dict=callback_func(waku)
+            )
+        self.logger.debug(f'completed insert to {tb_name}')
+
 
 class JyoData2sql(Data2MysqlTemplate):
 
@@ -214,15 +243,11 @@ class RaceData2sql(Data2MysqlTemplate):
             info_dict=op.raceinfo2dict()
         )
 
-        self.logger.debug(f'start insert program info.')
-        # 1~6枠でループ，データ取得でエラーの場合はインサートされない
-        for waku in range(1, 7):
-            waku_id = int(f"{race_id}{waku}")
-            super()._info_insert(
-                tb_name='program_tb',
-                id_list=[waku_id, race_id],
-                info_dict=op.getplayerinfo2dict(waku)
-            )
+        super()._waku_all_insert(
+            tb_name='program_tb',
+            base_id=race_id,
+            callback_func=op.getplayerinfo2dict
+        )
 
         return None
 
@@ -272,15 +297,10 @@ class ChokuzenData2sql(Data2MysqlTemplate):
             id_list=[race_id, datejyo_id],
             info_dict=och.getcondinfo2dict()
         )
-
-        self.logger.debug(f'start insert chokuzen_player_tb.')
-        # 1~6枠でループ，データ取得でエラーの場合はインサートされない
-        for waku in range(1, 7):
-            waku_id = int(f"{race_id}{waku}")
-            super()._info_insert(
-                tb_name='chokuzen_player_tb',
-                id_list=[waku_id, race_id],
-                info_dict=och.getplayerinfo2dict(waku)
-            )
+        super()._waku_all_insert(
+            tb_name='chokuzen_player_tb',
+            base_id=race_id,
+            callback_func=och.getplayerinfo2dict
+        )
 
         return None
