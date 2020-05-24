@@ -124,8 +124,20 @@
 
 ### 枠別直前データ（wakuごと)
 
-- 対象日+会場コード+レース番を主キーとする
-- テーブル名:
+- 対象日+会場コード+レース番+wakuを主キーとする
+- テーブル名: chokuzen_player_tb
 - カラム名:
+  - waku_id: yyyymmdd{jyo_cd:02}{race_no:02}{waku} BIGINT: Primary key
+      外部キー 設定参照： program_tb.waku_id
+  - race_id: yyyymmdd{jyo_cd:02}{race_no:02} BIGINT: 
+      外部キー 設定参照： chokuzen_cond_tb.race_id
+  - p_name VARCHAR(100): 選手名
+  - p_weight FLOAT: 体重
+  - p_chosei_weight FLOAT: 調整体重
+  - p_tenji_time FLOAT: 展示タイム
+  - p_tilt FLOAT: チルト角度
+  - p_tenji_course INT: スタ展時の進入コース
+  - p_tenji_st FLOAT: 展示ST
+
 - [ ] テーブルの作成
 - [ ] データ挿入部の作成

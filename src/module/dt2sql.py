@@ -233,7 +233,8 @@ class ChokuzenData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
-        self.__filename_list = ['create_chokuzen_cond_tb.sql']
+        self.__filename_list = ['create_chokuzen_cond_tb.sql',
+                                'create_chokuzen_p_tb.sql']
 
     def create_table_if_not_exists(self) -> None:
         """外部キーの関係でholdjyo_tbがないとエラーになる"""

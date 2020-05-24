@@ -123,11 +123,16 @@ class TestChokuzenInfo2sql(CommonMethod):
     cc_col_set = {'race_id', 'datejyo_id',
                   'temp', 'weather', 'wind_v',
                   'w_temp', 'wave', 'wind_dr'}
+    cp_col_set = {'waku_id', 'race_id', 'p_name',
+                  'p_weight', 'p_chosei_weight',
+                  'p_tenji_time', 'p_tilt',
+                  'p_tenji_course', 'p_tenji_st'}
 
-    @pytest.mark.parametrize("tb_type, tb_name, col_set", [
-        ('chokuzen_cond', 'chokuzen_cond_tb', cc_col_set),
+    @pytest.mark.parametrize("tb_name, col_set", [
+        ('chokuzen_cond_tb', cc_col_set),
+        ('chokuzen_player_tb', cp_col_set)
     ])
-    def test_exist_table_raceinfo(self, tb_type, tb_name, col_set):
+    def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト
         get_set = super().get_columns2set(tb_name)
         assert get_set == col_set
