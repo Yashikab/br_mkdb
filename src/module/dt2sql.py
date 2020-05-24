@@ -273,4 +273,14 @@ class ChokuzenData2sql(Data2MysqlTemplate):
             info_dict=och.getcondinfo2dict()
         )
 
+        self.logger.debug(f'start insert chokuzen_player_tb.')
+        # 1~6枠でループ，データ取得でエラーの場合はインサートされない
+        for waku in range(1, 7):
+            waku_id = int(f"{race_id}{waku}")
+            super()._info_insert(
+                tb_name='chokuzen_player_tb',
+                id_list=[waku_id, race_id],
+                info_dict=och.getplayerinfo2dict(waku)
+            )
+
         return None

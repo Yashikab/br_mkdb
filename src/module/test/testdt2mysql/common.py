@@ -3,11 +3,14 @@
 """
 dt2sqlモジュール用単体テストの共通関数
 """
+from logging import getLogger
 from module import const
 from module.connect import MysqlConnector
 
 
 class CommonMethod:
+    def __init__(self):
+        self.logger = getLogger(self.__class__.__name__)
     def get_columns2set(self, tb_name: str) -> set:
         """テーブル名のカラムを取得
 
@@ -48,7 +51,8 @@ class CommonMethod:
                 cursor.execute(sql)
                 res_list = cursor.fetchall()
                 res_tpl = res_list[0]
-        except Exception:
+        except Exception as e:
+            self.logger.error(f"{e}")
             res_tpl = None
         finally:
             return res_tpl
