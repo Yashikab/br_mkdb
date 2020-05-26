@@ -67,7 +67,7 @@ class TestOfficialResults:
         ('w_temp', 16.0),
         ('wave', 4),  # cm
         ('wind_dr', 3),
-        ('henkantei', [1]),
+        ('henkantei_list', '1'),
         ('is_henkan', True),
         ('kimarite', '恵まれ'),
         ('biko', '【返還艇あり】'),

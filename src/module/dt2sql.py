@@ -14,9 +14,11 @@ from typing import Callable
 
 from module import const
 from module.connect import MysqlConnector
-from module.getdata import GetHoldPlacePast
-from module.getdata import OfficialProgram
-from module.getdata import OfficialChokuzen
+from module.getdata import (
+    GetHoldPlacePast,
+    OfficialProgram,
+    OfficialChokuzen
+)
 
 
 class Data2MysqlTemplate(metaclass=ABCMeta):
@@ -57,29 +59,31 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
 
         return None
 
-    def _run_query_from_path(self, filename: str) -> None:
+    def _run_query_from_paths(self, filename_list: list) -> None:
         """
         queryフォルダ内のファイル名を指定してクエリを実行する
+        ファイル名はリストで受取，複数のテーブルを一気に作る
 
         Parameters
         ----------
-            filename : str
-                クエリのファイル名
+            filename_list : list
+                クエリのファイル名のリスト
 
         Returns
         -------
             status : int
                 成功したら0，失敗したら1
         """
-        # パスの指定
-        query_filepath = \
-            Path(__file__).parent\
-                          .joinpath('query', filename)\
-                          .resolve()
-        self.logger.debug(f'run query from {query_filepath}')
-        with open(query_filepath, 'r') as f:
-            query = f.read()
-            self._run_query(query)
+        for filename in filename_list:
+            # パスの指定
+            query_filepath = \
+                Path(__file__).parent\
+                              .joinpath('query', filename)\
+                              .resolve()
+            self.logger.debug(f'run query from {query_filepath}')
+            with open(query_filepath, 'r') as f:
+                query = f.read()
+                self._run_query(query)
 
         return None
 
@@ -204,11 +208,7 @@ class RaceData2sql(Data2MysqlTemplate):
             ['create_raceinfo_tb.sql', 'create_program_tb.sql']
 
     def create_table_if_not_exists(self) -> None:
-        """外部キーの関係でholdjyo_tbがないとエラーになる"""
-
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        for filename in self.__filename_list:
-            super()._run_query_from_path(filename)
+        super()._run_query_from_path(self.__filename_list)
         return None
 
     def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
@@ -262,9 +262,7 @@ class ChokuzenData2sql(Data2MysqlTemplate):
                                 'create_chokuzen_p_tb.sql']
 
     def create_table_if_not_exists(self) -> None:
-        """外部キーの関係でholdjyo_tbがないとエラーになる"""
-        for filename in self.__filename_list:
-            super()._run_query_from_path(filename)
+        super()._run_query_from_path(self.__filename_list)
         return None
 
     def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
@@ -304,3 +302,21 @@ class ChokuzenData2sql(Data2MysqlTemplate):
         )
 
         return None
+
+
+class ResultData2sql(Data2MysqlTemplate):
+    """結果情報テーブル作成"""
+
+    def __init__(self):
+        self.logger = getLogger(self.__class__.__name__)
+        self.__filename_list = ['create_raceresult_tb.sql']
+
+    def create_table_if_not_exists(self) -> None:
+        super()._run_query_from_path(self.__filename_list)
+        return None
+
+    def insert2table(self):
+        pass
+
+    # TODO: リファクタリング，すべてのクラスをテンプレートで共通化
+    # 現在のテンプレートをアブストラクトのみにする

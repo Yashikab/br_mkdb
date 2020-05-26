@@ -108,8 +108,8 @@
 
 - テーブル名: chokuzen_cond_tb
 - カラム名:
-  - race_id BIGINT: PRIMAR KEY
-  - datejyo_id INT: 外部キー 参照元：holdjyo_tb
+  - race_id BIGINT: PRIMAR KEY 外部キー 参照先:race_info.race_id
+  - datejyo_id INT
   - temp FLOAT: 気温
   - weather VARCHAR(10): 天気
   - wind_v INT: 風速
@@ -146,10 +146,38 @@
 
 ### レース共通結果データ
 
+- race_idを主キーとする
+- テーブル名: race_result_tb
+- カラム名:
+  - race_id BIGINT: yyyymmdd{jyo_cd:02}{race_no:02}
+      Primary key & 外部キー参照元: raceinfo_tb.race_id
+  - temp FLOAT: 気温
+  - weather VARCHAR(10): 天気
+  - wind_v INT: 風速
+  - w_temp FLOAT: 水温
+  - wave INT: 波高
+  - wind_dr INT: 風向
+  - henkantei_list VARCHAR(100): 返還艇のカンマ区切り文字列（リスト）
+  - is_henkan BOOL: 返還挺の有無
+  - kimarite VARCHAR(100): 決まりて
+  - biko VARCHAR(500): 備考
+  - payout_3tan INT: 3連単払戻金
+  - popular_3tan INT: 3連単人気
+  - payout_3fuku INT: 3連複払戻金
+  - popular_3fuku INT: 3連複人気
+  - payout_2tan INT: 2連単払戻金
+  - popular_2tan INT: 2連単人気
+  - payout_2fuku INT: 2連複払戻金
+  - popular_2fuku INT: 2連複人気
+  - payout_1tan INT: 単勝払戻金
+
 - [ ] テーブルの作成
 - [ ] データ挿入部の作成
 
 ### 枠別結果データ
+
+- waku_idを主キーとする
+- テーブル名: p_result_tb
 
 - [ ] テーブルの作成
 - [ ] データ挿入部の作成

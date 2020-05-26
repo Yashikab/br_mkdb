@@ -827,22 +827,24 @@ class OfficialResults(CommonMethods4Official):
         henkantei_html_list = self.__soup.select(table_selector)
 
         # 返還艇をint型に直す，変なやつはNoneでハンドル（あんまりないけど）
-        def teistr2int(tei_str):
+        def teistr2str(tei_str):
             tei = re.search(r'[1-6]', tei_str)
             if tei is not None:
-                return int(tei.group(0))
+                return str(tei.group(0))
             else:
                 return None
 
         # 返還艇があればリスト長が1以上になる
         if len(henkantei_html_list) != 0:
             henkantei_list = list(map(
-                lambda x: teistr2int(x.text), henkantei_html_list))
+                lambda x: teistr2str(x.text), henkantei_html_list))
+            henkantei_list = [n for n in henkantei_list if n is not None]
             is_henkan = True
         else:
             henkantei_list = []
             is_henkan = False
-        content_dict['henkantei'] = henkantei_list
+        henkantei_str = ','.join(henkantei_list)
+        content_dict['henkantei_list'] = henkantei_str
         content_dict['is_henkan'] = is_henkan
 
         # 決まりて

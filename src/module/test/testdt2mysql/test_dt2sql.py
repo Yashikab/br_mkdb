@@ -5,12 +5,17 @@ dt2sqlモジュール用単体テスト
 実行順番があるので一つのファイルにまとめる
 """
 import pytest
+import time
 
-from module.dt2sql import JyoData2sql
-from module.dt2sql import RaceData2sql
-from module.dt2sql import ChokuzenData2sql
+from module.dt2sql import (
+    JyoData2sql,
+    RaceData2sql,
+    ChokuzenData2sql,
+    ResultData2sql
+)
 from .common import CommonMethod
 
+WAIT = 0.5
 
 class TestJyoData2sql(CommonMethod):
     __target_date = 20200512
@@ -18,6 +23,7 @@ class TestJyoData2sql(CommonMethod):
     __jd2sql = JyoData2sql()
     __jd2sql.create_table_if_not_exists()
     __jd2sql.insert2table(date=__target_date)
+    time.sleep(WAIT)
 
     def test_exist_table(self):
         # カラム名の一致でテスト
@@ -59,6 +65,7 @@ class TestRaceInfo2sql(CommonMethod):
         date=target_date,
         jyo_cd=jyo_cd,
         race_no=race_no)
+    time.sleep(WAIT)
 
     ri_col_set = {'race_id', 'datejyo_id', 'holddate',
                   'jyo_cd', 'race_no', 'taikai_name',
@@ -120,6 +127,8 @@ class TestChokuzenInfo2sql(CommonMethod):
     __ci2sql = ChokuzenData2sql()
     __ci2sql.create_table_if_not_exists()
     __ci2sql.insert2table(target_date, jyo_cd, race_no)
+    time.sleep(WAIT)
+
     cc_col_set = {'race_id', 'datejyo_id',
                   'temp', 'weather', 'wind_v',
                   'w_temp', 'wave', 'wind_dr'}
@@ -169,3 +178,67 @@ class TestChokuzenInfo2sql(CommonMethod):
             col_list
         )
         assert res_tpl == expected
+
+
+class TestResult2sql(CommonMethod):
+    target_date = 20200512
+    jyo_cd = 21
+    race_no = 1
+    __res2sql = ResultData2sql()
+    __res2sql.create_table_if_not_exists()
+    # __res2sql.insert2table(target_date, jyo_cd, race_no)
+    time.sleep(WAIT)
+
+    rr_col_set = {'race_id', 'temp', 'weather', 'wind_v', 
+                  'w_temp', 'wave', 'wind_dr',
+                  'henkantei_list', 'is_henkan', 'kimarite',
+                  'biko', 'payout_3tan', 'popular_3tan',
+                  'payout_3fuku', 'popular_3fuku',
+                  'payout_2tan', 'popular_2tan',
+                  'payout_2fuku', 'popular_2fuku', 'payout_1tan'}
+    # cp_col_set = {'waku_id', 'race_id', 'p_name',
+    #               'p_weight', 'p_chosei_weight',
+    #               'p_tenji_time', 'p_tilt',
+    #               'p_tenji_course', 'p_tenji_st'}
+
+    @pytest.mark.parametrize("tb_name, col_set", [
+        ('race_result_tb', rr_col_set),
+        # ('chokuzen_player_tb', cp_col_set)
+    ])
+    def test_exist_table_raceinfo(self, tb_name, col_set):
+        # カラム名の一致でテスト
+        get_set = super().get_columns2set(tb_name)
+        assert get_set == col_set
+
+    # race_id = f"{target_date}{jyo_cd:02}{race_no:02}"
+    # cond_col_list = ["race_id", "temp", "weather", "wave"]
+    # cond_expected = (
+    #     int(race_id),
+    #     24.0,
+    #     '晴',
+    #     5
+    # )
+    # waku_id = f"{target_date}{jyo_cd:02}{race_no:02}1"
+    # waku_col_list = ["waku_id", "p_chosei_weight", "p_tenji_time",
+    #                  "p_tilt", "p_tenji_course", "p_tenji_st"]
+    # waku_ex = (
+    #         int(waku_id),
+    #         0.0,
+    #         6.91,
+    #         -0.5,
+    #         2,
+    #         0.11
+    #     )
+
+    # @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
+    #     ("chokuzen_cond_tb", "race_id", race_id, cond_col_list, cond_expected),
+    #     ("chokuzen_player_tb", "waku_id", waku_id, waku_col_list, waku_ex)
+    # ])
+    # def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
+    #     res_tpl = super().getdata2tuple(
+    #         tb_nm,
+    #         id_nm,
+    #         t_id,
+    #         col_list
+    #     )
+    #     assert res_tpl == expected
