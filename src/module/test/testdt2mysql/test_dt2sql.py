@@ -68,8 +68,7 @@ class TestRaceInfo2sql(CommonMethod):
         race_no=race_no)
     time.sleep(WAIT)
 
-    ri_col_set = {'race_id', 'datejyo_id', 'holddate',
-                  'jyo_cd', 'race_no', 'taikai_name',
+    ri_col_set = {'race_id', 'datejyo_id', 'taikai_name',
                   'grade', 'race_type', 'race_kyori',
                   'is_antei', 'is_shinnyukotei'}
     pr_col_set = {'waku_id', 'race_id',
@@ -91,10 +90,9 @@ class TestRaceInfo2sql(CommonMethod):
         assert get_set == col_set
 
     race_id = f"{target_date}{jyo_cd:02}{race_no:02}"
-    race_col_list = ["race_id", "jyo_cd", "grade", "race_kyori"]
+    race_col_list = ["race_id", "grade", "race_kyori"]
     race_expected = (
         int(race_id),
-        jyo_cd,
         'is-G1b',
         1800
     )
@@ -187,10 +185,10 @@ class TestResult2sql(CommonMethod):
     race_no = 1
     __res2sql = ResultData2sql()
     __res2sql.create_table_if_not_exists()
-    # __res2sql.insert2table(target_date, jyo_cd, race_no)
+    __res2sql.insert2table(target_date, jyo_cd, race_no)
     time.sleep(WAIT)
 
-    rr_col_set = {'race_id', 'temp', 'weather', 'wind_v', 
+    rr_col_set = {'race_id', 'datejyo_id', 'temp', 'weather', 'wind_v',
                   'w_temp', 'wave', 'wind_dr',
                   'henkantei_list', 'is_henkan', 'kimarite',
                   'biko', 'payout_3tan', 'popular_3tan',
@@ -211,14 +209,17 @@ class TestResult2sql(CommonMethod):
         get_set = super().get_columns2set(tb_name)
         assert get_set == col_set
 
-    # race_id = f"{target_date}{jyo_cd:02}{race_no:02}"
-    # cond_col_list = ["race_id", "temp", "weather", "wave"]
-    # cond_expected = (
-    #     int(race_id),
-    #     24.0,
-    #     '晴',
-    #     5
-    # )
+    race_id = f"{target_date}{jyo_cd:02}{race_no:02}"
+    race_col_list = ["race_id", "temp", "kimarite", "biko",
+                     "payout_3tan", "popular_3tan"]
+    race_expected = (
+        int(race_id),
+        21.0,
+        '逃げ',
+        '',
+        4000,
+        14
+    )
     # waku_id = f"{target_date}{jyo_cd:02}{race_no:02}1"
     # waku_col_list = ["waku_id", "p_chosei_weight", "p_tenji_time",
     #                  "p_tilt", "p_tenji_course", "p_tenji_st"]
@@ -231,15 +232,15 @@ class TestResult2sql(CommonMethod):
     #         0.11
     #     )
 
-    # @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
-    #     ("chokuzen_cond_tb", "race_id", race_id, cond_col_list, cond_expected),
-    #     ("chokuzen_player_tb", "waku_id", waku_id, waku_col_list, waku_ex)
-    # ])
-    # def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
-    #     res_tpl = super().getdata2tuple(
-    #         tb_nm,
-    #         id_nm,
-    #         t_id,
-    #         col_list
-    #     )
-    #     assert res_tpl == expected
+    @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
+        ("race_result_tb", "race_id", race_id, race_col_list, race_expected),
+        # ("chokuzen_player_tb", "waku_id", waku_id, waku_col_list, waku_ex)
+    ])
+    def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
+        res_tpl = super().getdata2tuple(
+            tb_nm,
+            id_nm,
+            t_id,
+            col_list
+        )
+        assert res_tpl == expected

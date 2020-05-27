@@ -1,5 +1,6 @@
 CREATE TABLE race_result_tb(
     race_id BIGINT PRIMARY KEY,
+    datejyo_id INT,
     temp FLOAT,
     weather VARCHAR(10),
     wind_v INT,

@@ -1,9 +1,6 @@
 CREATE TABLE raceinfo_tb(
     race_id BIGINT PRIMARY KEY,
     datejyo_id INT,
-    holddate DATE,
-    jyo_cd INT,
-    race_no INT,
     taikai_name VARCHAR(400),
     grade VARCHAR(100),
     race_type VARCHAR(100),

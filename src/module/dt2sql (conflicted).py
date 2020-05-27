@@ -77,12 +77,12 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         race_id = int(f"{date}{jyo_cd:02}{race_no:02}")
         datejyo_id = int(f"{date}{jyo_cd:02}")
 
-        self._info_insert(
+        super()._info_insert(
             tb_name=self.__tb_name_list[0],
             id_list=[race_id, datejyo_id],
             info_dict=tcls.getcommoninfo2dict()
         )
-        self._waku_all_insert(
+        super()._waku_all_insert(
             tb_name=self.__tb_name_list[1],
             base_id=race_id,
             callback_func=tcls.getplayerinfo2dict
@@ -100,10 +100,10 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                 クエリ文
         """
         try:
-            self.logger.debug('connecteng Mysql.')
+            self.logger.debug(f'connecteng Mysql.')
             with MysqlConnector(const.MYSQL_CONFIG) as conn:
                 cursor = conn.cursor()
-                self.logger.debug('run query.')
+                self.logger.debug(f'run query.')
                 cursor.execute(query)
                 cursor.close()
                 self.logger.debug('query run successfully!')
@@ -191,7 +191,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
     def _waku_all_insert(self,
                          tb_name: str,
                          base_id: int,
-                         callback_func: Callable[[], dict],
+                         callback_func: Callable[['function'], dict],
                          ommit_list: list = []) -> None:
         """1~6枠の情報をインサートするメソッド
 
@@ -256,9 +256,48 @@ class RaceData2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
         super().__init__(
-            filename_list=['create_raceinfo_tb.sql', 'create_program_tb.sql'],
-            table_name_list=['raceinfo_tb', 'program_tb'],
-            target_cls=OfficialProgram)
+            ['create_raceinfo_tb.sql', 'create_program_tb.sql'])
+
+    # オーバーライド
+    def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
+        """番組表をSQLへ
+
+        日付，会場コード，レース番号を受取る \n
+        レース情報を挿入し続けて，番組表情報を挿入する \n
+        create_tableのようにタイプ分けはしない
+        （opを一回の読み込みで終わらせたい）
+
+        Parameters
+        ----------
+            date: int
+                日付，yyyymmdd型
+            jyo_cd : int
+                会場コード
+            race_no : int
+                レース番号
+        """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
+        self.logger.debug(f'start insert raceinfo')
+        op = OfficialProgram(race_no=race_no, jyo_code=jyo_cd, date=date)
+
+        # 各種id
+        race_id = int(f"{date}{jyo_cd:02}{race_no:02}")
+        datejyo_id = int(f"{date}{jyo_cd:02}")
+
+        super()._info_insert(
+            tb_name='raceinfo_tb',
+            id_list=[race_id, datejyo_id, date, jyo_cd, race_no],
+            info_dict=op.raceinfo2dict()
+        )
+
+        super()._waku_all_insert(
+            tb_name='program_tb',
+            base_id=race_id,
+            callback_func=op.getplayerinfo2dict
+        )
+
+        return None
 
 
 class ChokuzenData2sql(Data2MysqlTemplate):
@@ -268,10 +307,47 @@ class ChokuzenData2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
         super().__init__(
-            filename_list=[
-                'create_chokuzen_cond_tb.sql', 'create_chokuzen_p_tb.sql'],
-            table_name_list=['chokuzen_cond_tb', 'chokuzen_player_tb'],
-            target_cls=OfficialChokuzen)
+            ['create_chokuzen_cond_tb.sql',
+             'create_chokuzen_p_tb.sql'])
+
+    # オーバーライド
+    def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
+        """直前情報をSQLへ
+
+        日付，会場コード，レース番号を受取る \n
+        レース情報を挿入し続けて，直前情報を挿入する \n
+        create_tableのようにタイプ分けはしない
+        （opを一回の読み込みで終わらせたい）
+
+        Parameters
+        ----------
+            date: int
+                日付，yyyymmdd型
+            jyo_cd : int
+                会場コード
+            race_no : int
+                レース番号
+        """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
+        och = OfficialChokuzen(race_no=race_no, jyo_code=jyo_cd, date=date)
+
+        # 各種id
+        race_id = int(f"{date}{jyo_cd:02}{race_no:02}")
+        datejyo_id = int(f"{date}{jyo_cd:02}")
+
+        super()._info_insert(
+            tb_name='chokuzen_cond_tb',
+            id_list=[race_id, datejyo_id],
+            info_dict=och.getcondinfo2dict()
+        )
+        super()._waku_all_insert(
+            tb_name='chokuzen_player_tb',
+            base_id=race_id,
+            callback_func=och.getplayerinfo2dict
+        )
+
+        return None
 
 
 class ResultData2sql(Data2MysqlTemplate):
@@ -279,7 +355,19 @@ class ResultData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
-        super().__init__(
-            filename_list=['create_raceresult_tb.sql'],
-            table_name_list=['race_result_tb', ''],
-            target_cls=OfficialResults)
+        super().__init__(['create_raceresult_tb.sql'])
+
+    # オーバーライド
+    def insert2table(self, date: int, jyo_cd: int, race_no: int):
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
+        ors = OfficialResults(race_no, jyo_cd, date)
+        race_id = int(f"{date}{jyo_cd:02}{race_no:02}")
+
+        super()._info_insert(
+            tb_name='race_result_tb',
+            id_list=[race_id],
+            info_dict=ors.getraceresult2dict()
+        )
+
+    # TODO: リファクタリング，すべてのクラスをテンプレートで共通化

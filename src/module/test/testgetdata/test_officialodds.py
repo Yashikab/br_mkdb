@@ -22,9 +22,9 @@ class TestOfficialOdds:
         # place : hamanako 06
         self.jyo_code = 6
         # day 2020/04/08
-        self.day = 20200408
+        self.date = 20200408
         odds = getdata.OfficialOdds(
-            self.race_no, self.jyo_code, self.day)
+            self.race_no, self.jyo_code, self.date)
         return odds
 
     # 3連単

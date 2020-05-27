@@ -245,7 +245,7 @@ class OfficialProgram(CommonMethods4Official):
                 何レース目か
             jyo_code : int
                 会場コード
-            day : int
+            date : int
                 yyyymmdd形式で入力
 
         """
@@ -344,7 +344,7 @@ class OfficialProgram(CommonMethods4Official):
         boat_2rate = float(boat_info_list[1])
         boat_3rate = float(boat_info_list[2])
 
-        self.logger.debug(f'get target player info completed.')
+        self.logger.debug('get target player info completed.')
 
         content_dict = {
             'name': name,
@@ -373,7 +373,7 @@ class OfficialProgram(CommonMethods4Official):
 
         return content_dict
 
-    def raceinfo2dict(self) -> dict:
+    def getcommoninfo2dict(self) -> dict:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         table_selector = \
             'body > main > div > div > div > '\
@@ -502,7 +502,7 @@ class OfficialChokuzen(CommonMethods4Official):
         }
         return content_dict
 
-    def getcondinfo2dict(self) -> dict:
+    def getcommoninfo2dict(self) -> dict:
         """
         直前情報の水面気象情報を抜き出し，辞書型にする
         """
@@ -519,17 +519,235 @@ class OfficialChokuzen(CommonMethods4Official):
         return content_dict
 
 
+class OfficialResults(CommonMethods4Official):
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 date: int):
+        """
+        競艇公式サイトの結果からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
+
+        Parameters
+        ----------
+            race_no : int
+                何レース目か
+            jyo_code : int
+                会場コード
+            date : int
+                yyyymmdd形式で入力
+
+        """
+        self.logger = getLogger(self.__class__.__name__)
+        # htmlをload
+        base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
+        self.__soup = super()._url2soup(target_url)
+        # 結果テーブルだけ最初に抜く
+        self.waku_dict = self._getresulttable2dict()
+
+    def getplayerinfo2dict(self, waku: int) -> dict:
+        """
+        枠drivenでdictを作成する（サイトは順位drivenなのに注意)
+
+        Parameters
+        ----------
+            waku : int
+                枠
+
+        Returns
+        -------
+            racerls : dict
+        """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        # 結果テーブルのキーを選択 1~6
+        content_dict = self.waku_dict[waku]
+
+        # 結果STテーブルの情報を取得
+        target_table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > '\
+            'div.grid.is-type2.h-clear.h-mt10 > '\
+            'div:nth-child(2) > div > table'
+        course, st_time = super()._getSTtable2tuple(
+            soup=self.__soup,
+            table_selector=target_table_selector,
+            waku=waku)
+        content_dict['course'] = course
+        content_dict['st_time'] = st_time
+
+        return content_dict
+
+    def getcommoninfo2dict(self) -> dict:
+        """
+        水面気象情報と決まり手，返還挺の有無などの選手以外のレース結果情報
+        """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        # 水面気象情報の取得
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(2) > div.grid.is-type6.h-clear > '\
+            'div:nth-child(1) > div > div.weather1_body.is-type1__3rdadd'
+        content_dict = \
+            super()._getweatherinfo2dict(
+                soup=self.__soup,
+                table_selector=table_selector
+            )
+
+        # 返還テーブルを抜く
+        # 返還挺はリストのまま辞書に入れる
+        # 返還艇がなければ空リスト
+        table_selector = \
+            'body > main > div > div > div > div.contentsFrame1_inner > '\
+            'div:nth-child(5) > div:nth-child(2) > '\
+            'div.grid.is-type6.h-clear > '\
+            'div:nth-child(2) > div:nth-child(1) > '\
+            'table > tbody > tr > td > '\
+            'div > div span.numberSet1_number'
+        henkantei_html_list = self.__soup.select(table_selector)
+
+        # 返還艇をint型に直す，変なやつはNoneでハンドル（あんまりないけど）
+        def teistr2str(tei_str):
+            tei = re.search(r'[1-6]', tei_str)
+            if tei is not None:
+                return str(tei.group(0))
+            else:
+                return None
+
+        # 返還艇があればリスト長が1以上になる
+        if len(henkantei_html_list) != 0:
+            henkantei_list = list(map(
+                lambda x: teistr2str(x.text), henkantei_html_list))
+            henkantei_list = [n for n in henkantei_list if n is not None]
+            is_henkan = True
+        else:
+            henkantei_list = []
+            is_henkan = False
+        henkantei_str = ','.join(henkantei_list)
+        content_dict['henkantei_list'] = henkantei_str
+        content_dict['is_henkan'] = is_henkan
+
+        # 決まりて
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(2) > div.grid.is-type6.h-clear > '\
+            'div:nth-child(2) > div:nth-child(2) > table > tbody > tr > td'
+        kimarite = self.__soup.select_one(table_selector).text
+        content_dict['kimarite'] = kimarite
+
+        # 備考
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(2) > div.table1 > table > tbody > tr > td'
+        biko = self.__soup.select_one(table_selector).text
+        biko = biko.replace('\r', '')\
+                   .replace('\n', '')\
+                   .replace(' ', '')\
+                   .replace('\xa0', '')
+        content_dict['biko'] = biko
+
+        # 払い戻し，人気
+        table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div:nth-child(5) > '\
+            'div:nth-child(1) > div > table'
+        pay_pop_tb = self.__soup.select_one(table_selector)
+        pay_pop_tb_list = pay_pop_tb.select('tbody')
+        content_dict['payout_3tan'], content_dict['popular_3tan'] = \
+            self._get_paypop(pay_pop_tb_list[0])
+        content_dict['payout_3fuku'], content_dict['popular_3fuku'] = \
+            self._get_paypop(pay_pop_tb_list[1])
+        content_dict['payout_2tan'], content_dict['popular_2tan'] = \
+            self._get_paypop(pay_pop_tb_list[2])
+        content_dict['payout_2fuku'], content_dict['popular_2fuku'] = \
+            self._get_paypop(pay_pop_tb_list[3])
+        content_dict['payout_1tan'], _ = \
+            self._get_paypop(pay_pop_tb_list[5])
+
+        return content_dict
+
+    def _get_paypop(self, element_tag: bs4.element.Tag) -> tuple:
+        """払い戻し金額と人気を取得"""
+        payout = element_tag.select_one('span.is-payout1').text
+        payout = int(payout.replace('¥', '').replace(',', ''))
+        popular = \
+            element_tag.select_one('tr:nth-child(1) > td:nth-child(4)').text
+        popular = super()._rmletter2int(popular)
+        return (payout, popular)
+
+    def _getresulttable2dict(self) -> dict:
+        """
+        結果テーブルをまとめてdict作成
+        initで呼びだし，テーブル抜きを1回で済ませる
+
+        Returns
+        -------
+            waku_dict : dict
+                枠をキーとしてテーブル情報を抜く
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        target_table_selector = \
+            'body > main > div > div > div > '\
+            'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
+            'div:nth-child(1) > div > table'
+        player_res_html_list = \
+            super()._getplayertable2list(self.__soup, target_table_selector)
+        # rank_p_html : 各順位の選手情報
+        # waku_dict : 枠をキーとしテーブル内容を入れ替える
+        waku_dict = {}
+        for rank_p_html in player_res_html_list:
+            rank, waku, name, racetime = \
+                list(map(lambda x: x.text, rank_p_html.select('td')))
+            # rankはF,L欠などが存在するためエラーハンドルがいる
+            try:
+                rank = int(rank)
+            except ValueError:
+                rank = -1
+
+            # レースタイムは秒に変換する
+            try:
+                t = datetime.strptime(racetime, '%M\'%S"%f')
+                delta = timedelta(
+                    seconds=t.second,
+                    microseconds=t.microsecond,
+                    minutes=t.minute,
+                )
+                racetime_sec = delta.total_seconds()
+            except ValueError:
+                racetime_sec = -1
+
+            waku = int(waku)
+            name = name.replace('\n', '')\
+                       .replace('\u3000', '')\
+                       .replace(' ', '')
+            no, name = name.split('\r')
+            no = int(no)
+
+            content_dict = {
+                'rank': rank,
+                'name': name,
+                'no': no,
+                'racetime': racetime_sec
+            }
+
+            waku_dict[waku] = content_dict
+        return waku_dict
+
+
 class OfficialOdds(CommonMethods4Official):
     def __init__(self,
                  race_no: int,
                  jyo_code: int,
-                 day: int):
+                 date: int):
 
         self.logger = getLogger(self.__class__.__name__)
         # 賭け方によりURLが違うので，関数ごとでURLを設定する
         self.race_no = race_no
         self.jyo_code = jyo_code
-        self.day = day
+        self.date = date
 
     def _tanfuku_common(self, num: int, kake: str) -> list:
         """
@@ -563,7 +781,7 @@ class OfficialOdds(CommonMethods4Official):
         base_url = f'https://boatrace.jp/owpc/pc/race/'\
                    f'odds{num}{html_type}?'
         target_url = f'{base_url}rno={self.race_no}&' \
-                     f'jcd={self.jyo_code:02}&hd={self.day}'
+                     f'jcd={self.jyo_code:02}&hd={self.date}'
         soup = super()._url2soup(target_url)
         # 3連単と共通--------------------
         # oddsテーブルの抜き出し
@@ -714,10 +932,10 @@ class OfficialOdds(CommonMethods4Official):
     def tansho(self):
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # htmlをload
-        base_url = f'https://boatrace.jp/owpc/pc/race/'\
-                   f'oddstf?'
+        base_url = 'https://boatrace.jp/owpc/pc/race/'\
+                   'oddstf?'
         target_url = f'{base_url}rno={self.race_no}&' \
-                     f'jcd={self.jyo_code:02}&hd={self.day}'
+                     f'jcd={self.jyo_code:02}&hd={self.date}'
         soup = super()._url2soup(target_url)
         target_table_selector = \
             'body > main > div > div > div > '\
@@ -736,223 +954,6 @@ class OfficialOdds(CommonMethods4Official):
     # 複勝
     def fukusho(self):
         pass
-
-
-class OfficialResults(CommonMethods4Official):
-    def __init__(self,
-                 race_no: int,
-                 jyo_code: int,
-                 day: int):
-        """
-        競艇公式サイトの結果からのデータ取得
-        レース番，場コード，日付を入力し公式サイトへアクセス
-
-        Parameters
-        ----------
-            race_no : int
-                何レース目か
-            jyo_code : int
-                会場コード
-            day : int
-                yyyymmdd形式で入力
-
-        """
-        self.logger = getLogger(self.__class__.__name__)
-        # htmlをload
-        base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
-        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={day}'
-        self.__soup = super()._url2soup(target_url)
-        # 結果テーブルだけ最初に抜く
-        self.waku_dict = self._getresulttable2dict()
-
-    def getplayerresult2dict(self, waku: int) -> dict:
-        """
-        枠drivenでdictを作成する（サイトは順位drivenなのに注意)
-
-        Parameters
-        ----------
-            waku : int
-                枠
-
-        Returns
-        -------
-            racerls : dict
-        """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        # 結果テーブルのキーを選択 1~6
-        content_dict = self.waku_dict[waku]
-
-        # 結果STテーブルの情報を取得
-        target_table_selector = \
-            'body > main > div > div > div > '\
-            'div.contentsFrame1_inner > '\
-            'div.grid.is-type2.h-clear.h-mt10 > '\
-            'div:nth-child(2) > div > table'
-        course, st_time = super()._getSTtable2tuple(
-            soup=self.__soup,
-            table_selector=target_table_selector,
-            waku=waku)
-        content_dict['course'] = course
-        content_dict['st_time'] = st_time
-
-        return content_dict
-
-    def getraceresult2dict(self) -> dict:
-        """
-        水面気象情報と決まり手，返還挺の有無などの選手以外のレース結果情報
-        """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        # 水面気象情報の取得
-        table_selector = \
-            'body > main > div > div > div > '\
-            'div.contentsFrame1_inner > div:nth-child(5) > '\
-            'div:nth-child(2) > div.grid.is-type6.h-clear > '\
-            'div:nth-child(1) > div > div.weather1_body.is-type1__3rdadd'
-        content_dict = \
-            super()._getweatherinfo2dict(
-                soup=self.__soup,
-                table_selector=table_selector
-            )
-
-        # 返還テーブルを抜く
-        # 返還挺はリストのまま辞書に入れる
-        # 返還艇がなければ空リスト
-        table_selector = \
-            'body > main > div > div > div > div.contentsFrame1_inner > '\
-            'div:nth-child(5) > div:nth-child(2) > '\
-            'div.grid.is-type6.h-clear > '\
-            'div:nth-child(2) > div:nth-child(1) > '\
-            'table > tbody > tr > td > '\
-            'div > div span.numberSet1_number'
-        henkantei_html_list = self.__soup.select(table_selector)
-
-        # 返還艇をint型に直す，変なやつはNoneでハンドル（あんまりないけど）
-        def teistr2str(tei_str):
-            tei = re.search(r'[1-6]', tei_str)
-            if tei is not None:
-                return str(tei.group(0))
-            else:
-                return None
-
-        # 返還艇があればリスト長が1以上になる
-        if len(henkantei_html_list) != 0:
-            henkantei_list = list(map(
-                lambda x: teistr2str(x.text), henkantei_html_list))
-            henkantei_list = [n for n in henkantei_list if n is not None]
-            is_henkan = True
-        else:
-            henkantei_list = []
-            is_henkan = False
-        henkantei_str = ','.join(henkantei_list)
-        content_dict['henkantei_list'] = henkantei_str
-        content_dict['is_henkan'] = is_henkan
-
-        # 決まりて
-        table_selector = \
-            'body > main > div > div > div > '\
-            'div.contentsFrame1_inner > div:nth-child(5) > '\
-            'div:nth-child(2) > div.grid.is-type6.h-clear > '\
-            'div:nth-child(2) > div:nth-child(2) > table > tbody > tr > td'
-        kimarite = self.__soup.select_one(table_selector).text
-        content_dict['kimarite'] = kimarite
-
-        # 備考
-        table_selector = \
-            'body > main > div > div > div > '\
-            'div.contentsFrame1_inner > div:nth-child(5) > '\
-            'div:nth-child(2) > div.table1 > table > tbody > tr > td'
-        biko = self.__soup.select_one(table_selector).text
-        biko = biko.replace('\r', '')\
-                   .replace('\n', '')\
-                   .replace(' ', '')
-        content_dict['biko'] = biko
-
-        # 払い戻し，人気
-        table_selector = \
-            'body > main > div > div > div > '\
-            'div.contentsFrame1_inner > div:nth-child(5) > '\
-            'div:nth-child(1) > div > table'
-        pay_pop_tb = self.__soup.select_one(table_selector)
-        pay_pop_tb_list = pay_pop_tb.select('tbody')
-        content_dict['payout_3tan'], content_dict['popular_3tan'] = \
-            self._get_paypop(pay_pop_tb_list[0])
-        content_dict['payout_3fuku'], content_dict['popular_3fuku'] = \
-            self._get_paypop(pay_pop_tb_list[1])
-        content_dict['payout_2tan'], content_dict['popular_2tan'] = \
-            self._get_paypop(pay_pop_tb_list[2])
-        content_dict['payout_2fuku'], content_dict['popular_2fuku'] = \
-            self._get_paypop(pay_pop_tb_list[3])
-        content_dict['payout_1tan'], _ = \
-            self._get_paypop(pay_pop_tb_list[5])
-
-        return content_dict
-
-    def _get_paypop(self, element_tag: bs4.element.Tag) -> tuple:
-        """払い戻し金額と人気を取得"""
-        payout = element_tag.select_one('span.is-payout1').text
-        payout = int(payout.replace('¥', '').replace(',', ''))
-        popular = \
-            element_tag.select_one('tr:nth-child(1) > td:nth-child(4)').text
-        popular = super()._rmletter2int(popular)
-        return (payout, popular)
-
-    def _getresulttable2dict(self) -> dict:
-        """
-        結果テーブルをまとめてdict作成
-        initで呼びだし，テーブル抜きを1回で済ませる
-
-        Returns
-        -------
-            waku_dict : dict
-                枠をキーとしてテーブル情報を抜く
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        target_table_selector = \
-            'body > main > div > div > div > '\
-            'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
-            'div:nth-child(1) > div > table'
-        player_res_html_list = \
-            super()._getplayertable2list(self.__soup, target_table_selector)
-        # rank_p_html : 各順位の選手情報
-        # waku_dict : 枠をキーとしテーブル内容を入れ替える
-        waku_dict = {}
-        for rank_p_html in player_res_html_list:
-            rank, waku, name, racetime = \
-                list(map(lambda x: x.text, rank_p_html.select('td')))
-            # rankはF,L欠などが存在するためエラーハンドルがいる
-            try:
-                rank = int(rank)
-            except ValueError:
-                rank = -1
-
-            # レースタイムは秒に変換する
-            try:
-                t = datetime.strptime(racetime, '%M\'%S"%f')
-                delta = timedelta(
-                    seconds=t.second,
-                    microseconds=t.microsecond,
-                    minutes=t.minute,
-                )
-                racetime_sec = delta.total_seconds()
-            except ValueError:
-                racetime_sec = -1
-
-            waku = int(waku)
-            name = name.replace('\n', '')\
-                       .replace('\u3000', '')\
-                       .replace(' ', '')
-            no, name = name.split('\r')
-            no = int(no)
-
-            content_dict = {
-                'rank': rank,
-                'name': name,
-                'no': no,
-                'racetime': racetime_sec
-            }
-
-            waku_dict[waku] = content_dict
-        return waku_dict
 
 
 class GetHoldPlacePast(CommonMethods4Official):
@@ -999,11 +1000,11 @@ class GetHoldPlacePast(CommonMethods4Official):
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # MySQLへ接続
-        self.logger.debug(f'connecting mysql server.')
+        self.logger.debug('connecting mysql server.')
         conn = mysql.connector.connect(**const.MYSQL_CONFIG)
-        self.logger.debug(f'done.')
+        self.logger.debug('done.')
         # load jyo master 場マスタのロード
-        self.logger.debug(f'loading table to df.')
+        self.logger.debug('loading table to df.')
         sql = """
             SELECT
                 *
@@ -1012,8 +1013,8 @@ class GetHoldPlacePast(CommonMethods4Official):
         """
         jyo_master = pd.read_sql(sql, conn)
         conn.close()
-        self.logger.debug(f'mysql connection closed.')
-        self.logger.debug(f'loading table to df done.')
+        self.logger.debug('mysql connection closed.')
+        self.logger.debug('loading table to df done.')
         # 会場名をインデックスにする
         jyo_master.set_index('jyo_name', inplace=True)
         # コードへ返還

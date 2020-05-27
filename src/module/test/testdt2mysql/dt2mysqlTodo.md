@@ -151,6 +151,7 @@
 - カラム名:
   - race_id BIGINT: yyyymmdd{jyo_cd:02}{race_no:02}
       Primary key & 外部キー参照元: raceinfo_tb.race_id
+  - datejyo_id INT,
   - temp FLOAT: 気温
   - weather VARCHAR(10): 天気
   - wind_v INT: 風速
@@ -171,8 +172,8 @@
   - popular_2fuku INT: 2連複人気
   - payout_1tan INT: 単勝払戻金
 
-- [ ] テーブルの作成
-- [ ] データ挿入部の作成
+- [x] テーブルの作成
+- [x] データ挿入部の作成
 
 ### 枠別結果データ
 

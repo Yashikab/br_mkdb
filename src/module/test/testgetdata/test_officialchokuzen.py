@@ -71,5 +71,5 @@ class TestOfficialChokuzen:
     ])
     def test_jyo_chokuzen(self, target, expected, calloch):
         # cnd_chokuzen = 直前のコンディションの意
-        cnd_chokuzen = calloch.getcondinfo2dict()
+        cnd_chokuzen = calloch.getcommoninfo2dict()
         assert cnd_chokuzen[target] == expected

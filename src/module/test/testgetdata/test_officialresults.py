@@ -21,9 +21,9 @@ class TestOfficialResults:
         # place : hamanako 06
         self.jyo_code = 6
         # day 2020/04/08
-        self.day = 20200410
+        self.date = 20200410
         ors = getdata.OfficialResults(
-            self.race_no, self.jyo_code, self.day)
+            self.race_no, self.jyo_code, self.date)
         return ors
 
     # 選手結果
@@ -32,7 +32,7 @@ class TestOfficialResults:
         # 各行呼び出し可能
         p_rls = []
         for i in range(1, 7):
-            p_rls.append(getcls.getplayerresult2dict(waku=i))
+            p_rls.append(getcls.getplayerinfo2dict(waku=i))
         return p_rls
 
     @pytest.mark.parametrize("waku, target, expected", [
@@ -57,7 +57,7 @@ class TestOfficialResults:
     # レース結果
     @pytest.fixture(scope='class')
     def racerls(self, getcls):
-        return getcls.getraceresult2dict()
+        return getcls.getcommoninfo2dict()
 
     # 会場コンディション
     @pytest.mark.parametrize("target, expected", [
