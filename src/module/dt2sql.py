@@ -21,8 +21,7 @@ from module.getdata import (
 )
 
 
-class Data2MysqlTemplate(metaclass=ABCMeta):
-
+class Data2sqlAbstract(metaclass=ABCMeta):
     @abstractmethod
     def create_table_if_not_exists(self):
         '''
@@ -35,6 +34,19 @@ class Data2MysqlTemplate(metaclass=ABCMeta):
         '''
         データを挿入する
         '''
+        pass
+
+
+class Data2MysqlTemplate(Data2sqlAbstract):
+
+    def __init__(self, filename_list: list):
+        self.__filename_list = filename_list
+
+    def create_table_if_not_exists(self) -> None:
+        self._run_query_from_paths(self.__filename_list)
+        return None
+
+    def insert2table(self):
         pass
 
     def _run_query(self, query: str) -> None:
@@ -168,13 +180,11 @@ class JyoData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
+        super().__init__(
+            ['create_jyodata_tb.sql']
+        )
 
-    def create_table_if_not_exists(self) -> None:
-        """テーブルの作成"""
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        super()._run_query_from_path('create_jyodata_tb.sql')
-        return None
-
+    # オーバーライド
     def insert2table(self, date: int) -> None:
         """
         日付をyyyymmdd型で受けとり，その日のレース情報をMySQLに挿入する
@@ -204,13 +214,10 @@ class RaceData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
-        self.__filename_list = \
-            ['create_raceinfo_tb.sql', 'create_program_tb.sql']
+        super().__init__(
+            ['create_raceinfo_tb.sql', 'create_program_tb.sql'])
 
-    def create_table_if_not_exists(self) -> None:
-        super()._run_query_from_path(self.__filename_list)
-        return None
-
+    # オーバーライド
     def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
         """番組表をSQLへ
 
@@ -258,13 +265,11 @@ class ChokuzenData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
-        self.__filename_list = ['create_chokuzen_cond_tb.sql',
-                                'create_chokuzen_p_tb.sql']
+        super().__init__(
+            ['create_chokuzen_cond_tb.sql',
+             'create_chokuzen_p_tb.sql'])
 
-    def create_table_if_not_exists(self) -> None:
-        super()._run_query_from_path(self.__filename_list)
-        return None
-
+    # オーバーライド
     def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
         """直前情報をSQLへ
 
@@ -309,12 +314,9 @@ class ResultData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
-        self.__filename_list = ['create_raceresult_tb.sql']
+        super().__init__(['create_raceresult_tb.sql'])
 
-    def create_table_if_not_exists(self) -> None:
-        super()._run_query_from_path(self.__filename_list)
-        return None
-
+    # オーバーライド
     def insert2table(self):
         pass
 

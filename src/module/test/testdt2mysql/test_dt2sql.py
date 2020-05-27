@@ -17,6 +17,7 @@ from .common import CommonMethod
 
 WAIT = 0.5
 
+
 class TestJyoData2sql(CommonMethod):
     __target_date = 20200512
     __jyo_cd = 20
