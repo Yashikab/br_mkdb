@@ -280,6 +280,7 @@ class ResultData2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
         super().__init__(
-            filename_list=['create_raceresult_tb.sql'],
-            table_name_list=['race_result_tb', ''],
+            filename_list=['create_raceresult_tb.sql',
+                           'create_playerresult_tb.sql'],
+            table_name_list=['race_result_tb', 'p_result_tb'],
             target_cls=OfficialResults)

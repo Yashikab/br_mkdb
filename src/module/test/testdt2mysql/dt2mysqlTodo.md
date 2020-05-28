@@ -129,7 +129,7 @@
 - カラム名:
   - waku_id: yyyymmdd{jyo_cd:02}{race_no:02}{waku} BIGINT: Primary key
       外部キー 設定参照： program_tb.waku_id
-  - race_id: yyyymmdd{jyo_cd:02}{race_no:02} BIGINT: 
+  - race_id: yyyymmdd{jyo_cd:02}{race_no:02} BIGINT:
       外部キー 設定参照： chokuzen_cond_tb.race_id
   - p_name VARCHAR(100): 選手名
   - p_weight FLOAT: 体重
@@ -179,6 +179,17 @@
 
 - waku_idを主キーとする
 - テーブル名: p_result_tb
+- カラム名
+  - waku_id: yyyymmdd{jyo_cd:02}{race_no:02}{waku} BIGINT: Primary key
+      外部キー 設定参照： program_tb.waku_id
+  - race_id: yyyymmdd{jyo_cd:02}{race_no:02} BIGINT:
+      外部キー 設定参照： chokuzen_cond_tb.race_id
+  - p_rank INT: 着順 (F,L 転覆などは-1)
+  - p_name VARCHAR(100): 選手名
+  - p_id INT: 選手登録番号
+  - p_racetime FLOAT: レースタイム
+  - p_course INT: 進入コース
+  - p_st_time FLOAT: スタートタイム(フライングはマイナス)
 
-- [ ] テーブルの作成
-- [ ] データ挿入部の作成
+- [x] テーブルの作成
+- [x] データ挿入部の作成

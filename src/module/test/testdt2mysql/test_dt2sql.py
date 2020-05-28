@@ -195,14 +195,12 @@ class TestResult2sql(CommonMethod):
                   'payout_3fuku', 'popular_3fuku',
                   'payout_2tan', 'popular_2tan',
                   'payout_2fuku', 'popular_2fuku', 'payout_1tan'}
-    # cp_col_set = {'waku_id', 'race_id', 'p_name',
-    #               'p_weight', 'p_chosei_weight',
-    #               'p_tenji_time', 'p_tilt',
-    #               'p_tenji_course', 'p_tenji_st'}
+    rp_col_set = {'waku_id', 'race_id', 'p_rank', 'p_name',
+                  'p_id', 'p_racetime', 'p_course', 'p_st_time'}
 
     @pytest.mark.parametrize("tb_name, col_set", [
         ('race_result_tb', rr_col_set),
-        # ('chokuzen_player_tb', cp_col_set)
+        ('p_result_tb', rp_col_set)
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト
@@ -220,21 +218,19 @@ class TestResult2sql(CommonMethod):
         4000,
         14
     )
-    # waku_id = f"{target_date}{jyo_cd:02}{race_no:02}1"
-    # waku_col_list = ["waku_id", "p_chosei_weight", "p_tenji_time",
-    #                  "p_tilt", "p_tenji_course", "p_tenji_st"]
-    # waku_ex = (
-    #         int(waku_id),
-    #         0.0,
-    #         6.91,
-    #         -0.5,
-    #         2,
-    #         0.11
-    #     )
+    # 5号艇を見る
+    waku_id = f"{target_date}{jyo_cd:02}{race_no:02}5"
+    waku_col_list = ["waku_id", "p_rank", "p_racetime", "p_st_time"]
+    waku_ex = (
+            int(waku_id),
+            -1,
+            -1,
+            0.11
+        )
 
     @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
         ("race_result_tb", "race_id", race_id, race_col_list, race_expected),
-        # ("chokuzen_player_tb", "waku_id", waku_id, waku_col_list, waku_ex)
+        ("p_result_tb", "waku_id", waku_id, waku_col_list, waku_ex)
     ])
     def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
         res_tpl = super().getdata2tuple(
