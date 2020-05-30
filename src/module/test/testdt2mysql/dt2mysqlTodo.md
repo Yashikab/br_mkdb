@@ -193,3 +193,18 @@
 
 - [x] テーブルの作成
 - [x] データ挿入部の作成
+
+## オッズデータを格納する
+
+- race_idを主キーとする
+- カラム名は，枠番を1-2-3のように'-'でつなぐ
+- 3連単，3連複，2連単，2連複，単勝
+- テーブル名: odds_3tan, odds_3fuku, odds_2tan, odds_2fuku, odds_1tan
+- カラム名:
+  - race_id BIGINT: PrimaryKey
+      外部キー 設定参照: raceinfo_tb race_id
+  - 1-2-3 FLOAT: (3連単の例，自動挿入する)
+
+- [ ] キーを生成してタプルで返す関数をgetdata.OfficialOddsに作成
+- [ ] テーブルの作成
+- [ ] データ挿入部の作成
