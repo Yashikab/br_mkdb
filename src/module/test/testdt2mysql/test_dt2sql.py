@@ -260,10 +260,16 @@ class TestOdds2sql(CommonMethod):
     key_set = {'race_id'}
     three_rentan_key = key_set.union(set(__ood.rentan_keylist(3)))
     three_renfuku_key = key_set.union(set(__ood.renfuku_keylist(3)))
+    two_rentan_key = key_set.union(set(__ood.rentan_keylist(2)))
+    two_renfuku_key = key_set.union(set(__ood.renfuku_keylist(2)))
+    one_rentan_key = key_set.union(set(__ood.rentan_keylist(1)))
 
     @pytest.mark.parametrize("tb_name, col_set", [
         ('odds_3tan_tb', three_rentan_key),
         ('odds_3fuku_tb', three_renfuku_key),
+        ('odds_2tan_tb', two_rentan_key),
+        ('odds_2fuku_tb', two_renfuku_key),
+        ('odds_1tan_tb', one_rentan_key)
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト

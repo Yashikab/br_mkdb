@@ -291,9 +291,16 @@ class Odds2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
         __ood = OfficialOdds
-        self.__tb_name_list = ['odds_3tan_tb', "odds_3fuku_tb"]
+        self.__tb_name_list = ['odds_3tan_tb',
+                               "odds_3fuku_tb",
+                               'odds_2tan_tb',
+                               "odds_2fuku_tb",
+                               "odds_1tan_tb"]
         self.__key_value_list = [__ood.rentan_keylist(3),
-                                 __ood.renfuku_keylist(3)]
+                                 __ood.renfuku_keylist(3),
+                                 __ood.rentan_keylist(2),
+                                 __ood.renfuku_keylist(2),
+                                 __ood.rentan_keylist(1)]
 
     # オーバーライド
     def create_table_if_not_exists(self):

@@ -207,5 +207,5 @@ odds_3tan_tb, odds_3fuku_tb, odds_2tan_tb, odds_2fuku_tb, odds_1tan_tb
   - 1-2-3 FLOAT: (3連単の例，自動挿入する)
 
 - [x] キーを生成してタプルで返す関数をgetdata.OfficialOddsに作成
-- [ ] テーブルの作成
+- [x] テーブルの作成
 - [ ] データ挿入部の作成
