@@ -840,6 +840,44 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = list(filter(lambda x: x != -1, odds_list))
         return odds_list
 
+    @classmethod
+    def rentan_keylist(cls, rank: int) -> list:
+        """連単用キーのリストを返す.
+
+        Parameters
+        ----------
+            rank : int
+                1 or 2 or 3 で単勝，2連単，3連単
+        """
+        rentan_key_list = []
+        for fst in range(1, 7):
+            if rank == 1:
+                rentan_key_list.append(f'{fst}')
+            else:
+                for snd in range(1, 7):
+                    if snd != fst and rank == 2:
+                        rentan_key_list.append(f'{fst}-{snd}')
+                    else:
+                        for trd in range(1, 7):
+                            if fst != snd and fst != trd and snd != trd:
+                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
+        return rentan_key_list
+
+    @classmethod
+    def renfuku_keylist(cls, rank: int) -> list:
+        renfuku_key_list = []
+        if rank == 2:
+            for fst in range(1, 6):
+                for snd in range(fst+1, 7):
+                    renfuku_key_list.append(f'{fst}-{snd}')
+            return renfuku_key_list
+        elif rank == 3:
+            for fst in range(1, 5):
+                for snd in range(fst+1, 6):
+                    for trd in range(snd+1, 7):
+                        renfuku_key_list.append(f'{fst}-{snd}-{trd}')
+            return renfuku_key_list
+
     # 3連単を集計
     def three_rentan(self) -> dict:
         """
@@ -868,42 +906,6 @@ class OfficialOdds(CommonMethods4Official):
         #                         odds_list.pop(0)
 
         return content_dict
-
-    def rentan_keylist(self, rank: int) -> list:
-        """連単用キーのリストを返す.
-
-        Parameters
-        ----------
-            rank : int
-                1 or 2 or 3 で単勝，2連単，3連単
-        """
-        rentan_key_list = []
-        for fst in range(1, 7):
-            if rank == 1:
-                rentan_key_list.append(f'{fst}')
-            else:
-                for snd in range(1, 7):
-                    if snd != fst and rank == 2:
-                        rentan_key_list.append(f'{fst}-{snd}')
-                    else:
-                        for trd in range(1, 7):
-                            if fst != snd and fst != trd and snd != trd:
-                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
-        return rentan_key_list
-
-    def renfuku_keylist(self, rank: int) -> list:
-        renfuku_key_list = []
-        if rank == 2:
-            for fst in range(1, 6):
-                for snd in range(fst+1, 7):
-                    renfuku_key_list.append(f'{fst}-{snd}')
-            return renfuku_key_list
-        elif rank == 3:
-            for fst in range(1, 5):
-                for snd in range(fst+1, 6):
-                    for trd in range(snd+1, 7):
-                        renfuku_key_list.append(f'{fst}-{snd}-{trd}')
-            return renfuku_key_list
 
     # 3連複を集計
     def three_renfuku(self) -> dict:

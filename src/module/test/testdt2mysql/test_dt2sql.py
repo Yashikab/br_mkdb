@@ -11,8 +11,10 @@ from module.dt2sql import (
     JyoData2sql,
     RaceData2sql,
     ChokuzenData2sql,
-    ResultData2sql
+    ResultData2sql,
+    Odds2sql
 )
+from module.getdata import OfficialOdds
 from .common import CommonMethod
 
 WAIT = 0.5
@@ -240,3 +242,30 @@ class TestResult2sql(CommonMethod):
             col_list
         )
         assert res_tpl == expected
+
+
+class TestOdds2sql(CommonMethod):
+    target_date = 20200512
+    jyo_cd = 21
+    race_no = 1
+
+    # load Official Odds for get keys
+    __ood = OfficialOdds
+
+    __od2sql = Odds2sql()
+    __od2sql.create_table_if_not_exists()
+    # __od2sql.insert2table(target_date, jyo_cd, race_no)
+    time.sleep(WAIT)
+
+    key_set = {'race_id'}
+    three_rentan_key = key_set.union(set(__ood.rentan_keylist(3)))
+    three_renfuku_key = key_set.union(set(__ood.renfuku_keylist(3)))
+
+    @pytest.mark.parametrize("tb_name, col_set", [
+        ('odds_3tan_tb', three_rentan_key),
+        ('odds_3fuku_tb', three_renfuku_key),
+    ])
+    def test_exist_table_raceinfo(self, tb_name, col_set):
+        # カラム名の一致でテスト
+        get_set = super().get_columns2set(tb_name)
+        assert get_set == col_set

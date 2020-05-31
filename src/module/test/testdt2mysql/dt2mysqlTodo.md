@@ -199,7 +199,8 @@
 - race_idを主キーとする
 - カラム名は，枠番を1-2-3のように'-'でつなぐ
 - 3連単，3連複，2連単，2連複，単勝
-- テーブル名: odds_3tan, odds_3fuku, odds_2tan, odds_2fuku, odds_1tan
+- テーブル名: 
+odds_3tan_tb, odds_3fuku_tb, odds_2tan_tb, odds_2fuku_tb, odds_1tan_tb
 - カラム名:
   - race_id BIGINT: PrimaryKey
       外部キー 設定参照: raceinfo_tb race_id

@@ -18,7 +18,8 @@ from module.getdata import (
     GetHoldPlacePast,
     OfficialProgram,
     OfficialChokuzen,
-    OfficialResults
+    OfficialResults,
+    OfficialOdds
 )
 
 
@@ -41,7 +42,7 @@ class Data2sqlAbstract(metaclass=ABCMeta):
 class Data2MysqlTemplate(Data2sqlAbstract):
 
     def __init__(self,
-                 filename_list: list,
+                 filename_list: list = [],
                  table_name_list: list = [],
                  target_cls: ABCMeta = None):
         self.__filename_list = filename_list
@@ -284,3 +285,26 @@ class ResultData2sql(Data2MysqlTemplate):
                            'create_playerresult_tb.sql'],
             table_name_list=['race_result_tb', 'p_result_tb'],
             target_cls=OfficialResults)
+
+
+class Odds2sql(Data2MysqlTemplate):
+    def __init__(self):
+        self.logger = getLogger(self.__class__.__name__)
+        __ood = OfficialOdds
+        self.__tb_name_list = ['odds_3tan_tb', "odds_3fuku_tb"]
+        self.__key_value_list = [__ood.rentan_keylist(3),
+                                 __ood.renfuku_keylist(3)]
+
+    # オーバーライド
+    def create_table_if_not_exists(self):
+        zip_list = zip(self.__tb_name_list, self.__key_value_list)
+        for tb_name, keylist in zip_list:
+            insert_cols_list = ["race_id BIGINT PRIMARY KEY"]
+            for key_name in keylist:
+                col_name = f"`{key_name}` FLOAT"
+                insert_cols_list.append(col_name)
+            insert_cols_list.append(
+                "FOREIGN KEY (race_id) REFERENCES raceinfo_tb (race_id)")
+            insert_cols = ", ".join(insert_cols_list)
+            query = f"CREATE TABLE {tb_name} ({insert_cols})"
+            super()._run_query(query)
