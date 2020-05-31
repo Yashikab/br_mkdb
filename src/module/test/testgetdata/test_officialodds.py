@@ -35,7 +35,7 @@ class TestOfficialOdds:
         (6, 5, 4, 810.9)
     ])
     def test_threerentan(self, fst, snd, trd, expected, odds):
-        assert odds.three_rentan()[fst][snd][trd] == expected
+        assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
 
     # 3連複
     @pytest.mark.parametrize("fst, snd, trd, expected", [
@@ -45,7 +45,7 @@ class TestOfficialOdds:
         (4, 5, 6, 228.9)
     ])
     def test_threerenfuku(self, fst, snd, trd, expected, odds):
-        assert odds.three_renfuku()[fst][snd][trd] == expected
+        assert odds.three_renfuku()[f'{fst}-{snd}-{trd}'] == expected
 
     # 2連単
     @pytest.mark.parametrize("fst, snd, expected", [
@@ -55,7 +55,7 @@ class TestOfficialOdds:
         (6, 5, 135.1)
     ])
     def test_tworentan(self, fst, snd, expected, odds):
-        assert odds.two_rentan()[fst][snd] == expected
+        assert odds.two_rentan()[f'{fst}-{snd}'] == expected
 
     # 2連単
     @pytest.mark.parametrize("fst, snd, expected", [
@@ -64,7 +64,7 @@ class TestOfficialOdds:
         (3, 4, 47.1),
     ])
     def test_tworenfuku(self, fst, snd, expected, odds):
-        assert odds.two_renfuku()[fst][snd] == expected
+        assert odds.two_renfuku()[f'{fst}-{snd}'] == expected
 
     # 単勝
     @pytest.mark.parametrize("fst, expected", [
@@ -74,4 +74,4 @@ class TestOfficialOdds:
         (6, 9.1)
     ])
     def test_tansho(self, fst, expected, odds):
-        assert odds.tansho()[fst] == expected
+        assert odds.tansho()[f'{fst}'] == expected

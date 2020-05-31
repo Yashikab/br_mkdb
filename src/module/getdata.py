@@ -853,19 +853,57 @@ class OfficialOdds(CommonMethods4Official):
 
         # 辞書で格納する
         content_dict = {}
-        for fst in range(1, 7):
-            if fst not in content_dict.keys():
-                content_dict[fst] = {}
-            for snd in range(1, 7):
-                if snd != fst:
-                    if snd not in content_dict[fst].keys():
-                        content_dict[fst][snd] = {}
-                    for trd in range(1, 7):
-                        if trd != fst and trd != snd:
-                            content_dict[fst][snd][trd] = \
-                                odds_list.pop(0)
+        for key_name in self.rentan_keylist(3):
+            content_dict[key_name] = odds_list.pop(0)
+        # for fst in range(1, 7):
+        #     if fst not in content_dict.keys():
+        #         content_dict[fst] = {}
+        #     for snd in range(1, 7):
+        #         if snd != fst:
+        #             if snd not in content_dict[fst].keys():
+        #                 content_dict[fst][snd] = {}
+        #             for trd in range(1, 7):
+        #                 if trd != fst and trd != snd:
+        #                     content_dict[fst][snd][trd] = \
+        #                         odds_list.pop(0)
 
         return content_dict
+
+    def rentan_keylist(self, rank: int) -> list:
+        """連単用キーのリストを返す.
+
+        Parameters
+        ----------
+            rank : int
+                1 or 2 or 3 で単勝，2連単，3連単
+        """
+        rentan_key_list = []
+        for fst in range(1, 7):
+            if rank == 1:
+                rentan_key_list.append(f'{fst}')
+            else:
+                for snd in range(1, 7):
+                    if snd != fst and rank == 2:
+                        rentan_key_list.append(f'{fst}-{snd}')
+                    else:
+                        for trd in range(1, 7):
+                            if fst != snd and fst != trd and snd != trd:
+                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
+        return rentan_key_list
+
+    def renfuku_keylist(self, rank: int) -> list:
+        renfuku_key_list = []
+        if rank == 2:
+            for fst in range(1, 6):
+                for snd in range(fst+1, 7):
+                    renfuku_key_list.append(f'{fst}-{snd}')
+            return renfuku_key_list
+        elif rank == 3:
+            for fst in range(1, 5):
+                for snd in range(fst+1, 6):
+                    for trd in range(snd+1, 7):
+                        renfuku_key_list.append(f'{fst}-{snd}-{trd}')
+            return renfuku_key_list
 
     # 3連複を集計
     def three_renfuku(self) -> dict:
@@ -879,15 +917,8 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
-        for fst in range(1, 5):
-            if fst not in content_dict.keys():
-                content_dict[fst] = {}
-            for snd in range(fst+1, 6):
-                if snd not in content_dict[fst].keys():
-                    content_dict[fst][snd] = {}
-                for trd in range(snd+1, 7):
-                    content_dict[fst][snd][trd] = \
-                        odds_list.pop(0)
+        for key_name in self.renfuku_keylist(3):
+            content_dict[key_name] = odds_list.pop(0)
 
         return content_dict
 
@@ -900,13 +931,8 @@ class OfficialOdds(CommonMethods4Official):
 
         # 辞書で格納する
         content_dict = {}
-        for fst in range(1, 7):
-            if fst not in content_dict.keys():
-                content_dict[fst] = {}
-            for snd in range(1, 7):
-                if snd != fst:
-                    if snd not in content_dict[fst].keys():
-                        content_dict[fst][snd] = odds_list.pop(0)
+        for key_name in self.rentan_keylist(2):
+            content_dict[key_name] = odds_list.pop(0)
         return content_dict
 
     # 2連複を集計
@@ -916,17 +942,9 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
-        for fst in range(1, 6):
-            if fst not in content_dict.keys():
-                content_dict[fst] = {}
-            for snd in range(fst+1, 7):
-                if snd not in content_dict[fst].keys():
-                    content_dict[fst][snd] = odds_list.pop(0)
+        for key_name in self.renfuku_keylist(rank=2):
+            content_dict[key_name] = odds_list.pop(0)
         return content_dict
-
-    # 拡連複を集計
-    def kakurenfuku(self):
-        pass
 
     # 単勝
     def tansho(self):
@@ -946,14 +964,10 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = list(map(lambda x: float(x.text), odds_html_list))
 
         content_dict = {}
-        for fst in range(1, 7):
-            content_dict[fst] = odds_list.pop(0)
+        for key_name in self.rentan_keylist(1):
+            content_dict[key_name] = odds_list.pop(0)
 
         return content_dict
-
-    # 複勝
-    def fukusho(self):
-        pass
 
 
 class GetHoldPlacePast(CommonMethods4Official):

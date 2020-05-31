@@ -205,6 +205,6 @@
       外部キー 設定参照: raceinfo_tb race_id
   - 1-2-3 FLOAT: (3連単の例，自動挿入する)
 
-- [ ] キーを生成してタプルで返す関数をgetdata.OfficialOddsに作成
+- [x] キーを生成してタプルで返す関数をgetdata.OfficialOddsに作成
 - [ ] テーブルの作成
 - [ ] データ挿入部の作成

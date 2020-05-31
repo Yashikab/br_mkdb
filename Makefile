@@ -1,7 +1,7 @@
 # Makefile
 
 targetdocker = docker-compose.yml
-dbdocker = ../mysql_local/boat/docker-compose.yml
+dbdocker = ../mysql_local/boat/
 servicename = boatracedocker
 
 start: $(targetdocker)
@@ -17,4 +17,4 @@ restart: $(targetdocker)
 	docker-compose down && docker-compose -f $(targetdocker) up -d
 
 start_db: $(dbdocker)
-	docker-compose -f $(dbdocker) up -d
+	cd $(dbdocker) && docker-compose up -d
