@@ -254,7 +254,7 @@ class TestOdds2sql(CommonMethod):
 
     __od2sql = Odds2sql()
     __od2sql.create_table_if_not_exists()
-    # __od2sql.insert2table(target_date, jyo_cd, race_no)
+    __od2sql.insert2table(target_date, jyo_cd, race_no)
     time.sleep(WAIT)
 
     key_set = {'race_id'}
@@ -275,3 +275,31 @@ class TestOdds2sql(CommonMethod):
         # カラム名の一致でテスト
         get_set = super().get_columns2set(tb_name)
         assert get_set == col_set
+
+    race_id = int(f"{target_date}{jyo_cd:02}{race_no:02}")
+    three_tan_col_list = ["race_id", "`1-2-3`", "`4-5-6`", "`6-5-4`"]
+    three_tan_expected = (race_id, 31.9, 157.4, 544.4)
+    three_fuku_col_list = ["race_id", "`1-2-3`", "`2-3-4`", "`4-5-6`"]
+    three_fuku_expected = (race_id, 7.6, 24.4, 38.3)
+    two_tan_col_list = ["race_id", "`1-2`", "`4-5`", "`6-5`"]
+    two_tan_expected = (race_id, 10.2, 28.0, 108.3)
+    two_fuku_col_list = ["race_id", "`1-2`", "`2-3`", "`4-5`"]
+    two_fuku_expected = (race_id, 7.9, 14.7, 11.6)
+    one_tan_col_list = ["race_id", "`1`", "`5`"]
+    one_tan_expected = (race_id, 2.7, 1.8)
+
+    @pytest.mark.parametrize("tb_nm, col_list, expected", [
+        ("odds_3tan_tb", three_tan_col_list, three_tan_expected),
+        ("odds_3fuku_tb", three_fuku_col_list, three_fuku_expected),
+        ("odds_2tan_tb", two_tan_col_list, two_tan_expected),
+        ("odds_2fuku_tb", two_fuku_col_list, two_fuku_expected),
+        ("odds_1tan_tb", one_tan_col_list, one_tan_expected),
+    ])
+    def test_insert2table(self, tb_nm, col_list, expected):
+        res_tpl = super().getdata2tuple(
+            tb_nm,
+            "race_id",
+            self.race_id,
+            col_list
+        )
+        assert res_tpl == expected

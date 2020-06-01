@@ -199,13 +199,14 @@
 - race_idを主キーとする
 - カラム名は，枠番を1-2-3のように'-'でつなぐ
 - 3連単，3連複，2連単，2連複，単勝
-- テーブル名: 
+- テーブル名:
 odds_3tan_tb, odds_3fuku_tb, odds_2tan_tb, odds_2fuku_tb, odds_1tan_tb
 - カラム名:
   - race_id BIGINT: PrimaryKey
       外部キー 設定参照: raceinfo_tb race_id
-  - 1-2-3 FLOAT: (3連単の例，自動挿入する)
+  - `1-2-3` FLOAT: (3連単の例，自動挿入する)
+    バッククオートで囲む
 
 - [x] キーを生成してタプルで返す関数をgetdata.OfficialOddsに作成
 - [x] テーブルの作成
-- [ ] データ挿入部の作成
+- [x] データ挿入部の作成

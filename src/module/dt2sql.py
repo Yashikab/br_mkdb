@@ -290,17 +290,17 @@ class ResultData2sql(Data2MysqlTemplate):
 class Odds2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
-        __ood = OfficialOdds
+        ood = OfficialOdds
         self.__tb_name_list = ['odds_3tan_tb',
                                "odds_3fuku_tb",
                                'odds_2tan_tb',
                                "odds_2fuku_tb",
                                "odds_1tan_tb"]
-        self.__key_value_list = [__ood.rentan_keylist(3),
-                                 __ood.renfuku_keylist(3),
-                                 __ood.rentan_keylist(2),
-                                 __ood.renfuku_keylist(2),
-                                 __ood.rentan_keylist(1)]
+        self.__key_value_list = [ood.rentan_keylist(3),
+                                 ood.renfuku_keylist(3),
+                                 ood.rentan_keylist(2),
+                                 ood.renfuku_keylist(2),
+                                 ood.rentan_keylist(1)]
 
     # オーバーライド
     def create_table_if_not_exists(self):
@@ -315,3 +315,16 @@ class Odds2sql(Data2MysqlTemplate):
             insert_cols = ", ".join(insert_cols_list)
             query = f"CREATE TABLE {tb_name} ({insert_cols})"
             super()._run_query(query)
+
+    def insert2table(self, date, jyo_cd, race_no):
+        ood = OfficialOdds(race_no, jyo_cd, date)
+        race_id = f"{date}{jyo_cd:02}{race_no:02}"
+        content_dict_list = \
+            [ood.three_rentan(), ood.three_renfuku(),
+             ood.two_rentan(), ood.two_renfuku(), ood.tansho()]
+        for tb_name, content in zip(self.__tb_name_list, content_dict_list):
+            super()._info_insert(
+                tb_name,
+                [race_id],
+                content
+            )
