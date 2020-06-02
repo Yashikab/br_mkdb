@@ -6,10 +6,14 @@
 
 ただクローンしても動かないので注意（mysqlのサーバーをローカルの別の場所に置いているため）
 
+## このRPでできるリレーショナル・データベース
+
+![db_img](./db_design.pdf)
+
 ## jupyter labを使う場合(dockerを立ち上げる)
 
 1. 下記makeの実行
-2. ブラウザで，localhost:8000にアクセス．
+2. ブラウザで，localhost:8840にアクセス．
 
 ```sh
 # jupyter付きコンテナを立てる
@@ -27,7 +31,7 @@ make start_db
 ```sh
 pipenv install
 # pythonの実行
-pipenv run python src/hogehoge.py
+pipenv run python src/**/hogehoge.py
 # testの実行
-pipenv run pytest src/test/
+pipenv run pytest src/**/test/
 ```
