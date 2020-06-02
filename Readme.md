@@ -8,6 +8,9 @@
 
 ## このRPでできるリレーショナル・データベース
 
+![テーブルのカラム定義](./DefColumns.md)
+
+### 構造
 ![db_img](./db_design.jpg)
 
 ## jupyter labを使う場合(dockerを立ち上げる)
