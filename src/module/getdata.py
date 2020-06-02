@@ -7,6 +7,7 @@ HTMLから情報をスクレイピングするためのモジュール
 import sys
 
 import re
+from typing import Iterator
 from urllib.request import urlopen
 from logging import getLogger
 from datetime import datetime, timedelta
@@ -1082,15 +1083,16 @@ class GetHoldPlacePast(CommonMethods4Official):
         return row_html.select('tr > td')[1].text
 
 
-class DateList:
+class DateRange:
     """
     ある日付からある日付までのyyyymmdd型の日付リストを返す
     """
-    def datelist(self,
-                 st_date: datetime,
-                 ed_date: datetime) -> list:
+    @classmethod
+    def daterange(cls,
+                  st_date: datetime,
+                  ed_date: datetime) -> Iterator:
         """
-        開始日から終了日までの日付リストを返す
+        開始日から終了日までの日付のイテレータ
 
         Parameters
         ----------
@@ -1099,10 +1101,9 @@ class DateList:
             ed_date: datetime
                 終了日
         """
-        date_list = []
+
         # +1することでeddateも含める
         for n in range((ed_date - st_date).days + 1):
-            ap_date = st_date + timedelta(n)
-            ap_date_int = int(ap_date.strftime('%Y%m%d'))
-            date_list.append(ap_date_int)
-        return date_list
+            itr_date = st_date + timedelta(n)
+            itr_date_int = int(itr_date.strftime('%Y%m%d'))
+            yield itr_date_int

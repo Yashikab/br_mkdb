@@ -18,9 +18,5 @@ class TestDateList:
          [20200228, 20200229, 20200301])
     ])
     def test_datelist(self, st_date, ed_date, expected):
-        dl = getdata.DateList()
-        res_dl = dl.datelist(
-            st_date,
-            ed_date
-        )
+        res_dl = [d for d in getdata.DateRange.daterange(st_date, ed_date)]
         assert res_dl == expected

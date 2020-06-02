@@ -237,16 +237,20 @@ class JyoData2sql(Data2MysqlTemplate):
             日付，yyyymmdd型
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        # 他のテーブルデータのinsertに使う辞書
+        self.dict_for_other_tb = {}
         ghp = GetHoldPlacePast(target_date=date)
         hp_str_list = ghp.holdplace2strlist()
         hp_cd_list = ghp.holdplace2cdlist()
 
         for hp_s, hp_c in zip(hp_str_list, hp_cd_list):
             datejyo_id = int(f'{date}{hp_c:02}')
+            hi_dict = ghp.holdinfo2dict(hp_s)
+            self.dict_for_other_tb[hp_c] = hi_dict['ed_race_no']
             super()._info_insert(
                 tb_name='holdjyo_tb',
                 id_list=[datejyo_id, date, hp_c, f"'{hp_s}'"],
-                info_dict=ghp.holdinfo2dict(hp_s)
+                info_dict=hi_dict
             )
 
         return None
