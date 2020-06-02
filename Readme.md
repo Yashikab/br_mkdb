@@ -8,7 +8,7 @@
 
 ## このRPでできるリレーショナル・データベース
 
-![db_img](./db_design.pdf)
+![db_img](./db_design.jpg)
 
 ## jupyter labを使う場合(dockerを立ち上げる)
 
