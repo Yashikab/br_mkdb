@@ -315,9 +315,12 @@ class OfficialProgram(CommonMethods4Official):
         flst = player_info_list[3]
         flst_list = super()._text2list_rn_split(flst, 3)
         # 数字のみ抜き出してキャスト
-        num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
-        num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
-        avg_ST = float(re.sub(r'[a-z, A-Z]', '', flst_list[2]))
+        # num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
+        # num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
+        # avg_ST = float(re.sub(r'[a-z, A-Z]', '', flst_list[2]))
+        num_F = super()._rmletter2int(flst_list[0])
+        num_L = super()._rmletter2int(flst_list[1])
+        avg_ST = super()._rmletter2float(flst_list[2])
 
         # 全国勝率・連対率は5番目
         all_123_rate = player_info_list[4]

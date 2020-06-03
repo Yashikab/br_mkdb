@@ -170,6 +170,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             if type(i_value) is str:
                 # ''で囲む
                 i_value = f"'{i_value}'"
+            elif i_value is None:
+                i_value = "null"
             else:
                 # "hoge" ならそれで統一する
                 i_value = f"{i_value}"
