@@ -81,7 +81,7 @@ class CommonMethods4Official:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         target_table_html = soup.select_one(table_selector)
         st_html = target_table_html.select_one('tbody')
-        st_html_list = st_html.select('tr')
+        st_html_list = st_html.select('tr > td')
         assert len(st_html_list) == 6, \
             f"lengh is not 6:{len(st_html_list)}"
         # コース抜き出し

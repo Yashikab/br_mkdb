@@ -64,26 +64,32 @@ def main():
         logger.debug('Completed creating table.')
 
     for date in dr.daterange(st_date, ed_date):
-        logger.debug(f'target date: {date}')
-        logger.debug('insert jyodata')
-        jd2sql.insert2table(date)
-        logger.debug('done')
+        try:
+            logger.debug(f'target date: {date}')
+            logger.debug('insert jyodata')
+            jd2sql.insert2table(date)
+            logger.debug('done')
 
-        # jd2sqlで開催場と最終レース番を取得する
-        logger.debug('insert race data: race chokuzen result odds')
-        for jyo_cd in jd2sql.dict_for_other_tb.keys():
-            ed_race_no = jd2sql.dict_for_other_tb[jyo_cd]
-            logger.debug(f'data with jyo_cd: {jyo_cd}')
-            start_time = time.time()
-            for race_no in range(1, ed_race_no + 1):
-                time.sleep(args.wait)
-                rd2sql.insert2table(date, jyo_cd, race_no)
-                cd2sql.insert2table(date, jyo_cd, race_no)
-                res2sql.insert2table(date, jyo_cd, race_no)
-                odds2sql.insert2table(date, jyo_cd, race_no)
-            elapsed_time = time.time() - start_time
-            logger.debug(f'completed in {elapsed_time}sec')
-        logger.debug('insert race data completed.')
+            # jd2sqlで開催場と最終レース番を取得する
+            logger.debug('insert race data: race chokuzen result odds')
+            for jyo_cd in jd2sql.dict_for_other_tb.keys():
+                ed_race_no = jd2sql.dict_for_other_tb[jyo_cd]
+                logger.debug(f'data with jyo_cd: {jyo_cd}')
+                start_time = time.time()
+                for race_no in range(1, ed_race_no + 1):
+                    try:
+                        time.sleep(args.wait)
+                        rd2sql.insert2table(date, jyo_cd, race_no)
+                        cd2sql.insert2table(date, jyo_cd, race_no)
+                        res2sql.insert2table(date, jyo_cd, race_no)
+                        odds2sql.insert2table(date, jyo_cd, race_no)
+                    except Exception as e:
+                        logger.error(f'{e}')
+                elapsed_time = time.time() - start_time
+                logger.debug(f'completed in {elapsed_time}sec')
+            logger.debug('insert race data completed.')
+        except Exception as e:
+            logger.error(f'{e}')
 
     logger.info('All completed.')
 
