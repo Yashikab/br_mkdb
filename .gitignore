@@ -7,3 +7,4 @@ docker/
 __pycache__
 .pytest_cache
 bin
+*.pem
