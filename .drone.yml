@@ -5,7 +5,7 @@ name: default
 steps:
 - name: reviewdog
   pull: always
-  image: yashikab/mydog:python
+  image: yashikab/mydog:python-dev
   environment:
     PRIVATE_KEY:
       from_secret: github_pri_key
