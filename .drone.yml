@@ -1,0 +1,20 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: reviewdog
+  pull: always
+  image: yashikab/mydog:python
+  environment:
+    PRIVATE_KEY:
+      from_secret: github_pri_key
+    APP_ID:
+      from_secret: app_id
+    INSTALLATION_ID:
+      from_secret: installation_id
+  commands:
+    - sh report.sh src/
+  when:
+    event:
+      - pull_request
