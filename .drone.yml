@@ -17,4 +17,4 @@ steps:
     - sh /report.sh src/
   when:
     event:
-      - pull_request
+    - pull_request

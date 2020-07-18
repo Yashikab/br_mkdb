@@ -18,3 +18,6 @@ restart: $(targetdocker)
 
 start_db: $(dbdocker)
 	cd $(dbdocker) && docker-compose up -d
+
+down_db: $(dbdocker)
+	cd $(dbdocker) && docker-compose down
