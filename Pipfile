@@ -11,10 +11,11 @@ pycodestyle = "*"
 
 [packages]
 beautifulsoup4 = "*"
-request = "*"
 numpy = "*"
 pandas = "*"
 mysql-connector = "*"
+requests = "*"
+google-cloud-secret-manager = "*"
 
 [requires]
 python_version = "3.7"
