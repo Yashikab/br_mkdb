@@ -1,10 +1,2 @@
-docker/
-.coverage
-.ipynb_checkpoints
-.docker
-.vscode
 .env
-__pycache__
-.pytest_cache
-bin
-*.pem
+.coverage
