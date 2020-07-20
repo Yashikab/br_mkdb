@@ -10,3 +10,5 @@ MYSQL_CONFIG = {
     'database': os.getenv('MYSQL_DATABASE'),
     'charset': 'utf8'
 }
+
+PROJECT_ID = os.getenv('PROJECT_ID')
