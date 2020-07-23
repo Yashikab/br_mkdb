@@ -9,4 +9,4 @@ __pycache__
 bin
 *.pem
 cloud_sql_proxy
-gsa-mysql_yashi-prd.json
+*mysql*.json
