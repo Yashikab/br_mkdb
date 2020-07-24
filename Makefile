@@ -21,3 +21,9 @@ start_db: $(dbdocker)
 
 down_db: $(dbdocker)
 	cd $(dbdocker) && docker-compose down
+
+start_gdb:
+	pipenv run bash start_gsql.sh
+
+down_gdb:
+	pipenv run bash down_gsql.sh
