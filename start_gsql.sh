@@ -9,9 +9,9 @@ gcloud iam service-accounts keys create ${KEY_NAME}.json \
 if ! type ./cloud_sql_proxy
 then
   wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-  chmod +x cloud_sql_proxy
 fi
 
+chmod +x cloud_sql_proxy
 # access to cloud sql with proxy
 ./cloud_sql_proxy -instances=${PROJECT_ID}:us-central1:${GSQL_DATABASE}=tcp:3206 \
                   -credential_file=${KEY_NAME}.json &
