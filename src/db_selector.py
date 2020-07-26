@@ -45,5 +45,6 @@ def main():
         print('use default')
         use_local_sql()
 
+
 if __name__ == '__main__':
     main()
