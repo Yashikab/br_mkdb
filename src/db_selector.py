@@ -5,6 +5,7 @@ google cloud sql proxyを通して, データを格納する
 '''
 import argparse
 import os
+import subprocess
 
 
 def use_cloud_sql():
@@ -19,8 +20,17 @@ def use_local_sql():
     this_dir = pwd.replace(this_filename, '')
     root_dir_for_sql = 'br_mkdb/src/'
     sql_dir = \
-        this_dir.replace(root_dir_for_sql, 'msql_local/boat/')
-    print(sql_dir)
+        this_dir.replace(root_dir_for_sql, 'mysql_local/boat/')
+
+    os.chdir(sql_dir)
+    try:
+        # 先に前のゾンビ達は処理しておく，なければエラー履くのでスキップ
+        subprocess.run(["docker-compose", "down"])
+        subprocess.run(["docker", "volume", "rm", "boat_mysql"])
+    except Exception:
+        pass
+
+    subprocess.run(["docker-compose", "up", "-d"])
 
 
 def main():
