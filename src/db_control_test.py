@@ -1,12 +1,12 @@
 # python 3.7.5
 # coding: utf-8
 '''
-google cloud sql proxyを通して, データを格納する
+pythonスクリプトを使ってDBを立てる＆削除する
 '''
 import argparse
 from logging import getLogger, DEBUG, basicConfig
 from module.dbcontroller import LocalSqlController
-
+import time
 
 # logger
 logger = getLogger("DbCtl")
@@ -35,6 +35,9 @@ def main():
         logger.info('use default')
         local_sql_ctl = LocalSqlController()
         local_sql_ctl.build()
+        # testのため
+        time.sleep(10)
+        local_sql_ctl.clean()
 
 
 if __name__ == '__main__':

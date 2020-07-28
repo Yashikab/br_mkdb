@@ -37,17 +37,17 @@ class LocalSqlController(DatabaseController):
     """use local mysql db"""
     def __init__(self):
         self.logger = getLogger("DbCtl").getChild(self.__class__.__name__)
-
-    def build(self):
         pwd = os.path.abspath(__file__)
         this_filename = os.path.basename(__file__)
         this_dir = pwd.replace(this_filename, '')
         diff_dir_for_sql = 'br_mkdb/src/module'
-        sql_dir = \
+        self.__sql_dir = \
             this_dir.replace(diff_dir_for_sql, 'mysql_local/boat')
+        self.logger.debug(f'sql dir is {self.__sql_dir}')
 
-        self.logger.debug(f'sql dir is {sql_dir}')
-        os.chdir(sql_dir)
+    def build(self):
+        self.logger.info('Build local mysql.')
+        os.chdir(self.__sql_dir)
         try:
             # 先に前のゾンビ達は処理しておく，なければエラー履くのでスキップ
             subprocess.run(["docker-compose", "down"])
@@ -55,8 +55,17 @@ class LocalSqlController(DatabaseController):
         except Exception as e:
             self.logger.warning(e)
 
-        subprocess.run(["docker-compose", "up", "-d"])
+        try:
+            subprocess.run(["docker-compose", "up", "-d"])
+        except Exception as e:
+            self.logger.error(e)
 
     def clean(self):
-        # TODO: 接続解除記述
-        pass
+        self.logger.info('Clean local mysql.')
+        os.chdir(self.__sql_dir)
+        try:
+            # 先に前のゾンビ達は処理しておく，なければエラー履くのでスキップ
+            subprocess.run(["docker-compose", "down"])
+            subprocess.run(["docker", "volume", "rm", "boat_mysql"])
+        except Exception as e:
+            self.logger.error(e)
