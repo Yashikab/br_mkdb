@@ -5,10 +5,16 @@ MYSQLへ公式データを格納する
 """
 import argparse
 from datetime import datetime
-from logging import basicConfig, getLogger, DEBUG
+from logging import (
+    getLogger,
+    Formatter,
+    StreamHandler,
+    DEBUG,
+    INFO
+)
 import time
 
-from module.const import LOG_NAME
+from module.const import MODULE_LOG_NAME
 from module.dbcontroller import (
     LocalSqlController,
     CloudSqlController
@@ -23,8 +29,7 @@ from module.dt2sql import (
 from module.getdata import DateRange as dr
 
 # logger
-logger = getLogger(LOG_NAME)
-logger.setLevel(DEBUG)
+logger = getLogger(__name__)
 
 
 def main():
@@ -63,6 +68,10 @@ def main():
         logger.debug('use local mysql server.')
         sql_ctl = LocalSqlController()
     sql_ctl.build()
+    logger.info('Done')
+
+    # 気持ち空けておく
+    time.sleep(1)
 
     logger.info(f'Table Creating: {args.table}')
     logger.debug('load classes from dt2sql')
@@ -117,9 +126,16 @@ def main():
 
 
 if __name__ == '__main__':
-    # このスクリプトから呼び出されるモジュール全体のログ設定を行う
-    basicConfig(
-        format='[%(asctime)s] %(name)s %(levelname)s: %(message)s',
+    # logging設定
+    handler = StreamHandler()
+    fmt = Formatter(
+        fmt='[%(asctime)s] %(name)s %(levelname)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
+    handler.setFormatter(fmt)
+    getLogger(__name__).addHandler(handler)
+    getLogger(__name__).setLevel(DEBUG)
+    getLogger(MODULE_LOG_NAME).addHandler(handler)
+    getLogger(MODULE_LOG_NAME).setLevel(INFO)
+
     main()

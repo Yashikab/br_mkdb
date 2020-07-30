@@ -8,7 +8,7 @@ import os
 import subprocess
 from abc import ABCMeta, abstractmethod
 
-from module.const import LOG_NAME
+from module.const import MODULE_LOG_NAME
 
 
 class DatabaseController(metaclass=ABCMeta):
@@ -38,7 +38,7 @@ class CloudSqlController(DatabaseController):
 class LocalSqlController(DatabaseController):
     """use local mysql db"""
     def __init__(self):
-        self.logger = getLogger(LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
         pwd = os.path.abspath(__file__)
         this_filename = os.path.basename(__file__)
         this_dir = pwd.replace(this_filename, '')

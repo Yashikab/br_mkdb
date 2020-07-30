@@ -24,7 +24,7 @@ from module import const
 class CommonMethods4Official:
     def __init__(self):
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
     def _url2soup(self, url):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
@@ -253,7 +253,7 @@ class OfficialProgram(CommonMethods4Official):
         """
         # logger設定
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
@@ -446,7 +446,7 @@ class OfficialChokuzen(CommonMethods4Official):
 
         """
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
@@ -546,7 +546,7 @@ class OfficialResults(CommonMethods4Official):
 
         """
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         # htmlをload
         base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
@@ -752,7 +752,7 @@ class OfficialOdds(CommonMethods4Official):
                  date: int):
 
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         # 賭け方によりURLが違うので，関数ごとでURLを設定する
         self.race_no = race_no
         self.jyo_code = jyo_code
@@ -994,7 +994,7 @@ class GetHoldPlacePast(CommonMethods4Official):
                 yyyymmdd型
         """
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         # htmlをload
         base_url = 'https://www.boatrace.jp/owpc/pc/race/index?'
         target_url = f'{base_url}hd={target_date}'

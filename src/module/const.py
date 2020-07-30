@@ -11,4 +11,4 @@ MYSQL_CONFIG = {
     'charset': 'utf8'
 }
 
-LOG_NAME = 'boatrace_main'
+MODULE_LOG_NAME = 'module'

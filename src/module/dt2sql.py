@@ -224,7 +224,7 @@ class JyoData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             ['create_jyodata_tb.sql']
         )
@@ -263,7 +263,7 @@ class RaceData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             filename_list=['create_raceinfo_tb.sql', 'create_program_tb.sql'],
             table_name_list=['raceinfo_tb', 'program_tb'],
@@ -276,7 +276,7 @@ class ChokuzenData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             filename_list=[
                 'create_chokuzen_cond_tb.sql', 'create_chokuzen_p_tb.sql'],
@@ -289,7 +289,7 @@ class ResultData2sql(Data2MysqlTemplate):
 
     def __init__(self):
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             filename_list=['create_raceresult_tb.sql',
                            'create_playerresult_tb.sql'],
@@ -300,7 +300,7 @@ class ResultData2sql(Data2MysqlTemplate):
 class Odds2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = \
-            getLogger(const.LOG_NAME).getChild(self.__class__.__name__)
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         ood = OfficialOdds
         self.__tb_name_list = ['odds_3tan_tb',
                                "odds_3fuku_tb",
