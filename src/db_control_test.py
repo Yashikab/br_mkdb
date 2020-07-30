@@ -5,11 +5,12 @@ pythonスクリプトを使ってDBを立てる＆削除する
 '''
 import argparse
 from logging import getLogger, DEBUG, basicConfig
+from module.const import LOG_NAME
 from module.dbcontroller import LocalSqlController
 import time
 
 # logger
-logger = getLogger("DbCtl")
+logger = getLogger(LOG_NAME)
 logger.setLevel(DEBUG)
 
 

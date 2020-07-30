@@ -8,6 +8,11 @@ from datetime import datetime
 from logging import basicConfig, getLogger, DEBUG
 import time
 
+from module.const import LOG_NAME
+from module.dbcontroller import (
+    LocalSqlController,
+    CloudSqlController
+)
 from module.dt2sql import (
     JyoData2sql,
     RaceData2sql,
@@ -18,7 +23,7 @@ from module.dt2sql import (
 from module.getdata import DateRange as dr
 
 # logger
-logger = getLogger(__name__)
+logger = getLogger(LOG_NAME)
 logger.setLevel(DEBUG)
 
 
@@ -38,14 +43,28 @@ def main():
     parser.add_argument('--table',
                         action='store_true',
                         help='if you want to create table.')
-    # parser.add_argument('-t', '--table')
+    parser.add_argument(
+        '--gcs',
+        action='store_true',
+        help='if you want to use gcs as MySQL db.'
+    )
 
     args = parser.parse_args()
     st_date = datetime.strptime(args.st_date, '%Y-%m-%d')
     ed_date = datetime.strptime(args.ed_date, '%Y-%m-%d')
     logger.info(f'Insert data between {st_date} and {ed_date}')
-    logger.info(f'Table Creating: {args.table}')
 
+    logger.info('Connect MySQL server.')
+    if args.gcs:
+        logger.debug('use Google Cloud SQL.')
+        # NOTE: メソッド未実装なので接続できない
+        sql_ctl = CloudSqlController()
+    else:
+        logger.debug('use local mysql server.')
+        sql_ctl = LocalSqlController()
+    sql_ctl.build()
+
+    logger.info(f'Table Creating: {args.table}')
     logger.debug('load classes from dt2sql')
     jd2sql = JyoData2sql()
     rd2sql = RaceData2sql()
@@ -90,6 +109,9 @@ def main():
             logger.debug('insert race data completed.')
         except Exception as e:
             logger.error(f'{e}')
+
+    logger.info('Down Server.')
+    sql_ctl.clean()
 
     logger.info('All completed.')
 

@@ -10,3 +10,5 @@ MYSQL_CONFIG = {
     'database': os.getenv('MYSQL_DATABASE'),
     'charset': 'utf8'
 }
+
+LOG_NAME = 'boatrace_main'
