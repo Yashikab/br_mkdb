@@ -135,6 +135,7 @@ if __name__ == '__main__':
     handler.setFormatter(fmt)
     getLogger(__name__).addHandler(handler)
     getLogger(__name__).setLevel(DEBUG)
+    # モジュール側の設定(INFOのみ)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
     getLogger(MODULE_LOG_NAME).setLevel(INFO)
 

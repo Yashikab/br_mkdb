@@ -38,7 +38,8 @@ class CloudSqlController(DatabaseController):
 class LocalSqlController(DatabaseController):
     """use local mysql db"""
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = \
+            getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
         pwd = os.path.abspath(__file__)
         this_filename = os.path.basename(__file__)
         this_dir = pwd.replace(this_filename, '')
