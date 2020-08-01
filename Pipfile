@@ -15,6 +15,7 @@ request = "*"
 numpy = "*"
 pandas = "*"
 mysql-connector = "*"
+coloredlogs = "*"
 
 [requires]
 python_version = "3.7"

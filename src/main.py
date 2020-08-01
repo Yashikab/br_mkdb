@@ -5,6 +5,7 @@ MYSQLへ公式データを格納する
 """
 import argparse
 from datetime import datetime
+import coloredlogs
 from logging import (
     getLogger,
     Formatter,
@@ -127,6 +128,27 @@ def main():
 
 if __name__ == '__main__':
     # logging設定
+    coloredlogs.DEFAULT_FIELD_STYLES = \
+        {'asctime': {'color': 'green'},
+         'hostname': {'color': 'magenta'},
+         'levelname': {'color': 'black', 'bold': True},
+         'name': {'color': 'blue'},
+         'programname': {'color': 'cyan'}}
+    coloredlogs.DEFAULT_LEVEL_STYLES = \
+        {'critical': {'color': 'red', 'bold': True},
+         'error': {'color': 'red'},
+         'warning': {'color': 'yellow'},
+         'notice': {'color': 'magenta'},
+         'info': {},
+         'debug': {'color': 'green'},
+         'spam': {'color': 'green', 'faint': True},
+         'success': {'color': 'green', 'bold': True},
+         'verbose': {'color': 'blue'}}
+    coloredlogs.install(
+        level='INFO',
+        logger=getLogger(__name__),
+        fmt='[%(asctime)s] %(name)s %(levelname)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S')
     handler = StreamHandler()
     fmt = Formatter(
         fmt='[%(asctime)s] %(name)s %(levelname)s: %(message)s',
