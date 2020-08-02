@@ -15,7 +15,13 @@ from logging import (
 )
 import time
 
-from module.const import MODULE_LOG_NAME
+from module.const import (
+    MODULE_LOG_NAME,
+    FMT,
+    DATE_FMT,
+    CL_FIELD_STYLES,
+    CL_LEVEL_STYLES,
+)
 from module.dbcontroller import (
     LocalSqlController,
     CloudSqlController
@@ -128,36 +134,23 @@ def main():
 
 if __name__ == '__main__':
     # logging設定
-    coloredlogs.DEFAULT_FIELD_STYLES = \
-        {'asctime': {'color': 'green'},
-         'hostname': {'color': 'magenta'},
-         'levelname': {'color': 'black', 'bold': True},
-         'name': {'color': 'blue'},
-         'programname': {'color': 'cyan'}}
-    coloredlogs.DEFAULT_LEVEL_STYLES = \
-        {'critical': {'color': 'red', 'bold': True},
-         'error': {'color': 'red'},
-         'warning': {'color': 'yellow'},
-         'notice': {'color': 'magenta'},
-         'info': {},
-         'debug': {'color': 'green'},
-         'spam': {'color': 'green', 'faint': True},
-         'success': {'color': 'green', 'bold': True},
-         'verbose': {'color': 'blue'}}
+    # mainのlog設定
+    coloredlogs.CAN_USE_BOLD_FONT = True
+    coloredlogs.DEFAULT_FIELD_STYLES = CL_FIELD_STYLES
+    coloredlogs.DEFAULT_LEVEL_STYLES = CL_LEVEL_STYLES
     coloredlogs.install(
-        level='INFO',
+        level='DEBUG',
         logger=getLogger(__name__),
-        fmt='[%(asctime)s] %(name)s %(levelname)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S')
+        fmt=FMT,
+        datefmt=DATE_FMT)
+
+    # モジュール側の設定(INFOのみ)
     handler = StreamHandler()
     fmt = Formatter(
-        fmt='[%(asctime)s] %(name)s %(levelname)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        fmt=FMT,
+        datefmt=DATE_FMT
     )
     handler.setFormatter(fmt)
-    getLogger(__name__).addHandler(handler)
-    getLogger(__name__).setLevel(DEBUG)
-    # モジュール側の設定(INFOのみ)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
     getLogger(MODULE_LOG_NAME).setLevel(INFO)
 
