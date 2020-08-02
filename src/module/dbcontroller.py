@@ -8,8 +8,10 @@ import os
 import subprocess
 from abc import ABCMeta, abstractmethod
 
-from module.const import MODULE_LOG_NAME
+from module.const import MODULE_LOG_NAME, MYSQL_CONFIG
 
+import mysql.connector
+import time
 
 class DatabaseController(metaclass=ABCMeta):
     @abstractmethod
@@ -62,6 +64,22 @@ class LocalSqlController(DatabaseController):
             subprocess.run(["docker-compose", "up", "-d"])
         except Exception as e:
             self.logger.error(e)
+
+        # 接続を確認する(接続されていなかったら10秒待って再度try)
+        # 10回やってだめならerror
+        for i in range(10):
+            try:
+                mysql.connector.connect(**MYSQL_CONFIG)
+                self.logger.info('Confirm connected to mysql.')
+                break
+            except Exception:
+                if i == 9:
+                    self.logger.error(
+                        'mysql connecting comfirmation: timeouted')
+                else:
+                    self.logger.warning('Not connected to mysql yet.')
+                    self.logger.debug('wait 10sec and retry.')
+                    time.sleep(10)
 
     def clean(self):
         self.logger.info('Clean local mysql.')
