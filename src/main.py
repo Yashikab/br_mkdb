@@ -10,7 +10,6 @@ from logging import (
     getLogger,
     Formatter,
     StreamHandler,
-    DEBUG,
     INFO
 )
 import time
