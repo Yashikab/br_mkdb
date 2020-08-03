@@ -76,9 +76,6 @@ def main():
     sql_ctl.build()
     logger.info('Done')
 
-    # 気持ち空けておく
-    time.sleep(1)
-
     logger.info(f'Table Creating: {args.table}')
     logger.debug('load classes from dt2sql')
     jd2sql = JyoData2sql()
@@ -100,17 +97,17 @@ def main():
     for date in dr.daterange(st_date, ed_date):
         try:
             logger.debug(f'target date: {date}')
-            logger.debug('insert jyodata')
             jd2sql.insert2table(date)
-            logger.debug('done')
 
             # jd2sqlで開催場と最終レース番を取得する
             logger.debug('insert race data: race chokuzen result odds')
             for jyo_cd in jd2sql.dict_for_other_tb.keys():
                 ed_race_no = jd2sql.dict_for_other_tb[jyo_cd]
-                logger.debug(f'data with jyo_cd: {jyo_cd}')
                 start_time = time.time()
                 for race_no in range(1, ed_race_no + 1):
+                    logger.info(
+                        f'data with date: {date} '
+                        f'jyo_cd: {jyo_cd} race_no: {race_no}')
                     try:
                         time.sleep(args.wait)
                         rd2sql.insert2table(date, jyo_cd, race_no)

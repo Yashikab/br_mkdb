@@ -258,12 +258,12 @@ class OfficialProgram(CommonMethods4Official):
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-        self.logger.info(f'get html: {target_url}')
+        self.logger.debug(f'get html: {target_url}')
         self.__soup = super()._url2soup(target_url)
-        self.logger.info('get html completed.')
+        self.logger.debug('get html completed.')
 
     def getplayerinfo2dict(self, waku: int) -> dict:
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         # 番組表を選択 css selectorより
         self.logger.debug('get table html from target url')
         target_table_selector = \
@@ -380,7 +380,7 @@ class OfficialProgram(CommonMethods4Official):
         return content_dict
 
     def getcommoninfo2dict(self) -> dict:
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         table_selector = \
             'body > main > div > div > div > '\
             'div.heading2 > div > div.heading2_title'
@@ -1057,6 +1057,7 @@ class GetHoldPlacePast(CommonMethods4Official):
             hp_name: str
                 開催場名
         """
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         shinko = self.shinko_info_list[self.place_name_list.index(hp_name)]
         ed_race_no = self._get_end_raceno(shinko)
 

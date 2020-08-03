@@ -71,7 +71,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                 レース番号
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
+        self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
         tcls = self.target_cls(race_no=race_no, jyo_code=jyo_cd, date=date)
 
         # 各種id
@@ -255,6 +255,7 @@ class JyoData2sql(Data2MysqlTemplate):
                 id_list=[datejyo_id, date, hp_c, f"'{hp_s}'"],
                 info_dict=hi_dict
             )
+        self.logger.info(f'{sys._getframe().f_code.co_name} completed.')
 
         return None
 
@@ -328,6 +329,7 @@ class Odds2sql(Data2MysqlTemplate):
             super()._run_query(query)
 
     def insert2table(self, date, jyo_cd, race_no):
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         ood = OfficialOdds(race_no, jyo_cd, date)
         race_id = f"{date}{jyo_cd:02}{race_no:02}"
         content_dict_list = \
