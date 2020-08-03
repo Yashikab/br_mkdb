@@ -71,7 +71,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                 レース番号
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
+        self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
         tcls = self.target_cls(race_no=race_no, jyo_code=jyo_cd, date=date)
 
         # 各種id
@@ -223,7 +223,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
 class JyoData2sql(Data2MysqlTemplate):
 
     def __init__(self):
-        self.logger = getLogger(self.__class__.__name__)
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             ['create_jyodata_tb.sql']
         )
@@ -254,6 +255,7 @@ class JyoData2sql(Data2MysqlTemplate):
                 id_list=[datejyo_id, date, hp_c, f"'{hp_s}'"],
                 info_dict=hi_dict
             )
+        self.logger.info(f'{sys._getframe().f_code.co_name} completed.')
 
         return None
 
@@ -261,7 +263,8 @@ class JyoData2sql(Data2MysqlTemplate):
 class RaceData2sql(Data2MysqlTemplate):
 
     def __init__(self):
-        self.logger = getLogger(self.__class__.__name__)
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             filename_list=['create_raceinfo_tb.sql', 'create_program_tb.sql'],
             table_name_list=['raceinfo_tb', 'program_tb'],
@@ -273,7 +276,8 @@ class ChokuzenData2sql(Data2MysqlTemplate):
     リアルタムデータ取得時のため別クラスにする"""
 
     def __init__(self):
-        self.logger = getLogger(self.__class__.__name__)
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             filename_list=[
                 'create_chokuzen_cond_tb.sql', 'create_chokuzen_p_tb.sql'],
@@ -285,7 +289,8 @@ class ResultData2sql(Data2MysqlTemplate):
     """結果情報テーブル作成"""
 
     def __init__(self):
-        self.logger = getLogger(self.__class__.__name__)
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
             filename_list=['create_raceresult_tb.sql',
                            'create_playerresult_tb.sql'],
@@ -295,7 +300,8 @@ class ResultData2sql(Data2MysqlTemplate):
 
 class Odds2sql(Data2MysqlTemplate):
     def __init__(self):
-        self.logger = getLogger(self.__class__.__name__)
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         ood = OfficialOdds
         self.__tb_name_list = ['odds_3tan_tb',
                                "odds_3fuku_tb",
@@ -323,6 +329,7 @@ class Odds2sql(Data2MysqlTemplate):
             super()._run_query(query)
 
     def insert2table(self, date, jyo_cd, race_no):
+        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         ood = OfficialOdds(race_no, jyo_cd, date)
         race_id = f"{date}{jyo_cd:02}{race_no:02}"
         content_dict_list = \
