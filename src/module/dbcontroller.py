@@ -13,6 +13,7 @@ from module.const import MODULE_LOG_NAME, MYSQL_CONFIG
 import mysql.connector
 import time
 
+
 class DatabaseController(metaclass=ABCMeta):
     @abstractmethod
     def build(self):
@@ -27,10 +28,32 @@ class DatabaseController(metaclass=ABCMeta):
 
 class CloudSqlController(DatabaseController):
     """use cloud sql mysql"""
+    def __init__(self):
+        self.logger = \
+            getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger.info('Set path to proxy.')
+        pwd = os.path.abspath(__file__)
+        this_filename = os.path.basename(__file__)
+        this_dir = pwd.replace(this_filename, '')
+        diff_dir_for_sql = 'src/module'
+        self.__proxy_dir = \
+            this_dir.replace(diff_dir_for_sql, 'proxy')
+        if not os.path.exists(self.__proxy_dir):
+            self.logger.debug('Path not exists then create.')
+            os.mkdir(self.__proxy_dir)
+        self.logger.debug(f'proxy path: {self.__proxy_dir}')
 
     def build(self):
         # TODO: Google cloud Mysql接続
-        pass
+        os.chdir(self.__proxy_dir)
+        if not os.path.exists('cloud_sql_proxy'):
+            proxy_dl_url = \
+                "https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64"
+            subprocess.run(["wget",
+                            proxy_dl_url,
+                            "-O",
+                            "cloud_sql_proxy"])
+        subprocess.run(["chmod", "+w", "cloud_sql_proxy"])
 
     def clean(self):
         # TODO: Google cloud Mysql接続解除

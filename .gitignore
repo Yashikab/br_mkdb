@@ -10,3 +10,5 @@ bin
 *.pem
 cloud_sql_proxy
 *mysql*.json
+
+proxy/
