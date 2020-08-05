@@ -13,5 +13,5 @@ fi
 
 chmod +x cloud_sql_proxy
 # access to cloud sql with proxy
-./cloud_sql_proxy -instances=${PROJECT_ID}:us-central1:${GSQL_DATABASE}=tcp:3206 \
+./cloud_sql_proxy -instances=${PROJECT_ID}:us-central1:${GSQL_DATABASE}=tcp:3306 \
                   -credential_file=${KEY_NAME}.json &
