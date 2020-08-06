@@ -74,32 +74,34 @@ class CloudSqlController(DatabaseController):
                             "cloud_sql_proxy"])
         subprocess.run(["chmod", "+w", "cloud_sql_proxy"])
         # TODO: saキー発行をここで行うかは考える(gcloudがdroneで使えない可能性)
-        self.logger.debug('get key')
         sa_name = os.getenv('SA_NAME')
         prj_name = os.getenv('PROJECT_ID')
         key_name = '_'.join([sa_name, prj_name])
-        account_name = f"{sa_name}@{prj_name}.iam.gserviceaccount.com"
-        subprocess.run([
-            "gcloud",
-            "iam",
-            "service-accounts",
-            "keys",
-            "create",
-            f"{key_name}.json",
-            "--iam-account",
-            account_name
-        ])
+        key_name_json = f'{key_name}.json'
+        if not os.path.exists(key_name_json):
+            self.logger.debug('get key')
+            account_name = f"{sa_name}@{prj_name}.iam.gserviceaccount.com"
+            subprocess.run([
+                "gcloud",
+                "iam",
+                "service-accounts",
+                "keys",
+                "create",
+                f"{key_name_json}",
+                "--iam-account",
+                account_name
+            ])
         self.logger.info('connect to cloud sql proxy')
         region = os.getenv('GSQL_REGION')
-        db_name = os.getenv('GSQL_DATABASE')
+        db_name = os.getenv('GSQL_INSTANCE_NAME')
         instance_name = f"{prj_name}:{region}:{db_name}"
         subprocess.Popen(
             ["./cloud_sql_proxy",
              f"-instances={instance_name}=tcp:3306",
-             f"-credential_file={key_name}.json",
-             "&"],  # バックグラウンド実行
-            shell=False
+             f"-credential_file={key_name_json}"]
             )
+        # wait
+        time.sleep(5)
         super()._check_connection()
 
     def clean(self):
@@ -135,6 +137,8 @@ class LocalSqlController(DatabaseController):
         except Exception as e:
             self.logger.error(e)
 
+        # wait
+        time.sleep(5)
         super()._check_connection()
 
     def clean(self):
