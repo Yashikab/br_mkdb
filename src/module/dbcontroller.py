@@ -5,6 +5,11 @@ google cloud sql proxyを通して, データを格納する
 '''
 from logging import getLogger
 import os
+from stat import (
+    S_IXUSR,
+    S_IXGRP,
+    S_IXOTH
+)
 import subprocess
 from abc import ABCMeta, abstractmethod
 
@@ -83,7 +88,8 @@ class CloudSqlController(DatabaseController):
                         proxy_dl_url,
                         "-O",
                         "cloud_sql_proxy"])
-        subprocess.run(["chmod", "+w", "cloud_sql_proxy"])
+        os.chmod('cloud_sql_proxy',
+                 S_IXUSR | S_IXGRP | S_IXOTH)
 
         if not os.path.exists(self.__key_name_json):
             self.logger.debug('get key')
