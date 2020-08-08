@@ -61,44 +61,48 @@ class CloudSqlController(DatabaseController):
             os.mkdir(self.__proxy_dir)
         self.logger.debug(f'proxy path: {self.__proxy_dir}')
 
-    def build(self):
-        # TODO: Google cloud Mysql接続
-        os.chdir(self.__proxy_dir)
-        if not os.path.exists('cloud_sql_proxy'):
-            self.logger.debug('Install cloud_sql_proxy')
-            proxy_dl_url = \
-                "https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64"
-            subprocess.run(["wget",
-                            proxy_dl_url,
-                            "-O",
-                            "cloud_sql_proxy"])
-        subprocess.run(["chmod", "+w", "cloud_sql_proxy"])
-        # TODO: saキー発行をここで行うかは考える(gcloudがdroneで使えない可能性)
+        self.logger.debug(f'Get Variables from environment.')
         sa_name = os.getenv('SA_NAME')
         prj_name = os.getenv('PROJECT_ID')
         key_name = '_'.join([sa_name, prj_name])
-        key_name_json = f'{key_name}.json'
-        if not os.path.exists(key_name_json):
+        self.__key_name_json = f'{key_name}.json'
+        self.__account_name = f"{sa_name}@{prj_name}.iam.gserviceaccount.com"
+        region = os.getenv('GSQL_REGION')
+        db_name = os.getenv('GSQL_INSTANCE_NAME')
+        self.__instance_name = f"{prj_name}:{region}:{db_name}"
+
+    def build(self):
+        os.chdir(self.__proxy_dir)
+        if os.path.exists('cloud_sql_proxy'):
+            self.logger.debug('delete file.')
+            os.remove('cloud_sql_proxy')
+        self.logger.debug('Install cloud_sql_proxy')
+        proxy_dl_url = \
+            "https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64"
+        subprocess.run(["wget",
+                        proxy_dl_url,
+                        "-O",
+                        "cloud_sql_proxy"])
+        subprocess.run(["chmod", "+w", "cloud_sql_proxy"])
+
+        if not os.path.exists(self.__key_name_json):
             self.logger.debug('get key')
-            account_name = f"{sa_name}@{prj_name}.iam.gserviceaccount.com"
+
             subprocess.run([
                 "gcloud",
                 "iam",
                 "service-accounts",
                 "keys",
                 "create",
-                f"{key_name_json}",
+                f"{self.__key_name_json}",
                 "--iam-account",
-                account_name
+                self.__account_name
             ])
         self.logger.info('connect to cloud sql proxy')
-        region = os.getenv('GSQL_REGION')
-        db_name = os.getenv('GSQL_INSTANCE_NAME')
-        instance_name = f"{prj_name}:{region}:{db_name}"
         subprocess.Popen(
             ["./cloud_sql_proxy",
-             f"-instances={instance_name}=tcp:3306",
-             f"-credential_file={key_name_json}"]
+             f"-instances={self.__instance_name}=tcp:3306",
+             f"-credential_file={self.__key_name_json}"]
             )
         # wait
         time.sleep(5)
