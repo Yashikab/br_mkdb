@@ -4,6 +4,7 @@
 google cloud sql proxyを通して, データを格納する
 '''
 from logging import getLogger
+import json
 import os
 from stat import (
     S_IXUSR,
@@ -116,7 +117,14 @@ class CloudSqlController(DatabaseController):
 
     def clean(self):
         # TODO: Google cloud Mysql接続解除
-        pass
+        os.chdir(self.__proxy_dir)
+        # subprocess.run(
+        #     ["ps | grep cloud_sql_proxy | awk \'{print $1}\' | xargs kill -9"]
+        # )
+        with open(self.__key_name_json, 'r') as f:
+            pri_key_json = json.load(f)
+        pri_key_id = pri_key_json['private_key_id']
+        self.logger.debug(pri_key_id)
 
 
 class LocalSqlController(DatabaseController):
