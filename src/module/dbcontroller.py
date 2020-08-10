@@ -79,16 +79,14 @@ class CloudSqlController(DatabaseController):
 
     def build(self):
         os.chdir(self.__proxy_dir)
-        if os.path.exists('cloud_sql_proxy'):
-            self.logger.debug('delete file.')
-            os.remove('cloud_sql_proxy')
-        self.logger.debug('Install cloud_sql_proxy')
-        proxy_dl_url = \
-            "https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64"
-        subprocess.run(["wget",
-                        proxy_dl_url,
-                        "-O",
-                        "cloud_sql_proxy"])
+        if not os.path.exists('cloud_sql_proxy'):
+            self.logger.debug('Install cloud_sql_proxy')
+            proxy_dl_url = \
+                "https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64"
+            subprocess.run(["wget",
+                            proxy_dl_url,
+                            "-O",
+                            "cloud_sql_proxy"])
         os.chmod('cloud_sql_proxy',
                  S_IXUSR | S_IXGRP | S_IXOTH)
 
@@ -118,13 +116,16 @@ class CloudSqlController(DatabaseController):
     def clean(self):
         # TODO: Google cloud Mysql接続解除
         os.chdir(self.__proxy_dir)
-        # subprocess.run(
-        #     ["ps | grep cloud_sql_proxy | awk \'{print $1}\' | xargs kill -9"]
-        # )
+        subprocess.Popen(
+            ["ps | grep cloud_sql_proxy | awk \'{print $1}\' | xargs kill -9"])
         with open(self.__key_name_json, 'r') as f:
             pri_key_json = json.load(f)
         pri_key_id = pri_key_json['private_key_id']
-        self.logger.debug(pri_key_id)
+        self.logger.debug('delete pri key id from gcp')
+        subprocess.Popen([f"echo yes | gcloud iam service-accounts keys delete {pri_key_id} \
+  --iam-account {self.__account_name}"])
+        self.logger.debug('delete json key file.')
+        os.remove(self.__key_name_json)
 
 
 class LocalSqlController(DatabaseController):

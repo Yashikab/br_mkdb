@@ -35,7 +35,7 @@ def main():
     if args.gcs:
         logger.info('use google cloud sql.')
         cloud_sql_ctl = CloudSqlController()
-        # cloud_sql_ctl.build()
+        cloud_sql_ctl.build()
         # testのため
         cloud_sql_ctl.clean()
 
