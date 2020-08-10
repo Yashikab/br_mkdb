@@ -67,7 +67,7 @@ class CloudSqlController(DatabaseController):
             os.mkdir(self.__proxy_dir)
         self.logger.debug(f'proxy path: {self.__proxy_dir}')
 
-        self.logger.debug(f'Get Variables from environment.')
+        self.logger.debug('Get Variables from environment.')
         sa_name = os.getenv('SA_NAME')
         prj_name = os.getenv('PROJECT_ID')
         key_name = '_'.join([sa_name, prj_name])
