@@ -116,14 +116,45 @@ class CloudSqlController(DatabaseController):
     def clean(self):
         # TODO: Google cloud Mysql接続解除
         os.chdir(self.__proxy_dir)
-        subprocess.Popen(
-            ["ps | grep cloud_sql_proxy | awk \'{print $1}\' | xargs kill -9"])
+        self.logger.debug('kill cloud_sql_proxy connection.')
+        cmd1 = ["ps"]
+        cmd2 = ["grep", "cloud_sql_proxy"]
+        cmd3 = ["awk", "{print $1}"]
+        cmd4 = ["xargs", "kill", "-9"]
+        pipe = subprocess.Popen(
+            cmd1,
+            stdout=subprocess.PIPE)
+        pipe = subprocess.Popen(
+            cmd2,
+            stdin=pipe.stdout,
+            stdout=subprocess.PIPE
+        )
+        pipe = subprocess.Popen(
+            cmd3,
+            stdin=pipe.stdout,
+            stdout=subprocess.PIPE
+        )
+        subprocess.run(
+            cmd4,
+            stdin=pipe.stdout
+        )
+
+        self.logger.debug('delete pri key id from gcp')
         with open(self.__key_name_json, 'r') as f:
             pri_key_json = json.load(f)
         pri_key_id = pri_key_json['private_key_id']
-        self.logger.debug('delete pri key id from gcp')
-        subprocess.Popen([f"echo yes | gcloud iam service-accounts keys delete {pri_key_id} \
-  --iam-account {self.__account_name}"])
+        cmd1 = ["echo", "yes"]
+        cmd2 = ["gcloud", "iam", "service-accounts",
+                "keys", "delete", pri_key_id,
+                "--iam-account", self.__account_name]
+        pipe = subprocess.Popen(
+            cmd1,
+            stdout=subprocess.PIPE
+        )
+        subprocess.run(
+            cmd2,
+            stdin=pipe.stdout
+        )
         self.logger.debug('delete json key file.')
         os.remove(self.__key_name_json)
 
