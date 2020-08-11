@@ -114,7 +114,6 @@ class CloudSqlController(DatabaseController):
         super()._check_connection()
 
     def clean(self):
-        # TODO: Google cloud Mysql接続解除
         os.chdir(self.__proxy_dir)
         self.logger.debug('kill cloud_sql_proxy connection.')
         cmd1 = ["ps"]
