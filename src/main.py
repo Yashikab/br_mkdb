@@ -68,7 +68,6 @@ def main():
     logger.info('Connect MySQL server.')
     if args.gcs:
         logger.debug('use Google Cloud SQL.')
-        # NOTE: メソッド未実装なので接続できない
         sql_ctl = CloudSqlController()
     else:
         logger.debug('use local mysql server.')
