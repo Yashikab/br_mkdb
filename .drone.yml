@@ -14,7 +14,7 @@ steps:
     INSTALLATION_ID:
       from_secret: installation_id
   commands:
-    - sh /report.sh src/
+    - rp_reviewdog src/
   when:
     event:
     - pull_request
