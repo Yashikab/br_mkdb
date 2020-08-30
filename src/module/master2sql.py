@@ -7,4 +7,6 @@ jyo_masterを入れる
 
 
 class JyoMaster2sql:
-    pass
+
+    def create_table_if_not_exists(self):
+        return None
