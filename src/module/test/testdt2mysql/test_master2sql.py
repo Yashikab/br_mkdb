@@ -6,4 +6,5 @@ master2sqlモジュール用単体テスト
 
 
 class TestJyoMaster2sql:
-    pass
+    def test_exist_table(self):
+        pass

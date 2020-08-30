@@ -11,4 +11,4 @@ bin
 cloud_sql_proxy
 *mysql*.json
 
-proxy/
+proxy/cloud_sql_proxy
