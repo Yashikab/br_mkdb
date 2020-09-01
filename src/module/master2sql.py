@@ -25,7 +25,7 @@ class JyoMaster2sql(Data2MysqlTemplate):
     def create_table_if_not_exists(self):
         self.logger.debug('create jyo master tb')
         super().create_table_if_not_exists()
-        # TODO csvのinsertもここでやる
+
         self.logger.debug('insert rows from csv.')
         sql = f"INSERT IGNORE INTO {self.__tb_name} VALUES"
         insert_value = ', '.join([
