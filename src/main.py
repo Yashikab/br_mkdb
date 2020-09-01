@@ -33,6 +33,7 @@ from module.dt2sql import (
     Odds2sql
 )
 from module.getdata import DateRange as dr
+from module.master2sql import JyoMaster2sql
 
 # logger
 logger = getLogger(__name__)
@@ -77,6 +78,7 @@ def main():
 
     logger.info(f'Table Creating: {args.table}')
     logger.debug('load classes from dt2sql')
+    jm2sql = JyoMaster2sql()
     jd2sql = JyoData2sql()
     rd2sql = RaceData2sql()
     cd2sql = ChokuzenData2sql()
@@ -86,6 +88,7 @@ def main():
 
     if args.table:
         logger.debug('Create table if it does not exist.')
+        jm2sql.create_table_if_not_exists()
         jd2sql.create_table_if_not_exists()
         rd2sql.create_table_if_not_exists()
         cd2sql.create_table_if_not_exists()

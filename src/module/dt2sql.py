@@ -91,7 +91,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
 
         return None
 
-    def _run_query(self, query: str) -> None:
+    def run_query(self, query: str) -> None:
         """
         クエリを実行する
 
@@ -137,7 +137,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             self.logger.debug(f'run query from {query_filepath}')
             with open(query_filepath, 'r') as f:
                 query = f.read()
-                self._run_query(query)
+                self.run_query(query)
 
         return None
 
@@ -186,7 +186,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         sql = f"INSERT IGNORE INTO {tb_name} VALUES"
         query = ' '.join([sql, insert_value])
         # 作成したクエリの実行
-        self._run_query(query)
+        self.run_query(query)
         self.logger.debug(f'insert to {tb_name} done.')
 
         return None
@@ -326,7 +326,7 @@ class Odds2sql(Data2MysqlTemplate):
                 "FOREIGN KEY (race_id) REFERENCES raceinfo_tb (race_id)")
             insert_cols = ", ".join(insert_cols_list)
             query = f"CREATE TABLE {tb_name} ({insert_cols})"
-            super()._run_query(query)
+            super().run_query(query)
 
     def insert2table(self, date, jyo_cd, race_no):
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')

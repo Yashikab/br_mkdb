@@ -10,10 +10,9 @@ from module.master2sql import JyoMaster2sql
 class TestJyoMaster2sql(CommonMethod):
     __table_name: str = 'jyo_master'
     __jm2sql = JyoMaster2sql()
+    __jm2sql.create_table_if_not_exists()
 
     def test_exist_table(self):
-        self.__jm2sql.create_table_if_not_exists()
-
         get_set = super().get_columns2set(self.__table_name)
         expected_set = {'jyo_name', 'jyo_cd'}
         # カラム名確認
