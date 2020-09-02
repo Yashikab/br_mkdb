@@ -26,8 +26,7 @@ steps:
     - name: sharecommand
       path: /usr/bin/
   commands:
-    - gcloud init
-    - gcloud auth list
+    - ls -l /usr/bin/
     - rp_reviewdog src/
   when:
     event:
