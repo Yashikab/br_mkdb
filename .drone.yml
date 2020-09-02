@@ -3,6 +3,13 @@ type: docker
 name: default
 
 steps:
+- name: cloud-sdk
+  pull: always
+  image: google/cloud-sdk
+  volumes:
+    - name: dockersock
+      path: /var/run/docker.sock
+
 - name: reviewdog
   pull: always
   image: yashikab/mydog:python-dev
@@ -13,7 +20,12 @@ steps:
       from_secret: app_id
     INSTALLATION_ID:
       from_secret: installation_id
+  volumes:
+    - name: dockersock
+      path: /var/run/docker.sock
   commands:
+    - gcloud init
+    - gcloud auth list
     - rp_reviewdog src/
   when:
     event:
