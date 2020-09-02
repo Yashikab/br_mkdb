@@ -6,9 +6,6 @@ steps:
 - name: cloud-sdk
   pull: always
   image: google/cloud-sdk
-  volumes:
-    - name: sharecommand
-      path: /root/
   commands:
     - echo "Hello from cloud sdk image" > comment
 
@@ -22,15 +19,9 @@ steps:
       from_secret: app_id
     INSTALLATION_ID:
       from_secret: installation_id
-  volumes:
-    - name: sharecommand
-      path: /root/
   commands:
     - pr_comment comment
     # - rp_reviewdog src/
   when:
     event:
     - pull_request
-volumes:
-  - name: sharecommand
-    temp: {}
