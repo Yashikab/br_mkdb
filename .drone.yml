@@ -8,7 +8,7 @@ steps:
   image: google/cloud-sdk
   volumes:
     - name: sharecommand
-      path: /usr/bin/
+      path: /
   commands:
     - which gcloud
 
@@ -24,9 +24,9 @@ steps:
       from_secret: installation_id
   volumes:
     - name: sharecommand
-      path: /usr/bin/
+      path: /
   commands:
-    - ls -l /usr/bin/
+    - which gcloud
     - rp_reviewdog src/
   when:
     event:
