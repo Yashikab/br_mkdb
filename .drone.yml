@@ -7,8 +7,8 @@ steps:
   pull: always
   image: google/cloud-sdk
   volumes:
-    - name: dockersock
-      path: /var/run/docker.sock
+    - name: sharecommand
+      path: /usr/bin/
   commands:
     - which gcloud
 
@@ -23,8 +23,8 @@ steps:
     INSTALLATION_ID:
       from_secret: installation_id
   volumes:
-    - name: dockersock
-      path: /var/run/docker.sock
+    - name: sharecommand
+      path: /usr/bin/
   commands:
     - gcloud init
     - gcloud auth list
@@ -33,5 +33,5 @@ steps:
     event:
     - pull_request
 volumes:
-  - name: dockersock
+  - name: sharecommand
     temp: {}
