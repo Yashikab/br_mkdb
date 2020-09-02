@@ -10,7 +10,7 @@ steps:
     - name: sharecommand
       path: /root/
   commands:
-    - which gcloud
+    - echo "Hello from cloud sdk image" > comment
 
 - name: reviewdog
   pull: always
@@ -26,8 +26,8 @@ steps:
     - name: sharecommand
       path: /root/
   commands:
-    - which gcloud
-    - rp_reviewdog src/
+    - pr_comment comment
+    # - rp_reviewdog src/
   when:
     event:
     - pull_request
