@@ -8,7 +8,7 @@ steps:
   image: google/cloud-sdk
   volumes:
     - name: sharecommand
-      path: /
+      path: /root/
   commands:
     - which gcloud
 
@@ -24,7 +24,7 @@ steps:
       from_secret: installation_id
   volumes:
     - name: sharecommand
-      path: /
+      path: /root/
   commands:
     - which gcloud
     - rp_reviewdog src/
