@@ -16,8 +16,7 @@ steps:
     SDK_ACCOUNT:
       from_secret: sdk_account
   commands:
-    - echo -E $${SDK_ACCOUNT} > ./credential.json
-    - gcloud auth activate-service-account --key-file ./credential.json
+    - echo -E $${SDK_ACCOUNT} | gcloud auth activate-service-account --key-file=-
     # - rp_reviewdog src/
   when:
     event:
