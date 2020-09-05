@@ -19,7 +19,7 @@ steps:
       from_secret: sa_mail
   commands:
     - echo -E $${SDK_ACCOUNT} > credential.json
-    - gcloud auth activate_service_account ${SA_MAIL} --key-file=credential.json
+    - gcloud auth activate_service_account $${SA_MAIL} --key-file=credential.json
     # - rp_reviewdog src/
   when:
     event:
