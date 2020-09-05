@@ -3,12 +3,6 @@ type: docker
 name: default
 
 steps:
-- name: cloud-sdk
-  pull: always
-  image: google/cloud-sdk
-  commands:
-    - echo "Hello from cloud sdk image" > comment
-
 - name: reviewdog
   pull: always
   image: yashikab/mydog:python-dev
@@ -19,8 +13,11 @@ steps:
       from_secret: app_id
     INSTALLATION_ID:
       from_secret: installation_id
+    SDK_ACCOUNT:
+      from_secret: sdk_account
   commands:
-    - pr_comment comment
+    - echo -E $${SDK_ACCOUNT} > ./credential.json
+    - gcloud auth activate-service-account --key-file ./credential.json
     # - rp_reviewdog src/
   when:
     event:
