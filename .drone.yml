@@ -13,13 +13,11 @@ steps:
       from_secret: app_id
     INSTALLATION_ID:
       from_secret: installation_id
-    SDK_ACCOUNT:
-      from_secret: sdk_account
-    SA_MAIL:
-      from_secret: sa_mail
+    CLIENT_JSON:
+      from_secret: client_json
   commands:
-    - echo -E $${SDK_ACCOUNT} > credential.json
-    - gcloud auth activate_service_account $${SA_MAIL} --key-file=credential.json
+    - echo -E $${CLIENT_JSON} > credential.json
+    - gcloud auth application-default login --client-id-file=credential.json
     # - rp_reviewdog src/
   when:
     event:
