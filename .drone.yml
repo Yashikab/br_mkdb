@@ -13,11 +13,10 @@ steps:
       from_secret: app_id
     INSTALLATION_ID:
       from_secret: installation_id
-    CLIENT_JSON:
-      from_secret: client_json
+    CREDENTIAL_KEY:
+      from_secret: cred_key
   commands:
-    - echo $${CLIENT_JSON} > credential.json
-    - gcloud auth application-default login --client-id-file=credential.json --quiet
+    - echo $CREDENTIAL_KEY | gcloud auth activate-service-account --key-file=-
     # - rp_reviewdog src/
   when:
     event:
