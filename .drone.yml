@@ -17,7 +17,7 @@ steps:
       from_secret: client_json
   commands:
     - echo $${CLIENT_JSON} > credential.json
-    - gcloud auth application-default login --client-id-file=credential.json
+    - gcloud auth application-default login --client-id-file=credential.json --quiet
     # - rp_reviewdog src/
   when:
     event:
