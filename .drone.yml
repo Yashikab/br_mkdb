@@ -16,7 +16,8 @@ steps:
     CREDENTIAL_KEY:
       from_secret: cred_key
   commands:
-    - echo $CREDENTIAL_KEY | gcloud auth activate-service-account drone-prd@yashi-prd.iam.gserviceaccount.com --key-file=-
+    - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
+    - gcloud auth activate-service-account --key-file /tmp/credential.json
     # - rp_reviewdog src/
   when:
     event:
