@@ -32,7 +32,9 @@ steps:
   commands:
     - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
     - gcloud auth activate-service-account --key-file /tmp/credential.json
-    # - gcloud config set project 
+    - gcloud config set project ${PROJECT_ID}
+    - make start_gdb
+    - make down_gdb
     # - rp_reviewdog src/
   when:
     event:
