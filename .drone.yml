@@ -15,9 +15,24 @@ steps:
       from_secret: installation_id
     CREDENTIAL_KEY:
       from_secret: cred_key
+    SA_NAME:
+      from_secret: sa_name
+    PROJECT_ID:
+      from_secret: project_id
+    GSQL_REGION: us-central1
+    GSQL_INSTANCE_NAME:
+      from_secret: db_instance_name
+    MYSQL_DATABASE:
+      from_secret: db_name
+    MYSQL_USER:
+      from_secret: sql_usr
+    MYSQL_PASSWORD:
+      from_secret: sql_usr_pw
+    MYSQL_HOST: 127.0.0.1
   commands:
     - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
     - gcloud auth activate-service-account --key-file /tmp/credential.json
+    # - gcloud config set project 
     # - rp_reviewdog src/
   when:
     event:
