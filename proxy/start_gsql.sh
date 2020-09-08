@@ -1,4 +1,7 @@
-#! bin/bash	
+#! bin/bash
+set -o errexit
+set -o nounset
+
 KEY_NAME=${SA_NAME}_${PROJECT_ID}
 # create
 gcloud iam service-accounts keys create ${KEY_NAME}.json \
