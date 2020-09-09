@@ -1,4 +1,7 @@
-#! bin/bash	
+#! bin/bash
+set -o errexit
+set -o nounset
+
 KEY_NAME=${SA_NAME}_${PROJECT_ID}
 # create
 gcloud iam service-accounts keys create ${KEY_NAME}.json \
@@ -14,5 +17,3 @@ chmod +x cloud_sql_proxy
 # access to cloud sql with proxy
 ./cloud_sql_proxy -instances=${PROJECT_ID}:us-central1:${GSQL_INSTANCE_NAME}=tcp:3306 \
     -credential_file=${KEY_NAME}.json &
-
-echo "done"
