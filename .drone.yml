@@ -34,6 +34,7 @@ steps:
     - gcloud auth activate-service-account --key-file /tmp/credential.json
     - gcloud config set project $PROJECT_ID
     - make start_gdb
+    - rp_pytest src/module/
     - make down_gdb
     # - rp_reviewdog src/
   when:
