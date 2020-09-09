@@ -36,8 +36,9 @@ steps:
     - make start_gdb
     - pipenv install --system
     - rp_pytest src/module/
+    - rp_reviewdog src/
     - make down_gdb
-    # - rp_reviewdog src/
+
   when:
     event:
     - pull_request
