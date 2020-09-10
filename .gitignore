@@ -1,6 +1,6 @@
 docker/
 .coverage
-.ipynb_checkpoints
+*/.ipynb_checkpoints
 .docker
 .vscode
 .env
