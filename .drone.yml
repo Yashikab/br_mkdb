@@ -33,12 +33,11 @@ steps:
     - gcloud auth activate-service-account --key-file /tmp/credential.json
     - gcloud config set project $PROJECT_ID
     - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
-    - echo $MYSQL_PASSWORD
-    # - make start_gdb
-    # - pipenv install --system
-    # - rp_pytest src/module/
-    # - rp_reviewdog src/
-    # - make down_gdb
+    - make start_gdb
+    - pipenv install --system
+    - rp_pytest src/module/
+    - rp_reviewdog src/
+    - make down_gdb
 
   when:
     event:
