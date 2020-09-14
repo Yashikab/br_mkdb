@@ -24,15 +24,13 @@ steps:
       from_secret: db_instance_name
     MYSQL_DATABASE:
       from_secret: db_name
-    MYSQL_USER:
-      from_secret: sql_usr
-    MYSQL_PASSWORD:
-      from_secret: sql_usr_pw
+    MYSQL_USER: boat_usr
     MYSQL_HOST: 127.0.0.1
   commands:
     - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
     - gcloud auth activate-service-account --key-file /tmp/credential.json
     - gcloud config set project $PROJECT_ID
+    - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
     - make start_gdb
     - pipenv install --system
     - rp_pytest src/module/
