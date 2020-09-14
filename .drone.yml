@@ -24,8 +24,7 @@ steps:
       from_secret: db_instance_name
     MYSQL_DATABASE:
       from_secret: db_name
-    MYSQL_USER:
-      from_secret: sql_usr
+    MYSQL_USER: boat_usr
     # MYSQL_PASSWORD:
     #   from_secret: sql_usr_pw
     MYSQL_HOST: 127.0.0.1
