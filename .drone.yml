@@ -7,12 +7,12 @@ steps:
   pull: always
   image: yashikab/mydog:python-dev
   environment:
-    PRIVATE_KEY:
-      from_secret: github_pri_key
-    APP_ID:
-      from_secret: app_id
-    INSTALLATION_ID:
-      from_secret: installation_id
+    # PRIVATE_KEY:
+    #   from_secret: github_pri_key
+    # APP_ID:
+    #   from_secret: app_id
+    # INSTALLATION_ID:
+    #   from_secret: installation_id
     CREDENTIAL_KEY:
       from_secret: cred_key
     SA_NAME:
@@ -30,12 +30,15 @@ steps:
     - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
     - gcloud auth activate-service-account --key-file /tmp/credential.json
     - gcloud config set project $PROJECT_ID
-    - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
-    - make start_gdb
-    - pipenv install --system
-    - rp_pytest src/module/
-    - rp_reviewdog src/
-    - make down_gdb
+    - vars_from_secret
+    - echo $APP_ID
+    - echo $INSTALLATION_ID
+    # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
+    # - make start_gdb
+    # - pipenv install --system
+    # - rp_pytest src/module/
+    # - rp_reviewdog src/
+    # - make down_gdb
 
   when:
     event:
