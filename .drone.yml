@@ -9,7 +9,7 @@ steps:
   environment:
     PRIVATE_KEY:
       from_secret: github_pri_key
-    APP_ID: $(gcloud secrets versions access latest --secret="mydog-installation-id")
+    APP_ID:
       from_secret: app_id
     INSTALLATION_ID:
       from_secret: installation_id
