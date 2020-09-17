@@ -30,7 +30,7 @@ steps:
     - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
     - gcloud auth activate-service-account --key-file /tmp/credential.json
     - gcloud config set project $PROJECT_ID
-    - bash -c 'source vars_from_secret'
+    - export APP_ID=$(gcloud secrets versions access latest --secret="mydog-installation-id")
     - echo $APP_ID
     - echo $INSTALLATION_ID
     # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
