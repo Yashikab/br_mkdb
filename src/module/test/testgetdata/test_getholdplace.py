@@ -63,6 +63,7 @@ class TestGetHoldPlace:
         with open(filepath, 'r') as f:
             html_content = f.read()
         return_soup = bs(html_content, 'html.parser')
-        mocker.patch.object(GetHoldPlacePast, "_url2soup", return_value=return_soup)
+        mocker.patch.object(GetHoldPlacePast, "_url2soup",
+                            return_value=return_soup)
         ghp = GetHoldPlacePast(date)
         return ghp
