@@ -11,6 +11,7 @@ from typing import Iterator
 from urllib.request import urlopen
 from logging import getLogger
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import bs4
 from bs4 import BeautifulSoup as bs
@@ -1025,21 +1026,9 @@ class GetHoldPlacePast(CommonMethods4Official):
         会場コードをset型で返す．
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        # MySQLへ接続
-        self.logger.debug('connecting mysql server.')
-        conn = mysql.connector.connect(**const.MYSQL_CONFIG)
-        self.logger.debug('done.')
-        # load jyo master 場マスタのロード
-        self.logger.debug('loading table to df.')
-        sql = """
-            SELECT
-                *
-            FROM
-                jyo_master
-        """
-        jyo_master = pd.read_sql(sql, conn)
-        conn.close()
-        self.logger.debug('mysql connection closed.')
+        # jyo master取得
+        filepath = Path(__file__).parent.resolve().joinpath('jyo_master.csv')
+        jyo_master = pd.read_csv(filepath, header=0)
         self.logger.debug('loading table to df done.')
         # 会場名をインデックスにする
         jyo_master.set_index('jyo_name', inplace=True)
