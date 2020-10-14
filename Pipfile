@@ -16,6 +16,7 @@ pandas = "*"
 mysql-connector = "*"
 coloredlogs = "*"
 pytest-mock = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.7"

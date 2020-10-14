@@ -18,7 +18,6 @@ from bs4 import BeautifulSoup as bs
 import numpy as np
 import pandas as pd
 
-import mysql.connector
 from module import const
 
 
@@ -31,7 +30,7 @@ class CommonMethods4Official:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         html_content = urlopen(url).read()
 
-        soup = bs(html_content, 'html.parser')
+        soup = bs(html_content, 'lxml')
 
         return soup
 

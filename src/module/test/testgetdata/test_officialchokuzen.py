@@ -3,9 +3,10 @@
 """
 getdataモジュール用単体テスト
 """
-
+from bs4 import BeautifulSoup as bs
+from pathlib import Path
 import pytest
-from module import getdata
+from module.getdata import OfficialChokuzen
 
 
 class TestOfficialChokuzen:
@@ -17,19 +18,27 @@ class TestOfficialChokuzen:
     '''
 
     # 選手直前情報取得のための前処理
-    @pytest.fixture(scope='module')
-    def calloch(self):
+    @pytest.fixture(scope='function')
+    def calloch(self, mocker):
         # 5R
-        self.race_no = 9
+        race_no = 9
         # place : hamanako 06
-        self.jyo_code = 6
+        jyo_code = 6
         # day 2020/04/08
-        self.date = 20200408
-        och = getdata.OfficialChokuzen(
-            self.race_no, self.jyo_code, self.date)
+        date = 20200408
+
+        # mocking
+        filepath = Path(__file__).resolve().parent.\
+            joinpath('test_html', f"choku_{date}{jyo_code}{race_no}.html")
+        with open(filepath, 'r') as f:
+            html_content = f.read()
+        soup_content = bs(html_content, 'lxml')
+        mocker.patch.object(OfficialChokuzen, '_url2soup', soup_content)
+
+        och = OfficialChokuzen(race_no, jyo_code, date)
         return och
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope='function')
     def p_chokuzen(self, calloch):
         # 1行目
         p_chokuzen = []
