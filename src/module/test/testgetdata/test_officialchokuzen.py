@@ -82,3 +82,7 @@ class TestOfficialChokuzen:
         # cnd_chokuzen = 直前のコンディションの意
         cnd_chokuzen = calloch.getcommoninfo2dict()
         assert cnd_chokuzen[target] == expected
+
+
+
+import sys

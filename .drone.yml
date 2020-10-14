@@ -33,7 +33,7 @@ steps:
     - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
     - make start_gdb
     - pipenv install --system
-    - rp_pytest src/module/
+    # - rp_pytest src/module/
     - rp_reviewdog src/
     - make down_gdb
 
