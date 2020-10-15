@@ -3,13 +3,15 @@
 """
 getdataモジュール用単体テスト
 """
-from bs4 import BeautifulSoup as bs
-from pathlib import Path
 import pytest
-from module.getdata import GetHoldPlacePast
+from module.getdata import (
+    CommonMethods4Official,
+    GetHoldPlacePast
+)
+from .common import CommonMethodForTest
 
 
-class TestGetHoldPlace:
+class TestGetHoldPlace(CommonMethodForTest):
     """
     本日のレーステーブルから開催会場を取得
     URL: https://www.boatrace.jp/owpc/pc/race/index?hd=20110311
@@ -57,13 +59,8 @@ class TestGetHoldPlace:
 
     def _ghp(self, date, mocker):
         """mock用に共通項にする"""
-        directory = Path(__file__).parent.resolve()
-        filepath = directory.joinpath('test_html', f'ghp_{date}.html')
-
-        with open(filepath, 'r') as f:
-            html_content = f.read()
-        return_soup = bs(html_content, 'html.parser')
-        mocker.patch.object(GetHoldPlacePast, "_url2soup",
-                            return_value=return_soup)
+        soup_content = super().htmlfile2bs4(f'ghp_{date}.html')
+        mocker.patch.object(CommonMethods4Official, "_url2soup",
+                            return_value=soup_content)
         ghp = GetHoldPlacePast(date)
         return ghp

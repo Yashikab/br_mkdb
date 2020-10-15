@@ -3,13 +3,15 @@
 """
 getdataモジュール用単体テスト
 """
-from bs4 import BeautifulSoup as bs
-from pathlib import Path
 import pytest
-from module.getdata import OfficialChokuzen
+from module.getdata import (
+    CommonMethods4Official,
+    OfficialChokuzen
+)
+from .common import CommonMethodForTest
 
 
-class TestOfficialChokuzen:
+class TestOfficialChokuzen(CommonMethodForTest):
     '''
     2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
     直前情報\n
@@ -28,12 +30,10 @@ class TestOfficialChokuzen:
         date = 20200408
 
         # mocking
-        filepath = Path(__file__).resolve().parent.\
-            joinpath('test_html', f"choku_{date}{jyo_code}{race_no}.html")
-        with open(filepath, 'r') as f:
-            html_content = f.read()
-        soup_content = bs(html_content, 'lxml')
-        mocker.patch.object(OfficialChokuzen, '_url2soup', soup_content)
+        # soup_content = super().htmlfile2bs4(
+        #     f"choku_{date}{jyo_code}{race_no}.html"
+        # )
+        # mocker.patch.object(CommonMethods4Official, '_url2soup', soup_content)
 
         och = OfficialChokuzen(race_no, jyo_code, date)
         return och
