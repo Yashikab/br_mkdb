@@ -5,35 +5,47 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module import getdata
+from module.getdata import (
+    CommonMethods4Official,
+    OfficialProgram
+)
+from .common import CommonMethodForTest
 
 
-class TestOfficialProgram:
+class TestOfficialProgram(CommonMethodForTest):
     """
     番組表\n
     2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/racelist?rno=3&jcd=06&hd=20200408 \n
     """
-    @pytest.fixture(scope='class')
-    def loadcls(self):
+    @pytest.fixture(scope='function')
+    def loadcls(self, mocker):
         """
         テスト用前処理
         公式サイトの番組表から選手欄の情報を選手毎に抜くテスト
 
         """
         # 3R
-        self.race_no = 3
+        race_no = 3
         # place : hamanako 06
-        self.jyo_code = 6
+        jyo_code = 6
         # day 2020/04/08
-        self.date = 20200408
+        date = 20200408
 
-        op = getdata.OfficialProgram(
-            self.race_no, self.jyo_code, self.date)
+        # mocking
+        soup_content = super().htmlfile2bs4(
+            f"pro_{date}{jyo_code}{race_no}.html"
+        )
+        mocker.patch.object(CommonMethods4Official,
+                            '_url2soup',
+                            return_value=soup_content)
+
+        op = OfficialProgram(
+            race_no, jyo_code, date)
         return op
 
     # 選手番組情報の取得のための前処理
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope='function')
     def programinfo(self, loadcls):
 
         # 各行呼び出し可能
@@ -43,7 +55,7 @@ class TestOfficialProgram:
 
         return programinfo
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope='function')
     def raceinfo(self, loadcls):
         return loadcls.getcommoninfo2dict()
 

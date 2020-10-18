@@ -3,15 +3,18 @@
 """
 getdataモジュール用単体テスト
 """
-
 import pytest
-from module import getdata
+from module.getdata import (
+    CommonMethods4Official,
+    GetHoldPlacePast
+)
+from .common import CommonMethodForTest
 
 
-class TestGetHoldPlace:
+class TestGetHoldPlace(CommonMethodForTest):
     """
     本日のレーステーブルから開催会場を取得
-    URL: https://www.boatrace.jp/owpc/pc/race/index?hd=20200408
+    URL: https://www.boatrace.jp/owpc/pc/race/index?hd=20110311
     """
 
     name_list1 = ['江戸川', '浜名湖', '常滑', '津',
@@ -26,15 +29,15 @@ class TestGetHoldPlace:
         (20200408, name_list1),
         (20110311, name_list2)
     ])
-    def test_holdplace2strlist(self, date, expected):
-        ghp = getdata.GetHoldPlacePast(date)
+    def test_holdplace2strlist(self, date, expected, mocker):
+        ghp = self._ghp(date, mocker)
         assert ghp.holdplace2strlist() == expected
 
     @pytest.mark.parametrize("date, expected", [
         (20110311, code_list2)
     ])
-    def test_holdplace2cdlist(self, date, expected):
-        ghp = getdata.GetHoldPlacePast(date)
+    def test_holdplace2cdlist(self, date, expected, mocker):
+        ghp = self._ghp(date, mocker)
         assert ghp.holdplace2cdlist() == expected
 
     tama_info = {
@@ -50,6 +53,14 @@ class TestGetHoldPlace:
         (20110311, '多摩川', tama_info),
         (20110311, '浜名湖', hama_info)
     ])
-    def test_holdinfo2dict(self, date, hp_name, expected):
-        ghp = getdata.GetHoldPlacePast(date)
+    def test_holdinfo2dict(self, date, hp_name, expected, mocker):
+        ghp = self._ghp(date, mocker)
         assert ghp.holdinfo2dict(hp_name) == expected
+
+    def _ghp(self, date, mocker):
+        """mock用に共通項にする"""
+        soup_content = super().htmlfile2bs4(f'ghp_{date}.html')
+        mocker.patch.object(CommonMethods4Official, "_url2soup",
+                            return_value=soup_content)
+        ghp = GetHoldPlacePast(date)
+        return ghp

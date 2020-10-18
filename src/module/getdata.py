@@ -11,13 +11,13 @@ from typing import Iterator
 from urllib.request import urlopen
 from logging import getLogger
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import bs4
 from bs4 import BeautifulSoup as bs
 import numpy as np
 import pandas as pd
 
-import mysql.connector
 from module import const
 
 
@@ -30,7 +30,7 @@ class CommonMethods4Official:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         html_content = urlopen(url).read()
 
-        soup = bs(html_content, 'html.parser')
+        soup = bs(html_content, 'lxml')
 
         return soup
 
@@ -184,8 +184,11 @@ class CommonMethods4Official:
                 返却するリスト
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        output_list = input_content.text.replace(' ', '')\
-                                        .split('\r\n')[1:-1]
+        edit_content = input_content.text.replace(' ', '')
+        # /r/n, /rを/nに寄せる
+        edit_content = edit_content.replace('\r\n', '\n')
+        edit_content = edit_content.replace('\r', '\n')
+        output_list = edit_content.split('\n')[1:-1]
         assert len(output_list) == expect_length,\
             f"lengh is not {expect_length}:{len(output_list)}"
         return output_list
@@ -728,10 +731,11 @@ class OfficialResults(CommonMethods4Official):
                 racetime_sec = -1
 
             waku = int(waku)
-            name = name.replace('\n', '')\
-                       .replace('\u3000', '')\
-                       .replace(' ', '')
-            no, name = name.split('\r')
+            name = name.replace('\u3000', '')\
+                       .replace(' ', '')\
+                       .replace('\r', '')
+            self.logger.debug(name)
+            no, name = name.split('\n')[1:-1]
             no = int(no)
 
             content_dict = {
@@ -1025,21 +1029,9 @@ class GetHoldPlacePast(CommonMethods4Official):
         会場コードをset型で返す．
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        # MySQLへ接続
-        self.logger.debug('connecting mysql server.')
-        conn = mysql.connector.connect(**const.MYSQL_CONFIG)
-        self.logger.debug('done.')
-        # load jyo master 場マスタのロード
-        self.logger.debug('loading table to df.')
-        sql = """
-            SELECT
-                *
-            FROM
-                jyo_master
-        """
-        jyo_master = pd.read_sql(sql, conn)
-        conn.close()
-        self.logger.debug('mysql connection closed.')
+        # jyo master取得
+        filepath = Path(__file__).parent.resolve().joinpath('jyo_master.csv')
+        jyo_master = pd.read_csv(filepath, header=0)
         self.logger.debug('loading table to df done.')
         # 会場名をインデックスにする
         jyo_master.set_index('jyo_name', inplace=True)

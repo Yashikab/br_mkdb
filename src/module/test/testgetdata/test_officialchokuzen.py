@@ -3,12 +3,15 @@
 """
 getdataモジュール用単体テスト
 """
-
 import pytest
-from module import getdata
+from module.getdata import (
+    CommonMethods4Official,
+    OfficialChokuzen
+)
+from .common import CommonMethodForTest
 
 
-class TestOfficialChokuzen:
+class TestOfficialChokuzen(CommonMethodForTest):
     '''
     2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
     直前情報\n
@@ -17,19 +20,26 @@ class TestOfficialChokuzen:
     '''
 
     # 選手直前情報取得のための前処理
-    @pytest.fixture(scope='module')
-    def calloch(self):
+    @pytest.fixture(scope='function')
+    def calloch(self, mocker):
         # 5R
-        self.race_no = 9
+        race_no = 9
         # place : hamanako 06
-        self.jyo_code = 6
+        jyo_code = 6
         # day 2020/04/08
-        self.date = 20200408
-        och = getdata.OfficialChokuzen(
-            self.race_no, self.jyo_code, self.date)
+        date = 20200408
+
+        # mocking
+        soup_content = super().htmlfile2bs4(
+            f"choku_{date}{jyo_code}{race_no}.html"
+        )
+        mocker.patch.object(CommonMethods4Official,
+                            '_url2soup',
+                            return_value=soup_content)
+        och = OfficialChokuzen(race_no, jyo_code, date)
         return och
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope='function')
     def p_chokuzen(self, calloch):
         # 1行目
         p_chokuzen = []
