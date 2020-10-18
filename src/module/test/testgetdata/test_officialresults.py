@@ -5,29 +5,40 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module import getdata
+from module.getdata import (
+    CommonMethods4Official,
+    OfficialResults
+)
+from .common import CommonMethodForTest
 
 
-class TestOfficialResults:
+class TestOfficialResults(CommonMethodForTest):
     '''
     2020 4月10日 浜名湖(06) 9レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/raceresult?rno=9&jcd=06&hd=20200410
     '''
     # 選手直前情報取得のための前処理
-    @pytest.fixture(scope='class')
-    def getcls(self):
+    @pytest.fixture(scope='function')
+    def getcls(self, mocker):
         # 5R
-        self.race_no = 9
+        race_no = 9
         # place : hamanako 06
-        self.jyo_code = 6
+        jyo_code = 6
         # day 2020/04/08
-        self.date = 20200410
-        ors = getdata.OfficialResults(
-            self.race_no, self.jyo_code, self.date)
+        date = 20200410
+
+        soup_content = super().htmlfile2bs4(
+            f"res_{date}{jyo_code}{race_no}.html"
+        )
+        mocker.patch.object(CommonMethods4Official,
+                            "_url2soup",
+                            return_value=soup_content)
+        ors = OfficialResults(
+            race_no, jyo_code, date)
         return ors
 
     # 選手結果
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope='function')
     def playerrls(self, getcls):
         # 各行呼び出し可能
         p_rls = []
@@ -55,7 +66,7 @@ class TestOfficialResults:
         assert playerrls[waku - 1][target] == expected
 
     # レース結果
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope='function')
     def racerls(self, getcls):
         return getcls.getcommoninfo2dict()
 

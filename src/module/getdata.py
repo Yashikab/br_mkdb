@@ -731,10 +731,11 @@ class OfficialResults(CommonMethods4Official):
                 racetime_sec = -1
 
             waku = int(waku)
-            name = name.replace('\n', '')\
-                       .replace('\u3000', '')\
-                       .replace(' ', '')
-            no, name = name.split('\r')
+            name = name.replace('\u3000', '')\
+                       .replace(' ', '')\
+                       .replace('\r', '')
+            self.logger.debug(name)
+            no, name = name.split('\n')[1:-1]
             no = int(no)
 
             content_dict = {
