@@ -33,12 +33,12 @@ class TestOfficialProgram(CommonMethodForTest):
         date = 20200408
 
         # mocking
-        # soup_content = super().htmlfile2bs4(
-        #     f"pro_{date}{jyo_code}{race_no}.html"
-        # )
-        # mocker.patch.object(CommonMethods4Official,
-        #                     '_url2soup',
-        #                     return_value=soup_content)
+        soup_content = super().htmlfile2bs4(
+            f"pro_{date}{jyo_code}{race_no}.html"
+        )
+        mocker.patch.object(CommonMethods4Official,
+                            '_url2soup',
+                            return_value=soup_content)
 
         op = OfficialProgram(
             race_no, jyo_code, date)

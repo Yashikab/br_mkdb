@@ -184,8 +184,11 @@ class CommonMethods4Official:
                 返却するリスト
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        output_list = input_content.text.replace(' ', '')\
-                                        .split('\r\n')[1:-1]
+        edit_content = input_content.text.replace(' ', '')
+        # /r/n, /rを/nに寄せる
+        edit_content = edit_content.replace('\r\n', '\n')
+        edit_content = edit_content.replace('\r', '\n')
+        output_list = edit_content.split('\n')[1:-1]
         assert len(output_list) == expect_length,\
             f"lengh is not {expect_length}:{len(output_list)}"
         return output_list
