@@ -4,7 +4,7 @@ import os
 
 
 MYSQL_CONFIG = {
-    'host': os.getenv('MYSQL_HOST'),
+    'host': "127.0.0.1",
     'user': os.getenv('MYSQL_USER'),
     'password': os.getenv('MYSQL_PASSWORD'),
     'database': os.getenv('MYSQL_DATABASE'),
