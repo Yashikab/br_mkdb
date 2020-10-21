@@ -10,8 +10,8 @@ start: $(targetdocker)
 bash: $(pathtodocker)
 	docker-compose exec $(servicename) bash
 
-stop: $(targetdocker)
-	docker-compose -f $(targetdocker) stop
+down: $(targetdocker)
+	docker-compose -f $(targetdocker) down
 
 restart: $(targetdocker)
 	docker-compose down && docker-compose -f $(targetdocker) up -d

@@ -106,8 +106,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                 cursor = conn.cursor()
                 self.logger.debug('run query.')
                 cursor.execute(query)
-                cursor.close()
-                self.logger.debug('query run successfully!')
+                # cursor.close()
+            self.logger.debug('query run successfully!')
         except Exception as e:
             self.logger.error(f'{e}')
 
