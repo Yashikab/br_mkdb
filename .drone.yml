@@ -28,6 +28,9 @@ steps:
     MYSQL_HOST: 127.0.0.1
   commands:
     - sleep 30
+    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show variables like 'character%'"
+    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "set character_set_dataset=utf8"
+    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show variables like 'character%'"
     # - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
     # - gcloud auth activate-service-account --key-file /tmp/credential.json
     # - gcloud config set project $PROJECT_ID
@@ -52,5 +55,3 @@ services:
     MYSQL_DATABASE: test_boat_db
     MYSQL_USER: 'test_boat_user'
     MYSQL_PASSWORD: 'test_pw'
-  entrypoint: [ "mysqld" ]
-  command: [ "--character-set-database=utf8", "--datadir=/var/lib/mysql", "--user=mysql"]
