@@ -49,7 +49,7 @@ steps:
 
 services:
 - name: testmysql
-  image: mysql:5.7
+  image: mysql
   entrypoint: [ "mysqld" ]
   command: [ "--character-set-server=utf8mb4" ]
   environment:
