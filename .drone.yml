@@ -49,12 +49,12 @@ steps:
 
 services:
 - name: testmysql
-  image: mysql
+  image: mysql:5.7
+  # environment:
+  #   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+  #   MYSQL_DATABASE: test_boat_db
+  #   MYSQL_USER: 'test_boat_user'
+  #   MYSQL_PASSWORD: 'test_pw'
   entrypoint: [ "mysqld" ]
-  command: [ "--character-set-server=utf8mb4" ]
-  environment:
-    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-    MYSQL_DATABASE: test_boat_db
-    MYSQL_USER: 'test_boat_user'
-    MYSQL_PASSWORD: 'test_pw'
-  # command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --explicit_defaults_for_timestamp=true --skip-character-set-client-handshake --character-set-filesystem=utf8
+  command: [ "--character-set-server=utf8mb4", "--user=$MYSQL_PASSWORD" ]
+    # command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --explicit_defaults_for_timestamp=true --skip-character-set-client-handshake --character-set-filesystem=utf8
