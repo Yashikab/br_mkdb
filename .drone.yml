@@ -48,7 +48,7 @@ services:
 - name: testmysql
   image: mysql:5.7
   entrypoint: [ "mysqld" ]
-  command: [ "--character-set-server=utf8"]
+  command: [ "--character-set-server=utf8", "--user=test_boat_user"]
   environment:
     MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     MYSQL_DATABASE: test_boat_db
