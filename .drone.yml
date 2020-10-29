@@ -53,4 +53,4 @@ services:
     MYSQL_USER: 'test_boat_user'
     MYSQL_PASSWORD: 'test_pw'
   entrypoint: [ "mysqld" ]
-  command: [ "--character-set-server=utf8", "--user=root"]
+  command: [ "--character-set-database=utf8", "--datadir=/var/lib/mysql", "--user=mysql"]
