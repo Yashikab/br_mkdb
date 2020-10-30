@@ -29,6 +29,7 @@ steps:
   commands:
     - sleep 30
     - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show variables like 'character%'"
+    - cat /etc/my.cnf
     # - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "set character_set_database=utf8"
     # - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show variables like 'character%'"
     # - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
@@ -50,8 +51,6 @@ steps:
 services:
 - name: testmysql
   image: mysql:5.7
-  entrypoint: [ "mysqld" ]
-  command: [ "--user=root", "--skip-grant-tables", "--character-set-server=utf8mb4" ]
   environment:
     MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     MYSQL_DATABASE: test_boat_db
