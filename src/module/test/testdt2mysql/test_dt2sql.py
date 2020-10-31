@@ -29,8 +29,8 @@ class TestJyoData2sql(CommonMethod):
     __jd2sql = JyoData2sql()
     __jd2sql.create_table_if_not_exists()
     time.sleep(WAIT)
-    __jd2sql.insert2table(date=__target_date)
-    time.sleep(WAIT)
+    # __jd2sql.insert2table(date=__target_date)
+    # time.sleep(WAIT)
 
     def test_exist_table(self):
         # カラム名の一致でテスト
