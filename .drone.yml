@@ -28,17 +28,15 @@ steps:
     MYSQL_HOST: 127.0.0.1
   commands:
     - sleep 30
-    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show variables like 'character%'"
-    # - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "set character_set_database=utf8"
-    # - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show variables like 'character%'"
     # - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
     # - gcloud auth activate-service-account --key-file /tmp/credential.json
     # - gcloud config set project $PROJECT_ID
     # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
     # - make start_gdb
     - pipenv install --system
-    - rp_pytest src/module/
+    - rp_pytest src/module/test/testdt2mysql
     # あとで外す
+    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
     - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "select * from jyo_master;"
     # - rp_reviewdog src/
     # - make down_gdb
