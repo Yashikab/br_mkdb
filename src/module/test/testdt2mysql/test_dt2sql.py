@@ -24,11 +24,11 @@ class TestJyoData2sql(CommonMethod):
 
     # @pytest.fixture(scope='class')
     # def insertdata(self):
-    __target_date = 20200512
-    __jyo_cd = 20
-    __jd2sql = JyoData2sql()
-    __jd2sql.create_table_if_not_exists()
-    time.sleep(WAIT)
+    # __target_date = 20200512
+    # __jyo_cd = 20
+    # __jd2sql = JyoData2sql()
+    # __jd2sql.create_table_if_not_exists()
+    # time.sleep(WAIT)
     # __jd2sql.insert2table(date=__target_date)
     # time.sleep(WAIT)
 
