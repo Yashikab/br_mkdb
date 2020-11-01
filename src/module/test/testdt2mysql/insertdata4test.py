@@ -15,14 +15,14 @@ from module.dt2sql import (
 from module.master2sql import JyoMaster2sql
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(autouse=True)
 def jyomaster():
     # jyomaster
     jm2sql = JyoMaster2sql()
     jm2sql.create_table_if_not_exists()
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(autouse=True)
 def jyodata():
     # jyodata
     jd2sql = JyoData2sql()
