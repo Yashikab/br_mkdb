@@ -8,6 +8,7 @@ flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
 pycodestyle = "*"
+pytest-ordering = "*"
 
 [packages]
 beautifulsoup4 = "*"
