@@ -34,10 +34,11 @@ steps:
     # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
     # - make start_gdb
     - pipenv install --system
-    - rp_pytest src/module/test/testdt2mysql
+    - pip freeze
+    # - rp_pytest src/module/test/testdt2mysql
     # あとで外す
-    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
-    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "select * from jyo_master;"
+    # - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
+    # - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "select * from jyo_master;"
     # - rp_reviewdog src/
     # - make down_gdb
 

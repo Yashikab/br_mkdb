@@ -12,3 +12,4 @@ CREATE TABLE p_result_tb(
     FOREIGN KEY (waku_id)
     REFERENCES program_tb (waku_id)
 )
+CHARACTER SET utf8;

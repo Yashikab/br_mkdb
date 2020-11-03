@@ -10,3 +10,4 @@ CREATE TABLE raceinfo_tb(
     FOREIGN KEY (datejyo_id)
     REFERENCES holdjyo_tb (datejyo_id)
 )
+CHARACTER SET utf8;

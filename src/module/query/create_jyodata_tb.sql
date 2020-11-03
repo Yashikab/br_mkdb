@@ -9,3 +9,4 @@ CREATE TABLE holdjyo_tb
     FOREIGN KEY (jyo_cd)
     REFERENCES jyo_master (jyo_cd)
 )
+CHARACTER SET utf8;
