@@ -8,7 +8,7 @@ from .common import CommonMethod
 from module.master2sql import JyoMaster2sql
 
 
-@pytest.mark.order1
+@pytest.mark.run(order=1)
 class TestJyoMaster2sql(CommonMethod):
     __table_name: str = 'jyo_master'
     __jm2sql = JyoMaster2sql()

@@ -42,7 +42,7 @@ WAIT = 0.5
 #         expected_tpl = ('桐生', 1)
 #         assert res_tpl == expected_tpl
 
-@pytest.mark.order2
+@pytest.mark.run(order=2)
 class TestJyoData2sql(CommonMethod):
 
     # @pytest.fixture(scope='class')
