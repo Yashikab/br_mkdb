@@ -8,7 +8,6 @@ flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
 pycodestyle = "*"
-pytest-ordering = "*"
 
 [packages]
 beautifulsoup4 = "*"
@@ -18,6 +17,7 @@ mysql-connector = "*"
 coloredlogs = "*"
 pytest-mock = "*"
 lxml = "*"
+pytest-ordering = "*"
 
 [requires]
 python_version = "3.7"
