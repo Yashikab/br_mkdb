@@ -20,6 +20,7 @@ from .common import CommonMethod
 WAIT = 0.5
 
 
+@pytest.mark.run(order=2)
 class TestJyoData2sql(CommonMethod):
 
     # @pytest.fixture(scope='class')
