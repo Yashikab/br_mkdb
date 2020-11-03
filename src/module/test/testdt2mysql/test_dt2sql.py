@@ -14,24 +14,46 @@ from module.dt2sql import (
     ResultData2sql,
     Odds2sql
 )
+from module.master2sql import JyoMaster2sql
 from module.getdata import OfficialOdds
 from .common import CommonMethod
 
 WAIT = 0.5
 
 
-@pytest.mark.order2
+class TestJyoMaster2sql(CommonMethod):
+    __table_name: str = 'jyo_master'
+    __jm2sql = JyoMaster2sql()
+    __jm2sql.create_table_if_not_exists()
+
+    def test_exist_table(self):
+        get_set = super().get_columns2set(self.__table_name)
+        expected_set = {'jyo_name', 'jyo_cd'}
+        # カラム名確認
+        assert get_set == expected_set
+
+    def test_inserteddata(self):
+        res_tpl = super().getdata2tuple(
+            tb_name=self.__table_name,
+            id_name='jyo_cd',
+            target_id=1,
+            col_list=['jyo_name', 'jyo_cd']
+        )
+        expected_tpl = ('桐生', 1)
+        assert res_tpl == expected_tpl
+
+
 class TestJyoData2sql(CommonMethod):
 
     # @pytest.fixture(scope='class')
     # def insertdata(self):
-    # __target_date = 20200512
-    # __jyo_cd = 20
-    # __jd2sql = JyoData2sql()
-    # __jd2sql.create_table_if_not_exists()
-    # time.sleep(WAIT)
-    # __jd2sql.insert2table(date=__target_date)
-    # time.sleep(WAIT)
+    __target_date = 20200512
+    __jyo_cd = 20
+    __jd2sql = JyoData2sql()
+    __jd2sql.create_table_if_not_exists()
+    time.sleep(WAIT)
+    __jd2sql.insert2table(date=__target_date)
+    time.sleep(WAIT)
 
     def test_exist_table(self):
         # カラム名の一致でテスト
