@@ -16,6 +16,7 @@ from module.master2sql import JyoMaster2sql
 
 
 @pytest.fixture(scope="session", autouse=True)
+@pytest.mark.order(1)
 def jyomaster():
     # jyomaster
     jm2sql = JyoMaster2sql()
@@ -23,6 +24,7 @@ def jyomaster():
 
 
 @pytest.fixture(scope="session", autouse=True)
+@pytest.mark.order(2)
 def jyodata():
     # jyodata
     jd2sql = JyoData2sql()
