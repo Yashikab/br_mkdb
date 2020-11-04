@@ -35,12 +35,9 @@ steps:
     # - make start_gdb
     - pipenv install --system
     - rp_pytest src/module/test/testdt2mysql
+    - rp_reviewdog src/
     # あとで外す
     - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
-    # - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "select * from jyo_master;"
-    # - rp_reviewdog src/
-    # - make down_gdb
-
   when:
     event:
     - pull_request
