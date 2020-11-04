@@ -5,13 +5,6 @@
 """
 import pytest
 
-from module.dt2sql import (
-    JyoData2sql,
-    RaceData2sql,
-    ChokuzenData2sql,
-    ResultData2sql,
-    Odds2sql
-)
 from module.master2sql import JyoMaster2sql
 
 
