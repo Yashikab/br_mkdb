@@ -3,21 +3,21 @@
 import os
 
 
-# MYSQL_CONFIG = {
-#     'host': "127.0.0.1",
-#     'user': os.getenv('MYSQL_USER'),
-#     'password': os.getenv('MYSQL_PASSWORD'),
-#     'database': os.getenv('MYSQL_DATABASE'),
-#     'charset': 'utf8'
-# }
-
 MYSQL_CONFIG = {
-    'host': "testmysql",
-    'user': "test_boat_user",
-    'password': "test_pw",
-    'database': "test_boat_db",
-    'charset': "utf8"
+    'host': os.getenv('MYSQL_HOST'),
+    'user': os.getenv('MYSQL_USER'),
+    'password': os.getenv('MYSQL_PASSWORD'),
+    'database': os.getenv('MYSQL_DATABASE'),
+    'charset': 'utf8'
 }
+
+# MYSQL_CONFIG = {
+#     'host': "testmysql",
+#     'user': "test_boat_user",
+#     'password': "test_pw",
+#     'database': "test_boat_db",
+#     'charset': "utf8"
+# }
 
 # logに関するconst
 MODULE_LOG_NAME = 'module'

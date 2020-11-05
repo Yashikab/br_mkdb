@@ -3,6 +3,7 @@
 """
 ここでmysqlにテスト用データを格納する
 """
+import os
 import pytest
 
 from module.master2sql import JyoMaster2sql
@@ -10,7 +11,12 @@ from module.master2sql import JyoMaster2sql
 
 # 場コードマスタだけ最初に入れておく
 @pytest.fixture(scope="session", autouse=True)
-def jyomaster():
+def prepare():
+    # 環境変数でmysqlの接続先を入れ替える
+    os.environ['MYSQL_HOST'] = "testmysql"
+    os.environ['MYSQL_USER'] = "test_boat_user"
+    os.environ['MYSQL_PASSWORD'] = "test_pw"
+    os.environ['MYSQL_DATABASE'] = "test_boat_db"
     # jyomaster
     jm2sql = JyoMaster2sql()
     jm2sql.create_table_if_not_exists()
