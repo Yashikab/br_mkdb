@@ -3,7 +3,7 @@
 import os
 
 
-if os.getenv('DRONE_ENV') == "TEST":
+if os.getenv('MYSQL_ENV') == "TEST":
     MYSQL_CONFIG = {
         'host': "testmysql",
         'user': "test_boat_user",
