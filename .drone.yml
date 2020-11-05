@@ -51,3 +51,6 @@ services:
     MYSQL_USER: 'test_boat_user'
     MYSQL_PASSWORD: 'test_pw'
     # command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --explicit_defaults_for_timestamp=true --skip-character-set-client-handshake --character-set-filesystem=utf8
+
+image_pull_secrets:
+  - dockerconfig
