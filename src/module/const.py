@@ -3,21 +3,22 @@
 import os
 
 
-MYSQL_CONFIG = {
-    'host': os.getenv('MYSQL_HOST'),
-    'user': os.getenv('MYSQL_USER'),
-    'password': os.getenv('MYSQL_PASSWORD'),
-    'database': os.getenv('MYSQL_DATABASE'),
-    'charset': 'utf8'
-}
-
-# MYSQL_CONFIG = {
-#     'host': "testmysql",
-#     'user': "test_boat_user",
-#     'password': "test_pw",
-#     'database': "test_boat_db",
-#     'charset': "utf8"
-# }
+if os.getenv('DRONE_ENV') == "TEST":
+    MYSQL_CONFIG = {
+        'host': "testmysql",
+        'user': "test_boat_user",
+        'password': "test_pw",
+        'database': "test_boat_db",
+        'charset': "utf8"
+    }
+else:
+    MYSQL_CONFIG = {
+        'host': os.getenv('MYSQL_HOST'),
+        'user': os.getenv('MYSQL_USER'),
+        'password': os.getenv('MYSQL_PASSWORD'),
+        'database': os.getenv('MYSQL_DATABASE'),
+        'charset': 'utf8'
+    }
 
 # logに関するconst
 MODULE_LOG_NAME = 'module'

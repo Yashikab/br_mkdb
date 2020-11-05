@@ -26,6 +26,7 @@ steps:
       from_secret: db_name
     MYSQL_USER: boat_usr
     MYSQL_HOST: 127.0.0.1
+    DRONE_ENV: TEST
   commands:
     - sleep 30
     # - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
