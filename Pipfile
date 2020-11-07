@@ -17,6 +17,7 @@ mysql-connector = "*"
 coloredlogs = "*"
 pytest-mock = "*"
 lxml = "*"
+pytest-ordering = "*"
 
 [requires]
 python_version = "3.7"

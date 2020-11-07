@@ -26,17 +26,32 @@ steps:
       from_secret: db_name
     MYSQL_USER: boat_usr
     MYSQL_HOST: 127.0.0.1
+    MYSQL_ENV: TEST
   commands:
-    - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
-    - gcloud auth activate-service-account --key-file /tmp/credential.json
-    - gcloud config set project $PROJECT_ID
-    - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
-    - make start_gdb
+    - sleep 30
+    # - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
+    # - gcloud auth activate-service-account --key-file /tmp/credential.json
+    # - gcloud config set project $PROJECT_ID
+    # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
+    # - make start_gdb
     - pipenv install --system
-    - rp_pytest src/module/
+    - rp_pytest src/module/test/testdt2mysql
     - rp_reviewdog src/
-    - make down_gdb
-
+    # あとで外す
+    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
   when:
     event:
     - pull_request
+
+services:
+- name: testmysql
+  image: mysql:5.7
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    MYSQL_DATABASE: test_boat_db
+    MYSQL_USER: 'test_boat_user'
+    MYSQL_PASSWORD: 'test_pw'
+    # command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --explicit_defaults_for_timestamp=true --skip-character-set-client-handshake --character-set-filesystem=utf8
+
+image_pull_secrets:
+  - dockerconfig

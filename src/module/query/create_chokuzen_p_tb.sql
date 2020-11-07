@@ -13,3 +13,4 @@ CREATE TABLE chokuzen_player_tb(
     FOREIGN KEY (race_id)
     REFERENCES chokuzen_cond_tb (race_id)
 )
+CHARACTER SET utf8;
