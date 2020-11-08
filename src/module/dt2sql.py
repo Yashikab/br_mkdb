@@ -222,6 +222,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
 
 class JyoData2sql(Data2MysqlTemplate):
 
+    __tb_name = 'holdjyo_tb'
+
     def __init__(self):
         self.logger = \
             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
