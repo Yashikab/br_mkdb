@@ -222,6 +222,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
 
 class JyoData2sql(Data2MysqlTemplate):
 
+    __tb_name = 'holdjyo_tb'
+
     def __init__(self):
         self.logger = \
             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
@@ -230,7 +232,7 @@ class JyoData2sql(Data2MysqlTemplate):
         )
 
     # オーバーライド
-    def insert2table(self, date: int) -> None:
+    def create_query(self, date: int) -> str:
         """
         日付をyyyymmdd型で受けとり，その日のレース情報をMySQLに挿入する
 
@@ -240,22 +242,6 @@ class JyoData2sql(Data2MysqlTemplate):
             日付，yyyymmdd型
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        query = self._create_query(date)
-        super().run_query(query)
-        self.logger.info(f'{sys._getframe().f_code.co_name} completed.')
-
-        return None
-
-    def _create_query(self, date: int) -> str:
-        """
-        その日のレース情報をクエリにする
-
-        Parameters
-        ----------
-            date: int
-            日付，yyyymmdd型
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 他のテーブルデータのinsertに使う辞書
         self.dict_for_other_tb = {}
         ghp = GetHoldPlacePast(target_date=date)
@@ -287,7 +273,7 @@ class JyoData2sql(Data2MysqlTemplate):
         insert_rows = ', '.join(rows)
         sql = f"INSERT IGNORE INTO {self.__tb_name} VALUES"
         query = ' '.join([sql, insert_rows])
-        self.logger.debug(f'{sys._getframe().f_code.co_name} completed.')
+        self.logger.info(f'{sys._getframe().f_code.co_name} completed.')
 
         return query
 
