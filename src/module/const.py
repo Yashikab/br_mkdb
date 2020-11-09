@@ -11,6 +11,14 @@ if os.getenv('MYSQL_ENV') == "TEST":
         'database': "test_boat_db",
         'charset': "utf8"
     }
+elif os.getenv('MYSQL_ENV') == "LOCALTEST":
+    MYSQL_CONFIG = {
+        'host': "127.0.0.1",
+        'user': "test_boat_user",
+        'password': "test_pw",
+        'database': "test_boat_db",
+        'charset': "utf8"
+    }
 else:
     MYSQL_CONFIG = {
         'host': os.getenv('MYSQL_HOST'),
