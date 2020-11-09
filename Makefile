@@ -1,7 +1,7 @@
 # Makefile
 
 targetdocker = docker-compose.yml
-dbdocker = ../mysql_local/boat/
+dbdocker = ./local_mysql/
 servicename = boatracedocker
 
 start: $(targetdocker)
