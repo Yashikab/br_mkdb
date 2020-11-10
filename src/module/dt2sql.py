@@ -45,6 +45,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                  filename_list: list = [],
                  table_name_list: list = [],
                  target_cls: ABCMeta = None):
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         self.__filename_list = filename_list
         self.__tb_name_list = table_name_list
         self.target_cls = target_cls
@@ -128,6 +130,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             status : int
                 成功したら0，失敗したら1
         """
+        query_list = []
         for filename in filename_list:
             # パスの指定
             query_filepath = \
@@ -136,8 +139,10 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                               .resolve()
             self.logger.debug(f'run query from {query_filepath}')
             with open(query_filepath, 'r') as f:
-                query = f.read()
-                self.run_query(query)
+                query_list.append(f.read())
+        query = '\n'.join(query_list)
+        self.logger.debug(f'{query}')
+        self.run_query(query)
 
         return None
 
