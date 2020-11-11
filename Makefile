@@ -1,7 +1,7 @@
 # Makefile
 
 targetdocker = docker-compose.yml
-dbdocker = ./local_mysql/
+dbdocker = ./local_mysql/docker-compose.yml
 servicename = boatracedocker
 
 start: $(targetdocker)
@@ -17,10 +17,10 @@ restart: $(targetdocker)
 	docker-compose down && docker-compose -f $(targetdocker) up -d
 
 start_db: $(dbdocker)
-	cd $(dbdocker) && docker-compose up -d
+	docker-compose -f $(dbdocker) up -d
 
 down_db: $(dbdocker)
-	cd $(dbdocker) && docker-compose down
+	docker-compose -f $(dbdocker) down
 
 start_gdb:
 	cd ./proxy && pipenv run bash start_gsql.sh

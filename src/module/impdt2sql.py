@@ -45,6 +45,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                  filename_list: list = [],
                  table_name_list: list = [],
                  target_cls: ABCMeta = None):
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         self.__filename_list = filename_list
         self.__tb_name_list = table_name_list
         self.target_cls = target_cls
@@ -145,7 +147,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                      tb_name: str,
                      id_list: list,
                      info_dict: dict,
-                     ommit_list: list = []) -> None:
+                     ommit_list: list = []) -> str:
         """
         選手の情報の辞書からsqlへインサートするsqlを作成し，挿入する
         注意：テーブルのカラムの順番とinfo_dict.keys()の順番が一致していること
@@ -186,10 +188,10 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         sql = f"INSERT IGNORE INTO {tb_name} VALUES"
         query = ' '.join([sql, insert_value])
         # 作成したクエリの実行
-        self.run_query(query)
+        # self.run_query(query)
         self.logger.debug(f'insert to {tb_name} done.')
 
-        return None
+        return query
 
     def _waku_all_insert(self,
                          tb_name: str,

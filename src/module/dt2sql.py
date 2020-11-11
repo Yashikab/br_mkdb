@@ -10,7 +10,7 @@ from abc import ABCMeta, abstractmethod
 from logging import getLogger
 # from datetime import datetime
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Any
 
 from module import const
 from module.connect import MysqlConnector
@@ -44,7 +44,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
     def __init__(self,
                  filename_list: list = [],
                  table_name_list: list = [],
-                 target_cls: ABCMeta = None):
+                 target_cls: Any = None):
         self.logger = \
             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         self.__filename_list = filename_list
@@ -55,6 +55,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         self._run_query_from_paths(self.__filename_list)
         return None
 
+    # TODO: jyo_cd, race_no -> jyo_cd_list, ed_race_noにしてdateで1回の処理にする
     def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
         """直前情報をSQLへ
 
@@ -80,18 +81,37 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         race_id = int(f"{date}{jyo_cd:02}{race_no:02}")
         datejyo_id = int(f"{date}{jyo_cd:02}")
 
-        self._info_insert(
-            tb_name=self.__tb_name_list[0],
+        insert_col = self._info2query_col(
+            # tb_name=self.__tb_name_list[0],
             id_list=[race_id, datejyo_id],
             info_dict=tcls.getcommoninfo2dict()
         )
-        self._waku_all_insert(
-            tb_name=self.__tb_name_list[1],
+
+        sql = self.create_insert_prefix(self.__tb_name_list[0])
+        query = ' '.join([sql, insert_col])
+
+        waku_insert_col = self._waku_all2query_col(
             base_id=race_id,
             callback_func=tcls.getplayerinfo2dict
         )
-
+        waku_sql = self.create_insert_prefix(self.__tb_name_list[1])
+        waku_query = ' '.join([waku_sql, waku_insert_col])
+        # 作成したクエリの実行
+        all_query = ';\n'.join([query, waku_query])
+        self.run_query(all_query)
         return None
+
+    def value2query_str(self, value: Any) -> str:
+        """ valueをsqlに挿入できる形にする"""
+        if type(value) is str:
+            # ''で囲む
+            value = f"'{value}'"
+        elif value is None:
+            value = "null"
+        else:
+            # "hoge" ならそれで統一する
+            value = f"{value}"
+        return value
 
     def run_query(self, query: str) -> None:
         """
@@ -114,6 +134,10 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             self.logger.error(f'{e}')
 
         return None
+
+    def create_insert_prefix(self, tb_name: str) -> str:
+        """挿入句用のテーブル指定部までを作成する"""
+        return f"INSERT IGNORE INTO {tb_name} VALUES"
 
     def _run_query_from_paths(self, filename_list: list) -> None:
         """
@@ -146,11 +170,10 @@ class Data2MysqlTemplate(Data2sqlAbstract):
 
         return None
 
-    def _info_insert(self,
-                     tb_name: str,
-                     id_list: list,
-                     info_dict: dict,
-                     ommit_list: list = []) -> None:
+    def _info2query_col(self,
+                        id_list: list,
+                        info_dict: dict,
+                        ommit_list: list = []) -> str:
         """
         選手の情報の辞書からsqlへインサートするsqlを作成し，挿入する
         注意：テーブルのカラムの順番とinfo_dict.keys()の順番が一致していること
@@ -166,42 +189,25 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             ommit_list: list = []
                 insertしない要素
         """
-        self.logger.debug(f'insert to {tb_name} start.')
         # idを格納する
         insert_value_list = list(map(lambda x: f"{x}", id_list))
         # python3.7から辞書型で順序を保持する
         for i_key in info_dict.keys():
             i_value = info_dict[i_key]
-            if type(i_value) is str:
-                # ''で囲む
-                i_value = f"'{i_value}'"
-            elif i_value is None:
-                i_value = "null"
-            else:
-                # "hoge" ならそれで統一する
-                i_value = f"{i_value}"
+            i_value = self.value2query_str(i_value)
             if i_value not in ommit_list:
                 insert_value_list.append(i_value)
 
         insert_value_content = ', '.join(insert_value_list)
         insert_value = "(" + insert_value_content + ")"
 
-        # sql作成
-        # 重複時は無視する
-        sql = f"INSERT IGNORE INTO {tb_name} VALUES"
-        query = ' '.join([sql, insert_value])
-        # 作成したクエリの実行
-        self.run_query(query)
-        self.logger.debug(f'insert to {tb_name} done.')
+        return insert_value
 
-        return None
-
-    def _waku_all_insert(self,
-                         tb_name: str,
-                         base_id: int,
-                         callback_func: Callable[[], dict],
-                         ommit_list: list = []) -> None:
-        """1~6枠の情報をインサートするメソッド
+    def _waku_all2query_col(self,
+                            base_id: int,
+                            callback_func: Callable[[int], dict],
+                            ommit_list: list = []) -> str:
+        """1~6枠の情報をクエリカラムにするメソッド
 
         Parameters
         ----------
@@ -213,16 +219,17 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             ommit_list: list
                 _info_insertを参照
         """
-        self.logger.debug(f'start insert to {tb_name}.')
         # 1~6枠でループ，データ取得でエラーの場合はインサートされない
+        query_col_list = []
         for waku in range(1, 7):
             waku_id = int(f"{base_id}{waku}")
-            self._info_insert(
-                tb_name=tb_name,
+            single_query_col = self._info2query_col(
                 id_list=[waku_id, base_id],
                 info_dict=callback_func(waku)
             )
-        self.logger.debug(f'completed insert to {tb_name}')
+            query_col_list.append(single_query_col)
+        query_col = ', '.join(query_col_list)
+        return query_col
 
 
 class JyoData2sql(Data2MysqlTemplate):
@@ -277,16 +284,8 @@ class JyoData2sql(Data2MysqlTemplate):
             # TODO: 親クラスに型変換のクラスを作る
             insert_value_list = [datejyo_id, str(date), str(hp_c), f"'{hp_s}'"]
             ommit_list = []
-            for i_key in hi_dict.keys():
-                i_value = hi_dict[i_key]
-                if type(i_value) is str:
-                    # ''で囲む
-                    i_value = f"'{i_value}'"
-                elif i_value is None:
-                    i_value = "null"
-                else:
-                    # "hoge" ならそれで統一する
-                    i_value = f"{i_value}"
+            for i_key, i_value in hi_dict.items():
+                i_value = super().value2query_str(i_value)
                 if i_value not in ommit_list:
                     insert_value_list.append(i_value)
             insert_value_content = ', '.join(insert_value_list)
@@ -367,6 +366,7 @@ class Odds2sql(Data2MysqlTemplate):
             query = f"CREATE TABLE {tb_name} ({insert_cols})"
             super().run_query(query)
 
+    # TODO: あとで書き換える(独自)
     def insert2table(self, date, jyo_cd, race_no):
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         ood = OfficialOdds(race_no, jyo_cd, date)
@@ -374,9 +374,14 @@ class Odds2sql(Data2MysqlTemplate):
         content_dict_list = \
             [ood.three_rentan(), ood.three_renfuku(),
              ood.two_rentan(), ood.two_renfuku(), ood.tansho()]
+        query_list = []
         for tb_name, content in zip(self.__tb_name_list, content_dict_list):
-            super()._info_insert(
-                tb_name,
+            insert_col = super()._info2query_col(
                 [race_id],
                 content
             )
+            sql = super().create_insert_prefix(tb_name)
+            query = ' '.join([sql, insert_col])
+            query_list.append(query)
+        all_query = ';\n'.join(query_list)
+        super().run_query(all_query)

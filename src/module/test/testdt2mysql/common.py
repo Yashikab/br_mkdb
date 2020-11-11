@@ -4,6 +4,7 @@
 dt2sqlモジュール用単体テストの共通関数
 """
 from logging import getLogger
+from typing import Any
 from module import const
 from module.connect import MysqlConnector
 
@@ -11,7 +12,7 @@ from module.connect import MysqlConnector
 class CommonMethod:
     logger = getLogger(__name__)
 
-    def get_columns2set(self, tb_name: str) -> set:
+    def get_columns2set(self, tb_name: str) -> Any:
         """テーブル名のカラムを取得
 
         Parameters
