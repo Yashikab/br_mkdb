@@ -378,7 +378,7 @@ class Odds2sql(Data2MysqlTemplate):
         content_dict_list = \
             [ood.three_rentan(), ood.three_renfuku(),
              ood.two_rentan(), ood.two_renfuku(), ood.tansho()]
-        query_list = []
+        # query_list = []
         for tb_name, content in zip(self.__tb_name_list, content_dict_list):
             insert_col = super()._info2query_col(
                 [race_id],
@@ -386,6 +386,7 @@ class Odds2sql(Data2MysqlTemplate):
             )
             sql = super().create_insert_prefix(tb_name)
             query = ' '.join([sql, insert_col])
-            query_list.append(query)
-        all_query = ';\n'.join(query_list)
-        super().run_query(all_query)
+            super().run_query(query)
+            # query_list.append(query)
+        # all_query = ';\n'.join(query_list)
+        # super().run_query(all_query)
