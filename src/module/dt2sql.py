@@ -355,6 +355,7 @@ class Odds2sql(Data2MysqlTemplate):
     # オーバーライド
     def create_table_if_not_exists(self):
         zip_list = zip(self.__tb_name_list, self.__key_value_list)
+        query_list = []
         for tb_name, keylist in zip_list:
             insert_cols_list = ["race_id BIGINT PRIMARY KEY"]
             for key_name in keylist:
@@ -363,8 +364,11 @@ class Odds2sql(Data2MysqlTemplate):
             insert_cols_list.append(
                 "FOREIGN KEY (race_id) REFERENCES raceinfo_tb (race_id)")
             insert_cols = ", ".join(insert_cols_list)
-            query = f"CREATE TABLE {tb_name} ({insert_cols})"
-            super().run_query(query)
+            query = f"CREATE TABLE {tb_name} ({insert_cols})"\
+                    f"CHARACTER SET utf8;"
+            query_list.append(query)
+        all_query = "\n".join(query_list)
+        super().run_query(all_query)
 
     # TODO: あとで書き換える(独自)
     def insert2table(self, date, jyo_cd, race_no):
