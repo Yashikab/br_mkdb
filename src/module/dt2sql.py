@@ -11,6 +11,7 @@ from logging import getLogger
 # from datetime import datetime
 from pathlib import Path
 from typing import Callable, Any
+from typing import List
 
 from module import const
 from module.connect import MysqlConnector
@@ -56,7 +57,10 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         return None
 
     # TODO: jyo_cd, race_no -> jyo_cd_list, ed_race_noにしてdateで1回の処理にする
-    def insert2table(self, date: int, jyo_cd: int, race_no: int) -> None:
+    def insert2table(self,
+                     date: int,
+                     jyo_cd_list: List[int],
+                     race_no_list: List[int]) -> None:
         """直前情報をSQLへ
 
         日付，会場コード，レース番号を受取る \n
@@ -73,6 +77,9 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             race_no : int
                 レース番号
         """
+
+        jyo_cd = jyo_cd_list[0]
+        race_no = race_no_list[0]
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
         tcls = self.target_cls(race_no=race_no, jyo_code=jyo_cd, date=date)

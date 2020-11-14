@@ -23,7 +23,9 @@ class TestResult2sql(CommonMethod):
     def insertdata(self):
         self.__res2sql.create_table_if_not_exists()
         self.__res2sql.insert2table(
-            self.__target_date, self.__jyo_cd, self.__race_no)
+            date=self.__target_date,
+            jyo_cd_list=[self.__jyo_cd],
+            race_no_list=range(self.__race_no, self.__race_no+1))
         time.sleep(WAIT)
 
     rr_col_set = {'race_id', 'datejyo_id', 'temp', 'weather', 'wind_v',

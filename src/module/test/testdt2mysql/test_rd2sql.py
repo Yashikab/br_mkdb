@@ -25,8 +25,8 @@ class TestRaceInfo2sql(CommonMethod):
         self.__rd2sql.create_table_if_not_exists()
         self.__rd2sql.insert2table(
             date=self.__target_date,
-            jyo_cd=self.__jyo_cd,
-            race_no=self.__race_no)
+            jyo_cd_list=[self.__jyo_cd],
+            race_no_list=range(self.__race_no, self.__race_no+1))
         time.sleep(WAIT)
 
     ri_col_set = {'race_id', 'datejyo_id', 'taikai_name',

@@ -23,7 +23,9 @@ class TestChokuzenInfo2sql(CommonMethod):
     def insertdata(self):
         self.__ci2sql.create_table_if_not_exists()
         self.__ci2sql.insert2table(
-            self.__target_date, self.__jyo_cd, self.__race_no)
+            date=self.__target_date,
+            jyo_cd_list=[self.__jyo_cd],
+            race_no_list=range(self.__race_no, self.__race_no+1))
         time.sleep(WAIT)
 
     cc_col_set = {'race_id', 'datejyo_id',
