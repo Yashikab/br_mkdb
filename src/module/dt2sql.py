@@ -77,16 +77,35 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             race_no : int
                 レース番号
         """
+        self.date = date
+        common_row_list = []
+        waku_row_list = []
+        for jyo_cd in jyo_cd_list:
+            for race_no in race_no_list:
+                common, waku = self._create_queries(jyo_cd, race_no)
+                common_row_list.append(common)
+                waku_row_list.append(waku)
+        common_sql = self.create_insert_prefix(self.__tb_name_list[0])
+        common_row = ", ".join(common_row_list)
+        query = ' '.join([common_sql, common_row])
+        waku_sql = self.create_insert_prefix(self.__tb_name_list[1])
+        waku_row = ", ".join(waku_row_list)
+        waku_query = ' '.join([waku_sql, waku_row])
+        all_query = ";\n".join([query, waku_query])
+        self.run_query(all_query)
+        return None
 
-        jyo_cd = jyo_cd_list[0]
-        race_no = race_no_list[0]
+    def _create_queries(self, jyo_cd, race_no) -> str:
+        """クエリを作る"""
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
-        tcls = self.target_cls(race_no=race_no, jyo_code=jyo_cd, date=date)
+        self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
+        tcls = self.target_cls(race_no=race_no,
+                               jyo_code=jyo_cd,
+                               date=self.date)
 
         # 各種id
-        race_id = int(f"{date}{jyo_cd:02}{race_no:02}")
-        datejyo_id = int(f"{date}{jyo_cd:02}")
+        race_id = int(f"{self.date}{jyo_cd:02}{race_no:02}")
+        datejyo_id = int(f"{self.date}{jyo_cd:02}")
 
         insert_col = self._info2query_col(
             # tb_name=self.__tb_name_list[0],
@@ -94,19 +113,19 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             info_dict=tcls.getcommoninfo2dict()
         )
 
-        sql = self.create_insert_prefix(self.__tb_name_list[0])
-        query = ' '.join([sql, insert_col])
+        # sql = self.create_insert_prefix(self.__tb_name_list[0])
+        # query = ' '.join([sql, insert_col])
 
         waku_insert_col = self._waku_all2query_col(
             base_id=race_id,
             callback_func=tcls.getplayerinfo2dict
         )
-        waku_sql = self.create_insert_prefix(self.__tb_name_list[1])
-        waku_query = ' '.join([waku_sql, waku_insert_col])
+        # waku_sql = self.create_insert_prefix(self.__tb_name_list[1])
+        # waku_query = ' '.join([waku_sql, waku_insert_col])
         # 作成したクエリの実行
-        all_query = ';\n'.join([query, waku_query])
-        self.run_query(all_query)
-        return None
+        # all_query = ';\n'.join([query, waku_query])
+        # self.run_query(all_query)
+        return insert_col, waku_insert_col
 
     def value2query_str(self, value: Any) -> str:
         """ valueをsqlに挿入できる形にする"""
