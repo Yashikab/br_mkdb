@@ -11,7 +11,7 @@ from logging import getLogger
 # from datetime import datetime
 from pathlib import Path
 from typing import Callable, Any
-from typing import List
+from typing import Dict, List
 
 from module import const
 from module.connect import MysqlConnector
@@ -56,11 +56,10 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         self._run_query_from_paths(self.__filename_list)
         return None
 
-    # TODO: jyo_cd, race_no -> jyo_cd_list, ed_race_noにしてdateで1回の処理にする
     def insert2table(self,
                      date: int,
                      jyo_cd_list: List[int],
-                     race_no_list: List[int]) -> None:
+                     raceno_dict: Dict[int, List[int]]) -> None:
         """直前情報をSQLへ
 
         日付，会場コード，レース番号を受取る \n
@@ -72,16 +71,16 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         ----------
             date: int
                 日付，yyyymmdd型
-            jyo_cd : int
-                会場コード
-            race_no : int
-                レース番号
+            jyo_cd_list : List[int]
+                当日開催の会場コードリスト
+            raceno_dict : Dict[int, List[int]]
+                開催場コードに対応するレース番号リスト(range)
         """
         self.date = date
         common_row_list = []
         waku_row_list = []
         for jyo_cd in jyo_cd_list:
-            for race_no in race_no_list:
+            for race_no in raceno_dict[jyo_cd]:
                 common, waku = self._create_queries(jyo_cd, race_no)
                 common_row_list.append(common)
                 waku_row_list.append(waku)
@@ -307,7 +306,6 @@ class JyoData2sql(Data2MysqlTemplate):
             datejyo_id: str = f'{date}{hp_c:02}'
             hi_dict = ghp.holdinfo2dict(hp_s)
             self.map_raceno_dict[hp_c] = hi_dict['ed_race_no']
-            # TODO: 親クラスに型変換のクラスを作る
             insert_value_list = [datejyo_id, str(date), str(hp_c), f"'{hp_s}'"]
             ommit_list = []
             for i_key, i_value in hi_dict.items():
