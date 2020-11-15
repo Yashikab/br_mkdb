@@ -297,7 +297,7 @@ class JyoData2sql(Data2MysqlTemplate):
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 他のテーブルデータのinsertに使う辞書
-        self.dict_for_other_tb = {}
+        self.map_raceno_dict = {}
         ghp = GetHoldPlacePast(target_date=date)
         hp_str_list = ghp.holdplace2strlist()
         hp_cd_list = ghp.holdplace2cdlist()
@@ -306,7 +306,7 @@ class JyoData2sql(Data2MysqlTemplate):
         for hp_s, hp_c in zip(hp_str_list, hp_cd_list):
             datejyo_id: str = f'{date}{hp_c:02}'
             hi_dict = ghp.holdinfo2dict(hp_s)
-            self.dict_for_other_tb[hp_c] = hi_dict['ed_race_no']
+            self.map_raceno_dict[hp_c] = hi_dict['ed_race_no']
             # TODO: 親クラスに型変換のクラスを作る
             insert_value_list = [datejyo_id, str(date), str(hp_c), f"'{hp_s}'"]
             ommit_list = []

@@ -103,8 +103,8 @@ def main():
 
             # jd2sqlで開催場と最終レース番を取得する
             logger.debug('insert race data: race chokuzen result odds')
-            for jyo_cd in jd2sql.dict_for_other_tb.keys():
-                ed_race_no = jd2sql.dict_for_other_tb[jyo_cd]
+            for jyo_cd in jd2sql.map_raceno_dict.keys():
+                ed_race_no = jd2sql.map_raceno_dict[jyo_cd]
                 start_time = time.time()
                 for race_no in range(1, ed_race_no + 1):
                     logger.info(
