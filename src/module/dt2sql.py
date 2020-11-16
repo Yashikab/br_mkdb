@@ -419,14 +419,15 @@ class Odds2sql(Data2MysqlTemplate):
                     ))
 
         # まとめる
-        query_list = []
+        # query_list = []
         for tb_name, insert_rows_list in insert_rows_dict.items():
             sql = super().create_insert_prefix(tb_name)
             insert_rows = ', '.join(insert_rows_list)
             query = ' '.join([sql, insert_rows])
-            query_list.append(query)
-        all_query = ';\n'.join(query_list)
-        super().run_query(all_query)
+            super().run_query(query)
+        #     query_list.append(query)
+        # all_query = ';\n'.join(query_list)
+        # super().run_query(all_query)
 
     def _call_oddsfunc(self, date, jyo_cd, race_no):
         ood = OfficialOdds(date, jyo_cd, race_no)
