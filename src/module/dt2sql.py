@@ -402,20 +402,36 @@ class Odds2sql(Data2MysqlTemplate):
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         jyo_cd = jyo_cd_list[0]
         race_no = raceno_dict[jyo_cd][0]
-        ood = OfficialOdds(date, jyo_cd, race_no)
-        race_id = f"{date}{jyo_cd:02}{race_no:02}"
-        content_dict_list = \
-            [ood.three_rentan(), ood.three_renfuku(),
-             ood.two_rentan(), ood.two_renfuku(), ood.tansho()]
-        # query_list = []
-        for tb_name, content in zip(self.__tb_name_list, content_dict_list):
-            insert_col = super()._info2query_col(
-                [race_id],
-                content
-            )
+        insert_rows_dict: Dict[str, List[Any]] = {}
+        for jyo_cd in jyo_cd_list:
+            for race_no in raceno_dict[jyo_cd]:
+                race_id = f"{date}{jyo_cd:02}{race_no:02}"
+                for tb_name, content in zip(self.__tb_name_list,
+                                            self._call_oddsfunc(
+                                                date,
+                                                jyo_cd,
+                                                race_no)):
+                    if tb_name not in insert_rows_dict.keys():
+                        insert_rows_dict[tb_name] = []
+                    insert_rows_dict[tb_name].append(super()._info2query_col(
+                        [race_id],
+                        content
+                    ))
+
+        # まとめる
+        query_list = []
+        for tb_name, insert_rows_list in insert_rows_dict.items():
             sql = super().create_insert_prefix(tb_name)
-            query = ' '.join([sql, insert_col])
-            super().run_query(query)
-            # query_list.append(query)
-        # all_query = ';\n'.join(query_list)
-        # super().run_query(all_query)
+            insert_rows = ', '.join(insert_rows_list)
+            query = ' '.join([sql, insert_rows])
+            query_list.append(query)
+        all_query = ';\n'.join(query_list)
+        super().run_query(all_query)
+
+    def _call_oddsfunc(self, date, jyo_cd, race_no):
+        ood = OfficialOdds(date, jyo_cd, race_no)
+        yield ood.three_rentan()
+        yield ood.three_renfuku()
+        yield ood.two_rentan()
+        yield ood.two_renfuku()
+        yield ood.tansho()
