@@ -751,9 +751,9 @@ class OfficialResults(CommonMethods4Official):
 
 class OfficialOdds(CommonMethods4Official):
     def __init__(self,
-                 race_no: int,
+                 date: int,
                  jyo_code: int,
-                 date: int):
+                 race_no: int,):
 
         self.logger = \
             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)

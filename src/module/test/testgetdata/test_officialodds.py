@@ -24,7 +24,7 @@ class TestOfficialOdds(CommonMethodForTest):
     @pytest.fixture(scope='class')
     def odds(self):
         odds = OfficialOdds(
-            self.__race_no, self.__jyo_code, self.__date)
+            self.__date, self.__jyo_code, self.__race_no)
         return odds
 
     # 3連単

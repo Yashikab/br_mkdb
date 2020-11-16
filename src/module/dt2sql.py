@@ -94,7 +94,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         self.run_query(all_query)
         return None
 
-    def _create_queries(self, jyo_cd, race_no) -> str:
+    def _create_queries(self, jyo_cd: int, race_no: int) -> str:
         """クエリを作る"""
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
         self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
@@ -395,9 +395,14 @@ class Odds2sql(Data2MysqlTemplate):
         super().run_query(all_query)
 
     # TODO: あとで書き換える(独自)
-    def insert2table(self, date, jyo_cd, race_no):
+    def insert2table(self,
+                     date: int,
+                     jyo_cd_list: List[int],
+                     raceno_dict: Dict[int, List[int]]) -> None:
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        ood = OfficialOdds(race_no, jyo_cd, date)
+        jyo_cd = jyo_cd_list[0]
+        race_no = raceno_dict[jyo_cd][0]
+        ood = OfficialOdds(date, jyo_cd, race_no)
         race_id = f"{date}{jyo_cd:02}{race_no:02}"
         content_dict_list = \
             [ood.three_rentan(), ood.three_renfuku(),
