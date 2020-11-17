@@ -306,7 +306,7 @@ class JyoData2sql(Data2MysqlTemplate):
         for hp_s, hp_c in zip(hp_str_list, hp_cd_list):
             datejyo_id: str = f'{date}{hp_c:02}'
             hi_dict = ghp.holdinfo2dict(hp_s)
-            self.map_raceno_dict[hp_c] = hi_dict['ed_race_no']
+            self.map_raceno_dict[hp_c] = range(1, hi_dict['ed_race_no'] + 1)
             insert_value_list = [datejyo_id, str(date), str(hp_c), f"'{hp_s}'"]
             ommit_list = []
             for i_key, i_value in hi_dict.items():

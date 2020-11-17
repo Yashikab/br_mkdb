@@ -100,26 +100,34 @@ def main():
         try:
             logger.debug(f'target date: {date}')
             jd2sql.insert2table(date)
-
             # jd2sqlで開催場と最終レース番を取得する
             logger.debug('insert race data: race chokuzen result odds')
-            for jyo_cd in jd2sql.map_raceno_dict.keys():
-                ed_race_no = jd2sql.map_raceno_dict[jyo_cd]
-                start_time = time.time()
-                for race_no in range(1, ed_race_no + 1):
-                    logger.info(
-                        f'data with date: {date} '
-                        f'jyo_cd: {jyo_cd} race_no: {race_no}')
-                    try:
-                        time.sleep(args.wait)
-                        rd2sql.insert2table(date, jyo_cd, race_no)
-                        cd2sql.insert2table(date, jyo_cd, race_no)
-                        res2sql.insert2table(date, jyo_cd, race_no)
-                        odds2sql.insert2table(date, jyo_cd, race_no)
-                    except Exception as e:
-                        logger.error(f'{e}')
-                elapsed_time = time.time() - start_time
-                logger.debug(f'completed in {elapsed_time}sec')
+            jyo_cd_list = jd2sql.map_raceno_dict.keys()
+            start_time = time.time()
+            rd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+            cd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+            res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+            odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+
+            elapsed_time = time.time() - start_time
+            logger.debug(f'completed in {elapsed_time}sec')
+            # for jyo_cd in jd2sql.map_raceno_dict.keys():
+            #     ed_race_no = jd2sql.map_raceno_dict[jyo_cd]
+            #     start_time = time.time()
+            #     for race_no in range(1, ed_race_no + 1):
+            #         logger.info(
+            #             f'data with date: {date} '
+            #             f'jyo_cd: {jyo_cd} race_no: {race_no}')
+            #         try:
+            #             time.sleep(args.wait)
+            #             rd2sql.insert2table(date, jyo_cd, race_no)
+            #             cd2sql.insert2table(date, jyo_cd, race_no)
+            #             res2sql.insert2table(date, jyo_cd, race_no)
+            #             odds2sql.insert2table(date, jyo_cd, race_no)
+            #         except Exception as e:
+            #             logger.error(f'{e}')
+            #     elapsed_time = time.time() - start_time
+            #     logger.debug(f'completed in {elapsed_time}sec')
             logger.debug('insert race data completed.')
         except Exception as e:
             logger.error(f'{e}')

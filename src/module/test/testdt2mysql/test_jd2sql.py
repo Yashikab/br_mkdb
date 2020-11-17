@@ -55,4 +55,4 @@ class TestJyoData2sql(CommonMethod):
         assert res_tpl == expected_tpl
 
     def test_map_raceno_dict(self):
-        assert self.__jd2sql.map_raceno_dict[21] == 12
+        assert self.__jd2sql.map_raceno_dict[21] == range(1, 13)
