@@ -400,8 +400,6 @@ class Odds2sql(Data2MysqlTemplate):
                      jyo_cd_list: List[int],
                      raceno_dict: Dict[int, List[int]]) -> None:
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        jyo_cd = jyo_cd_list[0]
-        race_no = raceno_dict[jyo_cd][0]
         insert_rows_dict: Dict[str, List[Any]] = {}
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
@@ -419,16 +417,16 @@ class Odds2sql(Data2MysqlTemplate):
                     ))
 
         # まとめる
-        query_list = []
+        # query_list = []
         for tb_name, insert_rows_list in insert_rows_dict.items():
             sql = super().create_insert_prefix(tb_name)
             insert_rows = ', '.join(insert_rows_list)
             query = ' '.join([sql, insert_rows])
-            # super().run_query(query)
-            query_list.append(query)
-        all_query = ';\n'.join(query_list)
-        print(all_query)
-        super().run_query(all_query)
+            super().run_query(query)
+            # query_list.append(query)
+        # all_query = ';\n'.join(query_list)
+        # print(all_query)
+        # super().run_query(all_query)
 
     def _call_oddsfunc(self, date, jyo_cd, race_no):
         ood = OfficialOdds(date, jyo_cd, race_no)
