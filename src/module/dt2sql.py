@@ -81,9 +81,13 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         waku_row_list = []
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
-                common, waku = self._create_queries(jyo_cd, race_no)
-                common_row_list.append(common)
-                waku_row_list.append(waku)
+                self.logger.info(f'args: {self.date}, {jyo_cd}, {race_no}')
+                try:
+                    common, waku = self._create_queries(jyo_cd, race_no)
+                    common_row_list.append(common)
+                    waku_row_list.append(waku)
+                except Exception as e:
+                    self.logger.error(e)
         common_sql = self.create_insert_prefix(self.__tb_name_list[0])
         common_row = ", ".join(common_row_list)
         query = ' '.join([common_sql, common_row])
@@ -97,8 +101,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
 
     def _create_queries(self, jyo_cd: int, race_no: int) -> str:
         """クエリを作る"""
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
-        self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         tcls = self.target_cls(race_no=race_no,
                                jyo_code=jyo_cd,
                                date=self.date)
@@ -280,6 +283,7 @@ class JyoData2sql(Data2MysqlTemplate):
             日付，yyyymmdd型
         """
         self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.info(f"Date: {date}")
         query = self._create_query(date)
         super().run_query(query)
         self.logger.info(f'{sys._getframe().f_code.co_name} completed.')
