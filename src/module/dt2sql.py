@@ -414,12 +414,17 @@ class Odds2sql(Data2MysqlTemplate):
                                                 date,
                                                 jyo_cd,
                                                 race_no)):
-                    if tb_name not in insert_rows_dict.keys():
-                        insert_rows_dict[tb_name] = []
-                    insert_rows_dict[tb_name].append(super()._info2query_col(
-                        [race_id],
-                        content
-                    ))
+                    try:
+                        if tb_name not in insert_rows_dict.keys():
+                            insert_rows_dict[tb_name] = []
+                        insert_rows_dict[tb_name].append(
+                            super()._info2query_col(
+                                [race_id],
+                                content
+                                )
+                            )
+                    except Exception as e:
+                        self.logger.error(e)
 
         # まとめる
         for tb_name, insert_rows_list in insert_rows_dict.items():

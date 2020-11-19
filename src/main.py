@@ -5,14 +5,16 @@ MYSQLへ公式データを格納する
 """
 import argparse
 from datetime import datetime
-import coloredlogs
 from logging import (
     getLogger,
     Formatter,
     StreamHandler,
-    INFO
+    INFO,
+    WARNING
 )
 import time
+
+import coloredlogs
 
 from module.const import (
     MODULE_LOG_NAME,
@@ -158,6 +160,6 @@ if __name__ == '__main__':
     )
     handler.setFormatter(fmt)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
-    getLogger(MODULE_LOG_NAME).setLevel(INFO)
+    getLogger(MODULE_LOG_NAME).setLevel(WARNING)
 
     main()
