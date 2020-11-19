@@ -286,7 +286,7 @@ class JyoData2sql(Data2MysqlTemplate):
         self.logger.info(f"Date: {date}")
         query = self._create_query(date)
         super().run_query(query)
-        self.logger.info(f'{sys._getframe().f_code.co_name} completed.')
+        self.logger.debug(f'{sys._getframe().f_code.co_name} completed.')
 
         return None
 
@@ -404,7 +404,7 @@ class Odds2sql(Data2MysqlTemplate):
                      date: int,
                      jyo_cd_list: List[int],
                      raceno_dict: Dict[int, List[int]]) -> None:
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         insert_rows_dict: Dict[str, List[Any]] = {}
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:

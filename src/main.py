@@ -10,7 +10,6 @@ from logging import (
     Formatter,
     StreamHandler,
     INFO,
-    WARNING
 )
 import time
 
@@ -160,6 +159,6 @@ if __name__ == '__main__':
     )
     handler.setFormatter(fmt)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
-    getLogger(MODULE_LOG_NAME).setLevel(WARNING)
+    getLogger(MODULE_LOG_NAME).setLevel(INFO)
 
     main()

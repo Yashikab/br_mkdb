@@ -266,7 +266,7 @@ class OfficialProgram(CommonMethods4Official):
         self.logger.debug('get html completed.')
 
     def getplayerinfo2dict(self, waku: int) -> dict:
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 番組表を選択 css selectorより
         self.logger.debug('get table html from target url')
         target_table_selector = \
@@ -383,7 +383,7 @@ class OfficialProgram(CommonMethods4Official):
         return content_dict
 
     def getcommoninfo2dict(self) -> dict:
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         table_selector = \
             'body > main > div > div > div > '\
             'div.heading2 > div > div.heading2_title'
@@ -456,7 +456,7 @@ class OfficialChokuzen(CommonMethods4Official):
         self.__soup = super()._url2soup(target_url)
 
     def getplayerinfo2dict(self, waku: int) -> dict:
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 選手直前情報を選択 css selectorより
         target_p_table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner > '\
@@ -516,7 +516,7 @@ class OfficialChokuzen(CommonMethods4Official):
         """
         直前情報の水面気象情報を抜き出し，辞書型にする
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         table_selector = \
             'body > main > div > div > div > div.contentsFrame1_inner > '\
             'div.grid.is-type3.h-clear > div:nth-child(2) > div.weather1 > '\
@@ -570,7 +570,7 @@ class OfficialResults(CommonMethods4Official):
         -------
             racerls : dict
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 結果テーブルのキーを選択 1~6
         content_dict = self.waku_dict[waku]
 
@@ -593,7 +593,7 @@ class OfficialResults(CommonMethods4Official):
         """
         水面気象情報と決まり手，返還挺の有無などの選手以外のレース結果情報
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 水面気象情報の取得
         table_selector = \
             'body > main > div > div > div > '\
@@ -897,7 +897,7 @@ class OfficialOdds(CommonMethods4Official):
         3連単オッズを抜き出し辞書型で返す
         1-2-3のオッズは return_dict[1][2][3]に格納される
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
         odds_matrix = self._tanfuku_common(3, 'rentan')
         odds_list = self._rentan_matrix2list(odds_matrix)
@@ -926,7 +926,7 @@ class OfficialOdds(CommonMethods4Official):
         3連複オッズを抜き出し辞書型で返す
         1=2=3のオッズは return_dict[1][2][3]に格納される
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
         odds_matrix = self._tanfuku_common(3, 'renfuku')
         odds_list = self._renfuku_matrix2list(odds_matrix)
@@ -939,7 +939,7 @@ class OfficialOdds(CommonMethods4Official):
 
     # 2連単を集計
     def two_rentan(self):
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # 共通メソッドを使える
         odds_matrix = self._tanfuku_common(2, 'rentan')
         odds_list = self._rentan_matrix2list(odds_matrix)
@@ -952,7 +952,7 @@ class OfficialOdds(CommonMethods4Official):
 
     # 2連複を集計
     def two_renfuku(self):
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         odds_matrix = self._tanfuku_common(2, 'renfuku')
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
@@ -963,7 +963,7 @@ class OfficialOdds(CommonMethods4Official):
 
     # 単勝
     def tansho(self):
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/'\
                    'oddstf?'
@@ -1021,14 +1021,14 @@ class GetHoldPlacePast(CommonMethods4Official):
         """
         会場名のままset型で返す
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         return self.place_name_list
 
     def holdplace2cdlist(self) -> list:
         """
         会場コードをset型で返す．
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         # jyo master取得
         filepath = Path(__file__).parent.resolve().joinpath('jyo_master.csv')
         jyo_master = pd.read_csv(filepath, header=0)
@@ -1049,7 +1049,7 @@ class GetHoldPlacePast(CommonMethods4Official):
             hp_name: str
                 開催場名
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         shinko = self.shinko_info_list[self.place_name_list.index(hp_name)]
         ed_race_no = self._get_end_raceno(shinko)
 
