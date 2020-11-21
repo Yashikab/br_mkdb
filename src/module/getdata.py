@@ -3,15 +3,14 @@
 """
 HTMLから情報をスクレイピングするためのモジュール
 """
-
-import sys
-
+from datetime import datetime, timedelta
+from logging import getLogger
+from pathlib import Path
 import re
+import sys
+import time
 from typing import Iterator
 from urllib.request import urlopen
-from logging import getLogger
-from datetime import datetime, timedelta
-from pathlib import Path
 
 import bs4
 from bs4 import BeautifulSoup as bs
@@ -28,7 +27,20 @@ class CommonMethods4Official:
 
     def _url2soup(self, url):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        html_content = urlopen(url).read()
+        # 5回リトライする
+        success_flg = False
+        html_content = None
+        for i in range(5):
+            with urlopen(url, timeout=10.) as f:
+                if f.get_code == 200:
+                    html_content = f.read()
+                    success_flg = True
+            if success_flg:
+                break
+            self.logger.debug(f"retry to download {url}")
+            time.sleep(0.5)
+        if not success_flg:
+            raise self.logger.error("Didn't succeed in 5 times retry.")
 
         soup = bs(html_content, 'lxml')
 
