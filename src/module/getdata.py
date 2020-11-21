@@ -40,7 +40,7 @@ class CommonMethods4Official:
                     self.logger.warning(f"{f.status}: {f.reason}")
             if success_flg:
                 break
-            self.logger.debug(f"retry")
+            self.logger.debug("retry")
             time.sleep(0.5)
         if not success_flg:
             raise self.logger.error("Didn't succeed in 5 times retry.")
