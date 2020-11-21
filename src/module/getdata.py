@@ -32,12 +32,15 @@ class CommonMethods4Official:
         html_content = None
         for i in range(5):
             with urlopen(url, timeout=10.) as f:
-                if f.get_code == 200:
+                if f.status == 200:
                     html_content = f.read()
                     success_flg = True
+                else:
+                    self.logger.warning(f"Not completed to download: {url}")
+                    self.logger.warning(f"{f.status}: {f.reason}")
             if success_flg:
                 break
-            self.logger.debug(f"retry to download {url}")
+            self.logger.debug(f"retry")
             time.sleep(0.5)
         if not success_flg:
             raise self.logger.error("Didn't succeed in 5 times retry.")
