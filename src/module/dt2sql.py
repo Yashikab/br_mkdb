@@ -399,7 +399,6 @@ class Odds2sql(Data2MysqlTemplate):
         all_query = "\n".join(query_list)
         super().run_query(all_query)
 
-    # TODO: try catch入れる
     def insert2table(self,
                      date: int,
                      jyo_cd_list: List[int],
