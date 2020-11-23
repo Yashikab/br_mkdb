@@ -41,6 +41,18 @@ class TestOfficialOdds(CommonMethodForTest):
             CommonMethods4Official, "_url2soup", return_value=soup_content)
         assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
 
+    # 3連単(欠場を試行)
+    @pytest.mark.parametrize("fst, snd, trd, expected", [
+        (1, 2, 3, 30.1),
+        (1, 2, 5, -9999.0),
+        (3, 1, 4, 30.2),
+    ])
+    def test_threerentan_ketsujyo(self, fst, snd, trd, expected, odds, mocker):
+        soup_content = super().htmlfile2bs4('odds_3tan_20190103222.html')
+        mocker.patch.object(
+            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
+
     # 3連複
     @pytest.mark.parametrize("fst, snd, trd, expected", [
         (1, 2, 3, 2.9),

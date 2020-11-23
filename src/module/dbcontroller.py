@@ -166,9 +166,9 @@ class LocalSqlController(DatabaseController):
         pwd = os.path.abspath(__file__)
         this_filename = os.path.basename(__file__)
         this_dir = pwd.replace(this_filename, '')
-        diff_dir_for_sql = 'br_mkdb/src/module'
+        diff_dir_for_sql = 'src/module'
         self.__sql_dir = \
-            this_dir.replace(diff_dir_for_sql, 'mysql_local/boat')
+            this_dir.replace(diff_dir_for_sql, 'local_mysql')
         self.logger.debug(f'sql dir is {self.__sql_dir}')
 
     def build(self):
@@ -180,12 +180,12 @@ class LocalSqlController(DatabaseController):
             subprocess.run(["docker", "volume", "rm", "boat_mysql"])
         except Exception as e:
             self.logger.warning(e)
+        time.sleep(2)
 
         try:
             subprocess.run(["docker-compose", "up", "-d"])
         except Exception as e:
             self.logger.error(e)
-
         # wait
         time.sleep(5)
         super()._check_connection()

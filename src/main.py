@@ -133,8 +133,10 @@ def main():
         except Exception as e:
             logger.error(f'{e}')
 
-    logger.info('Down Server.')
-    sql_ctl.clean()
+    # localは実験で落とすと消えてしまうので落とさない
+    if args.gcs:
+        logger.info('Down Server.')
+        sql_ctl.clean()
 
     logger.info('All completed.')
 

@@ -407,7 +407,7 @@ class Odds2sql(Data2MysqlTemplate):
         insert_rows_dict: Dict[str, List[Any]] = {}
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
-                self.logger.info(f'args: {self.date}, {jyo_cd}, {race_no}')
+                self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
                 race_id = f"{date}{jyo_cd:02}{race_no:02}"
                 for tb_name, content in zip(self.__tb_name_list,
                                             self._call_oddsfunc(

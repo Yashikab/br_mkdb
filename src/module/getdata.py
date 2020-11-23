@@ -804,6 +804,8 @@ class OfficialOdds(CommonMethods4Official):
             html_type = 't'
         elif kake == 'renfuku':
             html_type = 'f'
+        else:
+            html_type = 'tf'
 
         # htmlをload
         base_url = f'https://boatrace.jp/owpc/pc/race/'\
@@ -827,19 +829,26 @@ class OfficialOdds(CommonMethods4Official):
         # 1行ごとのリスト
         yoko_list = odds_table.select('tr')
 
-        # oddsPointクラスを抜き，要素を少数に変換してリストで返す
-        def _getoddsPoint2floatlist(odds_tr):
-            html_list = odds_tr.select('td.oddsPoint')
-            text_list = list(map(lambda x: x.text, html_list))
-            float_list = list(map(
-                lambda x: float(x), text_list))
-            return float_list
-
         odds_matrix = list(map(
-            lambda x: _getoddsPoint2floatlist(x),
+            lambda x: self._getoddsPoint2floatlist(x),
             yoko_list
         ))
         return odds_matrix
+
+    # oddsPointクラスを抜き，要素を少数に変換してリストで返す
+    def _getoddsPoint2floatlist(self, odds_tr):
+        html_list = odds_tr.select('td.oddsPoint')
+        text_list = list(map(lambda x: x.text, html_list))
+        float_list = list(map(
+            lambda x: self._check_ketsujyo(x), text_list))
+        return float_list
+
+    # 欠場をチェックする
+    def _check_ketsujyo(self, float_str: str):
+        try:
+            return float(float_str)
+        except ValueError:
+            return -9999.0
 
     def _rentan_matrix2list(self, odds_matrix: list) -> list:
         """
