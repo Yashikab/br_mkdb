@@ -81,13 +81,14 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         waku_row_list = []
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
-                self.logger.info(f'args: {self.date}, {jyo_cd}, {race_no}')
+                self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
                 try:
                     common, waku = self._create_queries(jyo_cd, race_no)
                     common_row_list.append(common)
                     waku_row_list.append(waku)
                 except Exception as e:
-                    self.logger.error(e)
+                    self.logger.error(
+                        f'args: {self.date}, {jyo_cd}, {race_no} error: {e}')
         common_sql = self.create_insert_prefix(self.__tb_name_list[0])
         common_row = ", ".join(common_row_list)
         query = ' '.join([common_sql, common_row])
@@ -407,7 +408,7 @@ class Odds2sql(Data2MysqlTemplate):
         insert_rows_dict: Dict[str, List[Any]] = {}
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
-                self.logger.info(f'args: {date}, {jyo_cd}, {race_no}')
+                self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
                 race_id = f"{date}{jyo_cd:02}{race_no:02}"
                 for tb_name, content in zip(self.__tb_name_list,
                                             self._call_oddsfunc(
@@ -424,7 +425,8 @@ class Odds2sql(Data2MysqlTemplate):
                                 )
                             )
                     except Exception as e:
-                        self.logger.error(e)
+                        self.logger.error(
+                            f'args: {date}, {jyo_cd}, {race_no} error: {e}')
 
         # まとめる
         for tb_name, insert_rows_list in insert_rows_dict.items():
