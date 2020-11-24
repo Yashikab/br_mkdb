@@ -70,7 +70,7 @@ class CommonMethods4Official:
         target_table_html = soup.select_one(table_selector)
         player_html_list = target_table_html.select('tbody')
         assert len(player_html_list) == 6, \
-            f"lengh is not 6:{len(player_html_list)}"
+            f"{self.__class__.__name__}:lengh is not 6:{len(player_html_list)}"
         return player_html_list
 
     def _getSTtable2tuple(self,
@@ -98,8 +98,8 @@ class CommonMethods4Official:
         target_table_html = soup.select_one(table_selector)
         st_html = target_table_html.select_one('tbody')
         st_html_list = st_html.select('tr > td')
-        assert len(st_html_list) == 6, \
-            f"lengh is not 6:{len(st_html_list)}"
+        # 欠場挺があると6挺にならないときがあるので、assertをつかわない
+        self.logger.warning(f"there are less than 6 boats.")
         # コース抜き出し
         # コースがキーで，号がvalueなので全て抜き出してから逆にする
         waku_list = list(
@@ -138,6 +138,7 @@ class CommonMethods4Official:
         target_table_html = soup.select_one(table_selector)
         condinfo_html_list = target_table_html.select('div')
         assert len(condinfo_html_list) == 12, \
+            f"{self.__class__.__name__}: "\
             f"lengh is not 12:{len(condinfo_html_list)}"
         # 気温は2番目のdiv
         tmp_info_html = condinfo_html_list[1]
@@ -1000,7 +1001,8 @@ class OfficialOdds(CommonMethods4Official):
             '> div:nth-child(1) > div.table1 > table'
         odds_table = soup.select_one(target_table_selector)
         odds_html_list = odds_table.select('tbody tr td.oddsPoint')
-        odds_list = list(map(lambda x: float(x.text), odds_html_list))
+        odds_list = list(
+            map(lambda x: self._check_ketsujyo(x.text), odds_html_list))
 
         content_dict = {}
         for key_name in self.rentan_keylist(1):

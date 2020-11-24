@@ -157,7 +157,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             with MysqlConnector(const.MYSQL_CONFIG) as conn:
                 cursor = conn.cursor()
                 self.logger.debug('run query.')
-                cursor.execute(query)
+                cursor.execute(query, multi=True)
                 # cursor.close()
             self.logger.debug('query run successfully!')
         except Exception as e:
