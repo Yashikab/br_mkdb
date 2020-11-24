@@ -100,7 +100,7 @@ class CommonMethods4Official:
         st_html_list = st_html.select('tr > td')
         # 欠場挺があると6挺にならないときがあるので、assertをつかわない
         if len(st_html_list) < 6:
-            self.logger.warning(f"there are less than 6 boats.")
+            self.logger.warning("there are less than 6 boats.")
         # コース抜き出し
         # コースがキーで，号がvalueなので全て抜き出してから逆にする
         waku_list = list(
