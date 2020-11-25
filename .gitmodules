@@ -1,0 +1,3 @@
+[submodule "local_mysql"]
+	path = local_mysql
+	url = git@github.com:Yashikab/local_mysql.git

@@ -27,7 +27,9 @@ class TestOdds2sql(CommonMethod):
         __od2sql = Odds2sql()
         __od2sql.create_table_if_not_exists()
         __od2sql.insert2table(
-            self.__target_date, self.__jyo_cd, self.__race_no)
+            self.__target_date,
+            [self.__jyo_cd],
+            {self.__jyo_cd: [self.__race_no]})
         time.sleep(WAIT)
 
     key_set = {'race_id'}

@@ -39,6 +39,7 @@ steps:
     - rp_reviewdog src/
     # あとで外す
     - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
+    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "select * from odds_1tan_tb;"
   when:
     event:
     - pull_request
