@@ -6,7 +6,7 @@
 import os
 import pytest
 
-from module.master2sql import JyoMaster2sql
+from module.dbcontroller import LocalSqlController
 
 
 # 場コードマスタだけ最初に入れておく
@@ -17,3 +17,9 @@ def prepare():
     os.environ['MYSQL_USER'] = "test_boat_user"
     os.environ['MYSQL_PASSWORD'] = "test_pw"
     os.environ['MYSQL_DATABASE'] = "test_boat_db"
+
+    # local実行の場合はdb立てる
+    if not os.getenv("DRONE_COMMIT"):
+        sql_ctl = LocalSqlController()
+        sql_ctl.build()
+        # データが消えるので落とさない
