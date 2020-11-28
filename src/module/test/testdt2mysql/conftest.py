@@ -17,6 +17,3 @@ def prepare():
     os.environ['MYSQL_USER'] = "test_boat_user"
     os.environ['MYSQL_PASSWORD'] = "test_pw"
     os.environ['MYSQL_DATABASE'] = "test_boat_db"
-    # jyomaster
-    jm2sql = JyoMaster2sql()
-    jm2sql.create_table_if_not_exists()
