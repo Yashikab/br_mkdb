@@ -7,7 +7,10 @@ import pytest
 import time
 
 from module.dt2sql import Odds2sql
-from module.getdata import OfficialOdds
+from module.getdata import (
+    OfficialOdds,
+    CommonMethods4Official
+)
 from ..common import CommonMethod
 
 WAIT = 0.5
