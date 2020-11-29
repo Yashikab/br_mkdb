@@ -7,7 +7,7 @@ import pytest
 import time
 
 from module.dt2sql import ChokuzenData2sql
-from .common import CommonMethod
+from ..common import CommonMethod
 
 WAIT = 0.5
 

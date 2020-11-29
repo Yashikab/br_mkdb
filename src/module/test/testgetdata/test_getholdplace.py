@@ -8,7 +8,7 @@ from module.getdata import (
     CommonMethods4Official,
     GetHoldPlacePast
 )
-from .common import CommonMethodForTest
+from ..common import CommonMethodForTest
 
 
 class TestGetHoldPlace(CommonMethodForTest):

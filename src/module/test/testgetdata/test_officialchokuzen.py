@@ -8,7 +8,7 @@ from module.getdata import (
     CommonMethods4Official,
     OfficialChokuzen
 )
-from .common import CommonMethodForTest
+from ..common import CommonMethodForTest
 
 
 class TestOfficialChokuzen(CommonMethodForTest):

@@ -4,7 +4,7 @@
 master2sqlモジュール用単体テスト
 """
 import pytest
-from .common import CommonMethod
+from ..common import CommonMethod
 from module.master2sql import JyoMaster2sql
 
 

@@ -4,7 +4,11 @@
 dt2sqlモジュール用単体テストの共通関数
 """
 from logging import getLogger
+from pathlib import Path
 from typing import Any
+
+from bs4 import BeautifulSoup as bs
+
 from module import const
 from module.connect import MysqlConnector
 
@@ -57,3 +61,16 @@ class CommonMethod:
             res_tpl = None
         finally:
             return res_tpl
+
+
+class CommonMethodForTest:
+
+    def htmlfile2bs4(self, filename: str) -> bs:
+        currentdir = Path(__file__).resolve().parent
+        filepath = currentdir.joinpath('test_html', filename)
+
+        with open(filepath, 'r') as f:
+            html_content = f.read()
+        soup_content = bs(html_content, "lxml")
+
+        return soup_content

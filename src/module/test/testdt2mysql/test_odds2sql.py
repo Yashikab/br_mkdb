@@ -8,7 +8,7 @@ import time
 
 from module.dt2sql import Odds2sql
 from module.getdata import OfficialOdds
-from .common import CommonMethod
+from ..common import CommonMethod
 
 WAIT = 0.5
 

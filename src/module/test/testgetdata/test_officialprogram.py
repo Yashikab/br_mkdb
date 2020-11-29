@@ -9,7 +9,7 @@ from module.getdata import (
     CommonMethods4Official,
     OfficialProgram
 )
-from .common import CommonMethodForTest
+from ..common import CommonMethodForTest
 
 
 class TestOfficialProgram(CommonMethodForTest):
