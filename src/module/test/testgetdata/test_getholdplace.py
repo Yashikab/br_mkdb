@@ -8,10 +8,10 @@ from module.getdata import (
     CommonMethods4Official,
     GetHoldPlacePast
 )
-from ..common import CommonMethodForTest
+from ..common import CommonMethod
 
 
-class TestGetHoldPlace(CommonMethodForTest):
+class TestGetHoldPlace(CommonMethod):
     """
     本日のレーステーブルから開催会場を取得
     URL: https://www.boatrace.jp/owpc/pc/race/index?hd=20110311

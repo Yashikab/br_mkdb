@@ -8,10 +8,10 @@ from module.getdata import (
     CommonMethods4Official,
     OfficialChokuzen
 )
-from ..common import CommonMethodForTest
+from ..common import CommonMethod
 
 
-class TestOfficialChokuzen(CommonMethodForTest):
+class TestOfficialChokuzen(CommonMethod):
     '''
     2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
     直前情報\n

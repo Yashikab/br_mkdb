@@ -8,10 +8,10 @@ from module.getdata import (
     CommonMethods4Official,
     OfficialOdds
 )
-from ..common import CommonMethodForTest
+from ..common import CommonMethod
 
 
-class TestOfficialOdds(CommonMethodForTest):
+class TestOfficialOdds(CommonMethod):
     '''
     2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/odds3t?rno=9&jcd=06&hd=20200408

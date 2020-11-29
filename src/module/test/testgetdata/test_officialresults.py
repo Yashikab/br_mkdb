@@ -9,10 +9,10 @@ from module.getdata import (
     CommonMethods4Official,
     OfficialResults
 )
-from ..common import CommonMethodForTest
+from ..common import CommonMethod
 
 
-class TestOfficialResults(CommonMethodForTest):
+class TestOfficialResults(CommonMethod):
     '''
     2020 4月10日 浜名湖(06) 9レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/raceresult?rno=9&jcd=06&hd=20200410

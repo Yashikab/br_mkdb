@@ -62,10 +62,8 @@ class CommonMethod:
         finally:
             return res_tpl
 
-
-class CommonMethodForTest:
-
     def htmlfile2bs4(self, filename: str) -> bs:
+        """mock用htmlをsoupにいれる"""
         currentdir = Path(__file__).resolve().parent
         filepath = currentdir.joinpath('test_html', filename)
 
