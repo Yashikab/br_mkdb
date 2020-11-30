@@ -8,10 +8,10 @@ from module.getdata import (
     CommonMethods4Official,
     GetHoldPlacePast
 )
-from .common import CommonMethodForTest
+from ..common import CommonMethod
 
 
-class TestGetHoldPlace(CommonMethodForTest):
+class TestGetHoldPlace(CommonMethod):
     """
     本日のレーステーブルから開催会場を取得
     URL: https://www.boatrace.jp/owpc/pc/race/index?hd=20110311
@@ -57,6 +57,7 @@ class TestGetHoldPlace(CommonMethodForTest):
         ghp = self._ghp(date, mocker)
         assert ghp.holdinfo2dict(hp_name) == expected
 
+    # dateを引数に取るため、fixture化しない
     def _ghp(self, date, mocker):
         """mock用に共通項にする"""
         soup_content = super().htmlfile2bs4(f'ghp_{date}.html')

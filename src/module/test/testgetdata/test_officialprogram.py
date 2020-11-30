@@ -9,10 +9,10 @@ from module.getdata import (
     CommonMethods4Official,
     OfficialProgram
 )
-from .common import CommonMethodForTest
+from ..common import CommonMethod
 
 
-class TestOfficialProgram(CommonMethodForTest):
+class TestOfficialProgram(CommonMethod):
     """
     番組表\n
     2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
