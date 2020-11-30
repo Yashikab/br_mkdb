@@ -4,10 +4,8 @@
 chokuseninfoo2sqlテスト
 """
 import pytest
-import time
 
 from module.dt2sql import ChokuzenData2sql
-from module.getdata import CommonMethods4Official
 from ..common import CommonMethod
 
 WAIT = 0.5
@@ -20,16 +18,8 @@ class TestChokuzenInfo2sql(CommonMethod):
     __race_no = 1
     __ci2sql = ChokuzenData2sql()
 
-    @pytest.fixture(autouse=True)
-    def insertdata(self, mocker):
-        # mocking
-        soup_content = super().htmlfile2bs4(
-            f"choku_{self.__target_date}{self.__jyo_cd}{self.__race_no}.html"
-        )
-        mocker.patch.object(CommonMethods4Official,
-                            '_url2soup',
-                            return_value=soup_content)
-
+    @pytest.fixture(scope='class', autouse=True)
+    def insertdata(self):
         self.__ci2sql.create_table_if_not_exists()
         self.__ci2sql.insert2table(
             date=self.__target_date,
@@ -37,7 +27,6 @@ class TestChokuzenInfo2sql(CommonMethod):
             raceno_dict={
                 self.__jyo_cd: range(self.__race_no, self.__race_no+1)},
         )
-        time.sleep(WAIT)
 
     cc_col_set = {'race_id', 'datejyo_id',
                   'temp', 'weather', 'wind_v',

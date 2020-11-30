@@ -4,13 +4,9 @@
 jyodata2sqlテスト
 """
 import pytest
-import time
 
 from module.dt2sql import JyoData2sql
-from module.getdata import CommonMethods4Official
 from ..common import CommonMethod
-
-WAIT = 0.5
 
 
 @pytest.mark.run(order=2)
@@ -20,17 +16,10 @@ class TestJyoData2sql(CommonMethod):
     __jyo_cd = 20
     __jd2sql = JyoData2sql()
 
-    @pytest.fixture(autouse=True)
-    def insertdata(self, mocker):
-        """mock用に共通項にする"""
-        soup_content = super().htmlfile2bs4(f'ghp_{self.__target_date}.html')
-        mocker.patch.object(CommonMethods4Official, "_url2soup",
-                            return_value=soup_content)
-
+    @pytest.fixture(scope='class', autouse=True)
+    def insertdata(self):
         self.__jd2sql.create_table_if_not_exists()
-        time.sleep(WAIT)
         self.__jd2sql.insert2table(date=self.__target_date)
-        time.sleep(WAIT)
 
     def test_exist_table(self):
         # カラム名の一致でテスト

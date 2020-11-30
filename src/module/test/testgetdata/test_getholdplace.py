@@ -57,6 +57,7 @@ class TestGetHoldPlace(CommonMethod):
         ghp = self._ghp(date, mocker)
         assert ghp.holdinfo2dict(hp_name) == expected
 
+    # dateを引数に取るため、fixture化しない
     def _ghp(self, date, mocker):
         """mock用に共通項にする"""
         soup_content = super().htmlfile2bs4(f'ghp_{date}.html')
