@@ -18,6 +18,7 @@ coloredlogs = "*"
 pytest-mock = "*"
 lxml = "*"
 pytest-ordering = "*"
+cssselect = "*"
 
 [requires]
 python_version = "3.7"
