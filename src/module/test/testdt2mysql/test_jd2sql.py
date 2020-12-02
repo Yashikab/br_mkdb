@@ -4,12 +4,9 @@
 jyodata2sqlテスト
 """
 import pytest
-import time
 
 from module.dt2sql import JyoData2sql
-from .common import CommonMethod
-
-WAIT = 0.5
+from ..common import CommonMethod
 
 
 @pytest.mark.run(order=2)
@@ -22,9 +19,7 @@ class TestJyoData2sql(CommonMethod):
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
         self.__jd2sql.create_table_if_not_exists()
-        time.sleep(WAIT)
         self.__jd2sql.insert2table(date=self.__target_date)
-        time.sleep(WAIT)
 
     def test_exist_table(self):
         # カラム名の一致でテスト

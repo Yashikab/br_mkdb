@@ -4,12 +4,9 @@
 raceinfo2sqlテスト
 """
 import pytest
-import time
 
 from module.dt2sql import RaceData2sql
-from .common import CommonMethod
-
-WAIT = 0.5
+from ..common import CommonMethod
 
 
 @pytest.mark.run(order=3)
@@ -29,7 +26,6 @@ class TestRaceInfo2sql(CommonMethod):
             raceno_dict={
                 self.__jyo_cd: range(self.__race_no, self.__race_no+1)},
         )
-        time.sleep(WAIT)
 
     ri_col_set = {'race_id', 'datejyo_id', 'taikai_name',
                   'grade', 'race_type', 'race_kyori',

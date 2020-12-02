@@ -4,13 +4,10 @@
 odds2sqlテスト
 """
 import pytest
-import time
 
 from module.dt2sql import Odds2sql
 from module.getdata import OfficialOdds
-from .common import CommonMethod
-
-WAIT = 0.5
+from ..common import CommonMethod
 
 
 @pytest.mark.run(ordre=6)
@@ -30,7 +27,6 @@ class TestOdds2sql(CommonMethod):
             self.__target_date,
             [self.__jyo_cd],
             {self.__jyo_cd: [self.__race_no]})
-        time.sleep(WAIT)
 
     key_set = {'race_id'}
     three_rentan_key = key_set.union(set(__ood.rentan_keylist(3)))
