@@ -274,11 +274,11 @@ class GetHoldPlacePast(CommonMethods4Official):
         self.__lx_content = super()._url2lxml(target_url)
 
         # 抜き出すテーブルの選択
-        target_table_selector = \
-            'body > main > div > div > div > '\
-            'div.contentsFrame1_inner > div.table1 > table'
-        target_table_html = self.__lx_content.select_one(target_table_selector)
-        tbody_list = target_table_html.select('tbody')
+        target_table_xpath = \
+            "/html/body/main/div/div/div/div[2]/div[3]/table"
+        target_table_content = self.__lx_content.xpath(target_table_xpath)[0]
+        
+        
 
         self.place_name_list = \
             list(map(lambda x: self._getplacename(x), tbody_list))

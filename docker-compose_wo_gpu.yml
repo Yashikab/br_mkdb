@@ -1,0 +1,33 @@
+version: '2.3'
+services:
+  boatracedocker:
+    container_name: 'jupyter4boatrace'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: 1000:1000
+    volumes:
+      - sourse:/home/contuser1/src
+      # - /mnt/dataset/My Documents/Project/datasets/BoatRace/:/home/contuser1/data
+      - ./.jupyter:/home/contuser1/.jupyter  # import jupyter setting
+      - ./Pipfile:/home/contuser1/Pipfile
+      - ./Pipfile.lock:/home/contuser1/Pipfile.lock
+
+    working_dir: /home/contuser1
+    env_file: .env
+    environment:
+      SHELL: /bin/bash
+      PYTHONPATH: /home/contuser1/src/:/home/contuser1/src/module
+      HOME: /home/contuser1
+      GRANT_SUDO: "yes"
+    ports:
+      - "8840:8840"
+    command: bash -c "
+      pipenv install --system &&
+      jupyter-lab --no-browser --port=8840 --ip=0.0.0.0 --allow-root --NotebookApp.password='sha1:408161a8c9a2:c3bc403dfe03f329997889dd5e8e06519f95b408'"
+volumes:
+  sourse:
+    driver_opts: 
+      type: none
+      device: /mnt/dataset/My Documents/Project/program/BoatRace/br_mkdb/src
+      o: bind
