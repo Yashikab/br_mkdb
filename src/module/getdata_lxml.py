@@ -238,10 +238,11 @@ class CommonMethods4Official:
         マイナス表記は残す
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        in_str = re.search(r'-{0,1}[0-9]+', in_str)
-        if in_str is not None:
+        try:
+            in_str = re.search(r'-{0,1}[0-9]+', in_str)
             out_int = int(in_str.group(0))
-        else:
+        except AttributeError as e:
+            self.logger.error(f"in_str: {in_str}, error: {e}")
             out_int = None
         return out_int
 
@@ -359,152 +360,152 @@ class GetHoldPlacePast(CommonMethods4Official):
         return target_el.text
 
 
-# class OfficialProgram(CommonMethods4Official):
-#     def __init__(self,
-#                  race_no: int,
-#                  jyo_code: int,
-#                  date: int) -> None:
-#         """
-#         競艇公式サイトの番組表からのデータ取得
-#         レース番，場コード，日付を入力し公式サイトへアクセス
+class OfficialProgram(CommonMethods4Official):
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 date: int) -> None:
+        """
+        競艇公式サイトの番組表からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
 
-#         Parameters
-#         ----------
-#             race_no : int
-#                 何レース目か
-#             jyo_code : int
-#                 会場コード
-#             date : int
-#                 yyyymmdd形式で入力
+        Parameters
+        ----------
+            race_no : int
+                何レース目か
+            jyo_code : int
+                会場コード
+            date : int
+                yyyymmdd形式で入力
 
-#         """
-#         # logger設定
-#         self.logger = \
-#             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        """
+        # logger設定
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
-#         # htmlをload
-#         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
-#         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-#         self.logger.debug(f'get html: {target_url}')
-#         self.__lx_content = super()._url2lxml(target_url)
-#         self.logger.debug('get html completed.')
+        # htmlをload
+        base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
+        self.logger.debug(f'get html: {target_url}')
+        self.__lx_content = super()._url2lxml(target_url)
+        self.logger.debug('get html completed.')
 
-#     def getplayerinfo2dict(self, waku: int) -> dict:
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 番組表を選択 css selectorより
-#         self.logger.debug('get table html from target url')
-#         target_table_selector = \
-#             'body > main > div > div > '\
-#             'div > div.contentsFrame1_inner > '\
-#             'div.table1.is-tableFixed__3rdadd > table'
-#         player_info_html_list = \
-#             super()._getplayertable2list(
-#                 self.__lx_content,
-#                 target_table_selector
-#             )
-#         self.logger.debug('get table html completed.')
+    def getplayerinfo2dict(self, waku: int) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
 
-#         # waku は1からなので-1
-#         self.logger.debug(f'get target player info (waku : {waku})')
-#         player_html = player_info_html_list[waku - 1]
-#         # 選手情報は1番目のtr
-#         player_info = player_html.select_one("tr")
-#         player_info_list = player_info.select("td")
+        target_tbody_xpath = \
+            f"/html/body/main/div/div/div/div[2]/div[4]/table/tbody[{waku}]"
 
-#         # 名前，登録番号などの欄は3番目
-#         player_name_list = player_info_list[2].select("div")
-#         assert len(player_name_list) == 3, \
-#             f'elements of player name info is not 3: {len(player_name_list)}'
-#         # list 登録番号・級，名前，出身・年齢，体重
-#         player_no_level, name, place_age_weight = \
-#             list(map(lambda elements: elements.text, player_name_list))
-#         # 名前の取り出し
-#         name = name.replace('\n', '').replace('\u3000', '')
-#         player_id, player_level = player_no_level.replace('\r', '')\
-#                                                  .replace('\n', '')\
-#                                                  .replace(' ', '')\
-#                                                  .split('/')
-#         # 登録番号の取り出し
-#         player_id = int(player_id)
+        self.logger.debug("Get player's informaiton.(id, level, name, etc)")
+        # 登録番号
+        player_id_xpath = "/".join([target_tbody_xpath, "tr[1]/td[3]/div[1]"])
+        row_player_id = self.__lx_content.xpath(player_id_xpath)[0].text
+        player_id = super()._rmletter2int(row_player_id)
 
-#         # 出身地, 年齢, 体重の取り出し
-#         place, age_weight = place_age_weight.replace(' ', '')\
-#                                             .replace('\r', '')\
-#                                             .split('\n')[1:-1]
-#         # 支部：home, 出身地: birth_place
-#         home, birth_place = place.split('/')
-#         # 年齢:age，体重:weight
-#         age, weight = age_weight.split('/')
-#         # 数字だけ抜く
-#         age = re.match(r'[0-9]+', age)
-#         age = int(age.group(0))
-#         weight = super()._rmletter2float(weight)
+        # 級
+        player_level_xpath = "/".join([player_id_xpath, "span"])
+        row_player_level = self.__lx_content.xpath(player_level_xpath)[0].text
+        # 級が取りうる値かチェックする
+        try:
+            player_level = re.search(r"[A,B][1,2]", row_player_level).group(0)
+        except AttributeError as e:
+            self.logger.error(f"player_level: {row_player_level} error: {e}")
+            player_level = None
 
-#         # F/L/ST平均は4番目
-#         flst = player_info_list[3]
-#         flst_list = super()._text2list_rn_split(flst, 3)
-#         # 数字のみ抜き出してキャスト
-#         # num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
-#         # num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
-#         # avg_ST = float(re.sub(r'[a-z, A-Z]', '', flst_list[2]))
-#         num_F = super()._rmletter2int(flst_list[0])
-#         num_L = super()._rmletter2int(flst_list[1])
-#         avg_ST = super()._rmletter2float(flst_list[2])
+        # # 名前，登録番号などの欄は3番目
+        # player_name_list = player_info_list[2].select("div")
+        # assert len(player_name_list) == 3, \
+        #     f'elements of player name info is not 3: {len(player_name_list)}'
+        # # list 登録番号・級，名前，出身・年齢，体重
+        # player_no_level, name, place_age_weight = \
+        #     list(map(lambda elements: elements.text, player_name_list))
+        # # 名前の取り出し
+        # name = name.replace('\n', '').replace('\u3000', '')
+        # player_id, player_level = player_no_level.replace('\r', '')\
+        #                                          .replace('\n', '')\
+        #                                          .replace(' ', '')\
+        #                                          .split('/')
+        # # 登録番号の取り出し
+        # player_id = int(player_id)
 
-#         # 全国勝率・連対率は5番目
-#         all_123_rate = player_info_list[4]
-#         all_123_list = super()._text2list_rn_split(all_123_rate, 3)
-#         all_1rate, all_2rate, all_3rate = \
-#             list(map(lambda x: float(x), all_123_list))
+        # # 出身地, 年齢, 体重の取り出し
+        # place, age_weight = place_age_weight.replace(' ', '')\
+        #                                     .replace('\r', '')\
+        #                                     .split('\n')[1:-1]
+        # # 支部：home, 出身地: birth_place
+        # home, birth_place = place.split('/')
+        # # 年齢:age，体重:weight
+        # age, weight = age_weight.split('/')
+        # # 数字だけ抜く
+        # age = re.match(r'[0-9]+', age)
+        # age = int(age.group(0))
+        # weight = super()._rmletter2float(weight)
 
-#         # 当地勝率・連対率は6番目
-#         local_123_rate = player_info_list[5]
-#         local_123_list = super()._text2list_rn_split(local_123_rate, 3)
-#         local_1rate, local_2rate, local_3rate = \
-#             list(map(lambda x: float(x), local_123_list))
+        # # F/L/ST平均は4番目
+        # flst = player_info_list[3]
+        # flst_list = super()._text2list_rn_split(flst, 3)
+        # # 数字のみ抜き出してキャスト
+        # # num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
+        # # num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
+        # # avg_ST = float(re.sub(r'[a-z, A-Z]', '', flst_list[2]))
+        # num_F = super()._rmletter2int(flst_list[0])
+        # num_L = super()._rmletter2int(flst_list[1])
+        # avg_ST = super()._rmletter2float(flst_list[2])
 
-#         # モーター情報は7番目
-#         motor_info = player_info_list[6]
-#         motor_info_list = super()._text2list_rn_split(motor_info, 3)
-#         motor_no = int(motor_info_list[0])
-#         motor_2rate = float(motor_info_list[1])
-#         motor_3rate = float(motor_info_list[2])
+        # # 全国勝率・連対率は5番目
+        # all_123_rate = player_info_list[4]
+        # all_123_list = super()._text2list_rn_split(all_123_rate, 3)
+        # all_1rate, all_2rate, all_3rate = \
+        #     list(map(lambda x: float(x), all_123_list))
 
-#         # ボート情報は8番目
-#         boat_info = player_info_list[7]
-#         boat_info_list = super()._text2list_rn_split(boat_info, 3)
-#         boat_no = int(boat_info_list[0])
-#         boat_2rate = float(boat_info_list[1])
-#         boat_3rate = float(boat_info_list[2])
+        # # 当地勝率・連対率は6番目
+        # local_123_rate = player_info_list[5]
+        # local_123_list = super()._text2list_rn_split(local_123_rate, 3)
+        # local_1rate, local_2rate, local_3rate = \
+        #     list(map(lambda x: float(x), local_123_list))
 
-#         self.logger.debug('get target player info completed.')
+        # # モーター情報は7番目
+        # motor_info = player_info_list[6]
+        # motor_info_list = super()._text2list_rn_split(motor_info, 3)
+        # motor_no = int(motor_info_list[0])
+        # motor_2rate = float(motor_info_list[1])
+        # motor_3rate = float(motor_info_list[2])
 
-#         content_dict = {
-#             'name': name,
-#             'id': player_id,
-#             'level': player_level,
-#             'home': home,
-#             'birth_place': birth_place,
-#             'age': age,
-#             'weight': weight,
-#             'num_F': num_F,
-#             'num_L': num_L,
-#             'avg_ST': avg_ST,
-#             'all_1rate': all_1rate,
-#             'all_2rate': all_2rate,
-#             'all_3rate': all_3rate,
-#             'local_1rate': local_1rate,
-#             'local_2rate': local_2rate,
-#             'local_3rate': local_3rate,
-#             'motor_no': motor_no,
-#             'motor_2rate': motor_2rate,
-#             'motor_3rate': motor_3rate,
-#             'boat_no': boat_no,
-#             'boat_2rate': boat_2rate,
-#             'boat_3rate': boat_3rate
-#         }
+        # # ボート情報は8番目
+        # boat_info = player_info_list[7]
+        # boat_info_list = super()._text2list_rn_split(boat_info, 3)
+        # boat_no = int(boat_info_list[0])
+        # boat_2rate = float(boat_info_list[1])
+        # boat_3rate = float(boat_info_list[2])
 
-#         return content_dict
+        self.logger.debug('get target player info completed.')
+
+        content_dict = {
+            # 'name': name,
+            'id': player_id,
+            'level': player_level,
+            # 'home': home,
+            # 'birth_place': birth_place,
+            # 'age': age,
+            # 'weight': weight,
+            # 'num_F': num_F,
+            # 'num_L': num_L,
+            # 'avg_ST': avg_ST,
+            # 'all_1rate': all_1rate,
+            # 'all_2rate': all_2rate,
+            # 'all_3rate': all_3rate,
+            # 'local_1rate': local_1rate,
+            # 'local_2rate': local_2rate,
+            # 'local_3rate': local_3rate,
+            # 'motor_no': motor_no,
+            # 'motor_2rate': motor_2rate,
+            # 'motor_3rate': motor_3rate,
+            # 'boat_no': boat_no,
+            # 'boat_2rate': boat_2rate,
+            # 'boat_3rate': boat_3rate
+        }
+
+        return content_dict
 
 #     def getcommoninfo2dict(self) -> dict:
 #         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
