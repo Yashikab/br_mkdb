@@ -273,84 +273,90 @@ class GetHoldPlacePast(CommonMethods4Official):
         self.logger.debug(f'access: {target_url}')
         self.__lx_content = super()._url2lxml(target_url)
 
-        # 抜き出すテーブルの選択
-        target_table_xpath = \
-            "/html/body/main/div/div/div/div[2]/div[3]/table"
-        target_table_content = self.__lx_content.xpath(target_table_xpath)[0]
-        
-        
+        # 抜き出すテーブルのxpath
+        target_table_xpath = "/html/body/main/div/div/div/div[2]/div[3]/table"
 
+        # 会場名のパス
+        place_name_xpath = "/".join([target_table_xpath,
+                                     "tbody/tr/td[1]/a/img"])
         self.place_name_list = \
-            list(map(lambda x: self._getplacename(x), tbody_list))
+            list(map(self._getplacename,
+                     self.__lx_content.xpath(place_name_xpath)))
+
+        # 進行状況のパス
+        shinko_info_xpath = "/".join([target_table_xpath, "tbody/tr/td[2]"])
         self.shinko_info_list = \
-            list(map(lambda x: self._getshinkoinfo(x), tbody_list))
+            list(map(self._getshinkoinfo,
+                     self.__lx_content.xpath(shinko_info_xpath)))
 
-    # def holdplace2strlist(self) -> list:
-    #     """
-    #     会場名のままset型で返す
-    #     """
-    #     self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-    #     return self.place_name_list
+    def holdplace2strlist(self) -> list:
+        """
+        会場名のままset型で返す
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        return self.place_name_list
 
-    # def holdplace2cdlist(self) -> list:
-    #     """
-    #     会場コードをset型で返す．
-    #     """
-    #     self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-    #     # jyo master取得
-    #     filepath = Path(__file__).parent.resolve().joinpath('jyo_master.csv')
-    #     jyo_master = pd.read_csv(filepath, header=0)
-    #     self.logger.debug('loading table to df done.')
-    #     # 会場名をインデックスにする
-    #     jyo_master.set_index('jyo_name', inplace=True)
-    #     # コードへ返還
-    #     code_name_list = \
-    #         list(map(
-    #             lambda x: jyo_master.at[x, 'jyo_cd'], self.place_name_list))
-    #     return code_name_list
+    def holdplace2cdlist(self) -> list:
+        """
+        会場コードをset型で返す．
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # jyo master取得
+        filepath = Path(__file__).parent.resolve().joinpath('jyo_master.csv')
+        jyo_master = pd.read_csv(filepath, header=0)
+        self.logger.debug('loading table to df done.')
+        # 会場名をインデックスにする
+        jyo_master.set_index('jyo_name', inplace=True)
+        # コードへ返還
+        code_name_list = \
+            list(map(
+                lambda x: jyo_master.at[x, 'jyo_cd'], self.place_name_list))
+        return code_name_list
 
-    # def holdinfo2dict(self, hp_name: str) -> dict:
-    #     """開催場の情報を辞書型で返す
+    def holdinfo2dict(self, hp_name: str) -> dict:
+        """開催場の情報を辞書型で返す
 
-    #     Parameters
-    #     ----------
-    #         hp_name: str
-    #             開催場名
-    #     """
-    #     self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-    #     shinko = self.shinko_info_list[self.place_name_list.index(hp_name)]
-    #     ed_race_no = self._get_end_raceno(shinko)
+        Parameters
+        ----------
+            hp_name: str
+                開催場名
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        shinko = self.shinko_info_list[self.place_name_list.index(hp_name)]
+        ed_race_no = self._get_end_raceno(shinko)
 
-    #     content_dict = {
-    #         'shinko': shinko,
-    #         'ed_race_no': ed_race_no
-    #     }
-    #     return content_dict
+        content_dict = {
+            'shinko': shinko,
+            'ed_race_no': ed_race_no
+        }
+        return content_dict
 
-    # def _get_end_raceno(self, msg: str) -> int:
-    #     """進行情報の欄をみて，その日の最終レースを返す"""
-    #     if re.search(r'1?[1-9]R以降中止', msg) is not None:
-    #         end_race = int(re.search(r'1?[1-9]', msg).group(0))
-    #     elif '中止' in msg:
-    #         end_race = 0
-    #     else:
-    #         # 通常
-    #         end_race = 12
-    #     return end_race
+    def _get_end_raceno(self, msg: str) -> int:
+        """進行情報の欄をみて，その日の最終レースを返す"""
+        if re.search(r'1?[1-9]R以降中止', msg) is not None:
+            end_race = int(re.search(r'1?[1-9]', msg).group(0))
+        elif '中止' in msg:
+            end_race = 0
+        else:
+            # 通常
+            end_race = 12
+        return end_race
 
-    # def _getplacename(self, row_html) -> str:
-    #     """
-    #     行htmlから会場名を抜き出す
-    #     """
-    #     place_name = row_html.select_one('tr > td > a > img')['alt']
-    #     place_name = super()._getonlyzenkaku2str(place_name)
-    #     return place_name
+    def _getplacename(self, target_el: lxml.Element) -> str:
+        """
+        Elementから会場名を抜き出す
+        """
+        place_name = target_el.attrib["alt"]
+        # 不要な文字を削除
+        place_name = place_name.replace(">", "")
+        place_name = super()._getonlyzenkaku2str(place_name)
+        return place_name
 
-    # def _getshinkoinfo(self, row_html) -> str:
-    #     """
-    #     中止などの情報を抜き出す
-    #     """
-    #     return row_html.select('tr > td')[1].text
+    def _getshinkoinfo(self, target_el) -> str:
+        """
+        中止などの情報を抜き出す
+        """
+        return target_el.text
 
 
 # class OfficialProgram(CommonMethods4Official):
