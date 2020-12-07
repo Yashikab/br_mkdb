@@ -412,34 +412,27 @@ class OfficialProgram(CommonMethods4Official):
             self.logger.error(f"player_level: {row_player_level} error: {e}")
             player_level = None
 
-        # # 名前，登録番号などの欄は3番目
-        # player_name_list = player_info_list[2].select("div")
-        # assert len(player_name_list) == 3, \
-        #     f'elements of player name info is not 3: {len(player_name_list)}'
-        # # list 登録番号・級，名前，出身・年齢，体重
-        # player_no_level, name, place_age_weight = \
-        #     list(map(lambda elements: elements.text, player_name_list))
-        # # 名前の取り出し
-        # name = name.replace('\n', '').replace('\u3000', '')
-        # player_id, player_level = player_no_level.replace('\r', '')\
-        #                                          .replace('\n', '')\
-        #                                          .replace(' ', '')\
-        #                                          .split('/')
-        # # 登録番号の取り出し
-        # player_id = int(player_id)
+        # 名前
+        player_name_xpath = "/".join([target_tbody_xpath,
+                                      "tr[1]/td[3]/div[2]/a"])
+        row_player_name = self.__lx_content.xpath(player_name_xpath)[0].text
+        player_name = row_player_name.replace('\n', '').replace('\u3000', '')
 
-        # # 出身地, 年齢, 体重の取り出し
-        # place, age_weight = place_age_weight.replace(' ', '')\
-        #                                     .replace('\r', '')\
-        #                                     .split('\n')[1:-1]
-        # # 支部：home, 出身地: birth_place
-        # home, birth_place = place.split('/')
-        # # 年齢:age，体重:weight
-        # age, weight = age_weight.split('/')
-        # # 数字だけ抜く
-        # age = re.match(r'[0-9]+', age)
-        # age = int(age.group(0))
-        # weight = super()._rmletter2float(weight)
+        # 所属、出身地
+        home_birth_xpath = "/".join([target_tbody_xpath,
+                                     "tr[1]/td[3]/div[3]/text()[1]"])
+        # xpathでtextまで指定されている
+        # 出力例: '\n                          愛知/愛知\n                          '
+        home_birth = self.__lx_content.xpath(home_birth_xpath)[0]
+        home, birth_place = home_birth.strip().split("/")
+
+        # 年齢、体重
+        age_weight_xpath = "/".join([target_tbody_xpath,
+                                     "tr[1]/td[3]/div[3]/text()[2]"])
+        age_weight = self.__lx_content.xpath(age_weight_xpath)[0]
+        row_age, row_weight = age_weight.strip().split("/")
+        age = super()._rmletter2int(row_age)
+        weight = super()._rmletter2float(row_weight)
 
         # # F/L/ST平均は4番目
         # flst = player_info_list[3]
@@ -481,13 +474,13 @@ class OfficialProgram(CommonMethods4Official):
         self.logger.debug('get target player info completed.')
 
         content_dict = {
-            # 'name': name,
+            'name': player_name,
             'id': player_id,
             'level': player_level,
-            # 'home': home,
-            # 'birth_place': birth_place,
-            # 'age': age,
-            # 'weight': weight,
+            'home': home,
+            'birth_place': birth_place,
+            'age': age,
+            'weight': weight,
             # 'num_F': num_F,
             # 'num_L': num_L,
             # 'avg_ST': avg_ST,
