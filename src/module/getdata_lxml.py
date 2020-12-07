@@ -434,28 +434,60 @@ class OfficialProgram(CommonMethods4Official):
         age = super()._rmletter2int(row_age)
         weight = super()._rmletter2float(row_weight)
 
-        # # F/L/ST平均は4番目
-        # flst = player_info_list[3]
-        # flst_list = super()._text2list_rn_split(flst, 3)
-        # # 数字のみ抜き出してキャスト
-        # # num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
-        # # num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
-        # # avg_ST = float(re.sub(r'[a-z, A-Z]', '', flst_list[2]))
-        # num_F = super()._rmletter2int(flst_list[0])
-        # num_L = super()._rmletter2int(flst_list[1])
-        # avg_ST = super()._rmletter2float(flst_list[2])
+        # TODO: 関数化する
+        # F数
+        num_F_xpath = "/".join([target_tbody_xpath,
+                                "tr[1]/td[4]/text()[1]"])
+        row_num_F = self.__lx_content.xpath(num_F_xpath)[0]
+        num_F = super()._rmletter2int(row_num_F.strip())
 
-        # # 全国勝率・連対率は5番目
-        # all_123_rate = player_info_list[4]
-        # all_123_list = super()._text2list_rn_split(all_123_rate, 3)
-        # all_1rate, all_2rate, all_3rate = \
-        #     list(map(lambda x: float(x), all_123_list))
+        # L数
+        num_L_xpath = "/".join([target_tbody_xpath,
+                                "tr[1]/td[4]/text()[2]"])
+        row_num_L = self.__lx_content.xpath(num_L_xpath)[0]
+        num_L = super()._rmletter2int(row_num_L.strip())
 
-        # # 当地勝率・連対率は6番目
-        # local_123_rate = player_info_list[5]
-        # local_123_list = super()._text2list_rn_split(local_123_rate, 3)
-        # local_1rate, local_2rate, local_3rate = \
-        #     list(map(lambda x: float(x), local_123_list))
+        # ST平均
+        avg_ST_xpath = "/".join([target_tbody_xpath,
+                                 "tr[1]/td[4]/text()[3]"])
+        row_avg_ST = self.__lx_content.xpath(avg_ST_xpath)[0]
+        avg_ST = super()._rmletter2float(row_avg_ST.strip())
+
+        # 全国勝率
+        all_1rate_xpath = "/".join([target_tbody_xpath,
+                                    "tr[1]/td[5]/text()[1]"])
+        row_all_1rate = self.__lx_content.xpath(all_1rate_xpath)[0]
+        all_1rate = super()._rmletter2float(row_all_1rate.strip())
+
+        # 全国2連対率
+        all_2rate_xpath = "/".join([target_tbody_xpath,
+                                    "tr[1]/td[5]/text()[2]"])
+        row_all_2rate = self.__lx_content.xpath(all_2rate_xpath)[0]
+        all_2rate = super()._rmletter2float(row_all_2rate.strip())
+
+        # 全国3連対率
+        all_3rate_xpath = "/".join([target_tbody_xpath,
+                                    "tr[1]/td[5]/text()[3]"])
+        row_all_3rate = self.__lx_content.xpath(all_3rate_xpath)[0]
+        all_3rate = super()._rmletter2float(row_all_3rate.strip())
+
+        # 当地勝率
+        local_1rate_xpath = "/".join([target_tbody_xpath,
+                                      "tr[1]/td[6]/text()[1]"])
+        row_local_1rate = self.__lx_content.xpath(local_1rate_xpath)[0]
+        local_1rate = super()._rmletter2float(row_local_1rate.strip())
+
+        # 当地2連対率
+        local_2rate_xpath = "/".join([target_tbody_xpath,
+                                      "tr[1]/td[6]/text()[2]"])
+        row_local_2rate = self.__lx_content.xpath(local_2rate_xpath)[0]
+        local_2rate = super()._rmletter2float(row_local_2rate.strip())
+
+        # 当地3連対率
+        local_3rate_xpath = "/".join([target_tbody_xpath,
+                                      "tr[1]/td[6]/text()[3]"])
+        row_local_3rate = self.__lx_content.xpath(local_3rate_xpath)[0]
+        local_3rate = super()._rmletter2float(row_local_3rate.strip())
 
         # # モーター情報は7番目
         # motor_info = player_info_list[6]
@@ -481,15 +513,15 @@ class OfficialProgram(CommonMethods4Official):
             'birth_place': birth_place,
             'age': age,
             'weight': weight,
-            # 'num_F': num_F,
-            # 'num_L': num_L,
-            # 'avg_ST': avg_ST,
-            # 'all_1rate': all_1rate,
-            # 'all_2rate': all_2rate,
-            # 'all_3rate': all_3rate,
-            # 'local_1rate': local_1rate,
-            # 'local_2rate': local_2rate,
-            # 'local_3rate': local_3rate,
+            'num_F': num_F,
+            'num_L': num_L,
+            'avg_ST': avg_ST,
+            'all_1rate': all_1rate,
+            'all_2rate': all_2rate,
+            'all_3rate': all_3rate,
+            'local_1rate': local_1rate,
+            'local_2rate': local_2rate,
+            'local_3rate': local_3rate,
             # 'motor_no': motor_no,
             # 'motor_2rate': motor_2rate,
             # 'motor_3rate': motor_3rate,
