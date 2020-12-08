@@ -18,5 +18,6 @@ class TestDateList:
          [20200228, 20200229, 20200301])
     ])
     def test_datelist(self, st_date, ed_date, expected):
-        res_dl = [d for d in getdata_lxml.DateRange.daterange(st_date, ed_date)]
+        res_dl = \
+            [d for d in getdata_lxml.DateRange.daterange(st_date, ed_date)]
         assert res_dl == expected
