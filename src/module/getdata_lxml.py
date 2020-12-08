@@ -4,7 +4,7 @@
 HTMLから情報をスクレイピングするためのモジュール
 """
 from datetime import datetime, timedelta
-from logging import getLogger
+from logging import getLogger, root
 from pathlib import Path
 import re
 import sys
@@ -399,24 +399,24 @@ class OfficialProgram(CommonMethods4Official):
         self.logger.debug("Get player's informaiton.(id, level, name, etc)")
         # 登録番号
         player_id_xpath = "/".join([target_tbody_xpath, "tr[1]/td[3]/div[1]"])
-        row_player_id = self.__lx_content.xpath(player_id_xpath)[0].text
-        player_id = super()._rmletter2int(row_player_id)
+        raw_player_id = self.__lx_content.xpath(player_id_xpath)[0].text
+        player_id = super()._rmletter2int(raw_player_id)
 
         # 級
         player_level_xpath = "/".join([player_id_xpath, "span"])
-        row_player_level = self.__lx_content.xpath(player_level_xpath)[0].text
+        raw_player_level = self.__lx_content.xpath(player_level_xpath)[0].text
         # 級が取りうる値かチェックする
         try:
-            player_level = re.search(r"[A,B][1,2]", row_player_level).group(0)
+            player_level = re.search(r"[A,B][1,2]", raw_player_level).group(0)
         except AttributeError as e:
-            self.logger.error(f"player_level: {row_player_level} error: {e}")
+            self.logger.error(f"player_level: {raw_player_level} error: {e}")
             player_level = None
 
         # 名前
         player_name_xpath = "/".join([target_tbody_xpath,
                                       "tr[1]/td[3]/div[2]/a"])
-        row_player_name = self.__lx_content.xpath(player_name_xpath)[0].text
-        player_name = row_player_name.replace('\n', '').replace('\u3000', '')
+        raw_player_name = self.__lx_content.xpath(player_name_xpath)[0].text
+        player_name = raw_player_name.replace('\n', '').replace('\u3000', '')
 
         # 所属、出身地
         home_birth_xpath = "/".join([target_tbody_xpath,
@@ -430,78 +430,47 @@ class OfficialProgram(CommonMethods4Official):
         age_weight_xpath = "/".join([target_tbody_xpath,
                                      "tr[1]/td[3]/div[3]/text()[2]"])
         age_weight = self.__lx_content.xpath(age_weight_xpath)[0]
-        row_age, row_weight = age_weight.strip().split("/")
-        age = super()._rmletter2int(row_age)
-        weight = super()._rmletter2float(row_weight)
+        raw_age, raw_weight = age_weight.strip().split("/")
+        age = super()._rmletter2int(raw_age)
+        weight = super()._rmletter2float(raw_weight)
 
-        # TODO: 関数化する
-        # F数
+        # F/L数 平均ST
         num_F_xpath = "/".join([target_tbody_xpath,
                                 "tr[1]/td[4]/text()[1]"])
-        row_num_F = self.__lx_content.xpath(num_F_xpath)[0]
-        num_F = super()._rmletter2int(row_num_F.strip())
-
-        # L数
-        num_L_xpath = "/".join([target_tbody_xpath,
-                                "tr[1]/td[4]/text()[2]"])
-        row_num_L = self.__lx_content.xpath(num_L_xpath)[0]
-        num_L = super()._rmletter2int(row_num_L.strip())
-
-        # ST平均
-        avg_ST_xpath = "/".join([target_tbody_xpath,
-                                 "tr[1]/td[4]/text()[3]"])
-        row_avg_ST = self.__lx_content.xpath(avg_ST_xpath)[0]
-        avg_ST = super()._rmletter2float(row_avg_ST.strip())
+        raw_num_F = self.__lx_content.xpath(num_F_xpath)[0]
+        raw_num_F, raw_num_L, raw_avg_ST = \
+            self._box_to_three_element(target_tbody_xpath, column_no=4)
+        num_F = super()._rmletter2int(raw_num_F.strip())
+        num_L = super()._rmletter2int(raw_num_L.strip())
+        avg_ST = super()._rmletter2float(raw_avg_ST.strip())
 
         # 全国勝率
-        all_1rate_xpath = "/".join([target_tbody_xpath,
-                                    "tr[1]/td[5]/text()[1]"])
-        row_all_1rate = self.__lx_content.xpath(all_1rate_xpath)[0]
-        all_1rate = super()._rmletter2float(row_all_1rate.strip())
-
-        # 全国2連対率
-        all_2rate_xpath = "/".join([target_tbody_xpath,
-                                    "tr[1]/td[5]/text()[2]"])
-        row_all_2rate = self.__lx_content.xpath(all_2rate_xpath)[0]
-        all_2rate = super()._rmletter2float(row_all_2rate.strip())
-
-        # 全国3連対率
-        all_3rate_xpath = "/".join([target_tbody_xpath,
-                                    "tr[1]/td[5]/text()[3]"])
-        row_all_3rate = self.__lx_content.xpath(all_3rate_xpath)[0]
-        all_3rate = super()._rmletter2float(row_all_3rate.strip())
+        raw_all_1rate, raw_all_2rate, raw_all_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=5)
+        all_1rate = super()._rmletter2float(raw_all_1rate.strip())
+        all_2rate = super()._rmletter2float(raw_all_2rate.strip())
+        all_3rate = super()._rmletter2float(raw_all_3rate.strip())
 
         # 当地勝率
-        local_1rate_xpath = "/".join([target_tbody_xpath,
-                                      "tr[1]/td[6]/text()[1]"])
-        row_local_1rate = self.__lx_content.xpath(local_1rate_xpath)[0]
-        local_1rate = super()._rmletter2float(row_local_1rate.strip())
+        raw_local_1rate, raw_local_2rate, raw_local_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=6)
+        local_1rate = super()._rmletter2float(raw_local_1rate.strip())
+        local_2rate = super()._rmletter2float(raw_local_2rate.strip())
+        local_3rate = super()._rmletter2float(raw_local_3rate.strip())
 
-        # 当地2連対率
-        local_2rate_xpath = "/".join([target_tbody_xpath,
-                                      "tr[1]/td[6]/text()[2]"])
-        row_local_2rate = self.__lx_content.xpath(local_2rate_xpath)[0]
-        local_2rate = super()._rmletter2float(row_local_2rate.strip())
+        # モーター情報は7番目
+        raw_motor_no, raw_motor_2rate, raw_motor_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=7)
+        motor_no = super()._rmletter2int(raw_motor_no.strip())
+        motor_2rate = super()._rmletter2float(raw_motor_2rate.strip())
+        motor_3rate = super()._rmletter2float(raw_motor_3rate.strip())
 
-        # 当地3連対率
-        local_3rate_xpath = "/".join([target_tbody_xpath,
-                                      "tr[1]/td[6]/text()[3]"])
-        row_local_3rate = self.__lx_content.xpath(local_3rate_xpath)[0]
-        local_3rate = super()._rmletter2float(row_local_3rate.strip())
-
-        # # モーター情報は7番目
-        # motor_info = player_info_list[6]
-        # motor_info_list = super()._text2list_rn_split(motor_info, 3)
-        # motor_no = int(motor_info_list[0])
-        # motor_2rate = float(motor_info_list[1])
-        # motor_3rate = float(motor_info_list[2])
-
-        # # ボート情報は8番目
-        # boat_info = player_info_list[7]
-        # boat_info_list = super()._text2list_rn_split(boat_info, 3)
-        # boat_no = int(boat_info_list[0])
-        # boat_2rate = float(boat_info_list[1])
-        # boat_3rate = float(boat_info_list[2])
+        # ボート情報は8番目
+        raw_boat_no, raw_boat_2rate, raw_boat_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=8)
+        boat_no = super()._rmletter2int(raw_boat_no.strip())
+        boat_2rate = super()._rmletter2float(raw_boat_2rate.strip())
+        boat_3rate = super()._rmletter2float(raw_boat_3rate.strip())
 
         self.logger.debug('get target player info completed.')
 
@@ -522,60 +491,70 @@ class OfficialProgram(CommonMethods4Official):
             'local_1rate': local_1rate,
             'local_2rate': local_2rate,
             'local_3rate': local_3rate,
-            # 'motor_no': motor_no,
-            # 'motor_2rate': motor_2rate,
-            # 'motor_3rate': motor_3rate,
-            # 'boat_no': boat_no,
-            # 'boat_2rate': boat_2rate,
-            # 'boat_3rate': boat_3rate
+            'motor_no': motor_no,
+            'motor_2rate': motor_2rate,
+            'motor_3rate': motor_3rate,
+            'boat_no': boat_no,
+            'boat_2rate': boat_2rate,
+            'boat_3rate': boat_3rate
         }
 
         return content_dict
 
-#     def getcommoninfo2dict(self) -> dict:
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.heading2 > div > div.heading2_title'
-#         raceinfo_html = self.__lx_content.select_one(table_selector)
-#         taikai_name = raceinfo_html.select_one('h2').text
+    def getcommoninfo2dict(self) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        target_table_xpath = "/html/body/main/div/div/div/div[1]/div/div[2]"
 
-#         # SG, G1, G2, G3 一般
-#         grade = raceinfo_html['class'][1]
+        # SG, G1, G2, G3 一般
+        raw_grade = \
+            self.__lx_content.xpath(target_table_xpath)[0].attrib["class"]
+        grade = raw_grade.split()[1].strip()
 
-#         # race_type : 予選 優勝戦など
-#         race_str = raceinfo_html.select_one('span').text
-#         race_str = race_str.replace('\u3000', '')
-#         race_type = super()._getonlyzenkaku2str(race_str)
+        # 大会名
+        taikai_xpath = "/".join([target_table_xpath, "h2"])
+        taikai_name = self.__lx_content.xpath(taikai_xpath)[0].text
+        taikai_name = super()._getonlyzenkaku2str(taikai_name)
 
-#         # レース距離
-#         try:
-#             race_kyori = re.search(r'[0-9]+m', race_str).group(0)
-#             race_kyori = int(race_kyori.replace('m', ''))
-#         except ValueError:
-#             race_kyori = None
+        # race_type : 予選 優勝戦など/レース距離
+        race_type_xpath = "/".join([target_table_xpath, "span"])
+        race_str = self.__lx_content.xpath(race_type_xpath)[0].text
+        race_list = re.sub("[\u3000\t]", "", race_str).split("\n")
+        race_type, race_kyori = list(filter(lambda x: x != "", race_list))
+        race_type = super()._getonlyzenkaku2str(race_type)
+        race_kyori = super()._rmletter2int(race_kyori)
 
-#         # 安定版or進入固定の有無
-#         other_labels_list = raceinfo_html.select('span.label2')
-#         if '安定板使用' in other_labels_list:
-#             is_antei = True
-#         else:
-#             is_antei = False
-#         if '進入固定' in other_labels_list:
-#             is_shinnyukotei = True
-#         else:
-#             is_shinnyukotei = False
+        # 安定版or進入固定の有無
+        antei_shinyu_xpath = "/".join([target_table_xpath, "/div/span"])
+        antei_shinyu_el_list = self.__lx_content.xpath(antei_shinyu_xpath)
+        antei_shinyu_list = list(map(
+            lambda x: x.text.strip(), antei_shinyu_el_list))
+        if '安定板使用' in antei_shinyu_list:
+            is_antei = True
+        else:
+            is_antei = False
+        if '進入固定' in antei_shinyu_list:
+            is_shinnyukotei = True
+        else:
+            is_shinnyukotei = False
 
-#         content_dict = {
-#             'taikai_name': taikai_name,
-#             'grade': grade,
-#             'race_type': race_type,
-#             'race_kyori': race_kyori,
-#             'is_antei': is_antei,
-#             'is_shinnyukotei': is_shinnyukotei
-#         }
+        content_dict = {
+            'taikai_name': taikai_name,
+            'grade': grade,
+            'race_type': race_type,
+            'race_kyori': race_kyori,
+            'is_antei': is_antei,
+            'is_shinnyukotei': is_shinnyukotei
+        }
 
-#         return content_dict
+        return content_dict
+
+    def _box_to_three_element(self, root_xpath: str, column_no: int) -> list:
+        el_list = []
+        for i in range(1, 4):
+            target_xpath = "/".join([root_xpath,
+                                     f"tr[1]/td[{column_no}]/text()[{i}]"])
+            el_list.append(self.__lx_content.xpath(target_xpath)[0])
+        return el_list
 
 
 # class OfficialChokuzen(CommonMethods4Official):

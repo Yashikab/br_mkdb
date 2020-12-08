@@ -93,28 +93,29 @@ class TestOfficialProgram(CommonMethodForTest):
         ('local_2rate', 1, 17.39),
         ('local_3rate', 0, 60.00),
         ('local_3rate', 1, 34.78),
-        # ('motor_no', 0, 23),
-        # ('motor_no', 1, 21),
-        # ('motor_2rate', 0, 54.66),
-        # ('motor_2rate', 1, 27.00),
-        # ('motor_3rate', 0, 72.46),
-        # ('motor_3rate', 1, 46.84),
-        # ('boat_no', 0, 34),
-        # ('boat_no', 1, 73),
-        # ('boat_2rate', 0, 15.05),
-        # ('boat_2rate', 1, 32.32),
-        # ('boat_3rate', 0, 33.33),
-        # ('boat_3rate', 1, 52.53)
+        ('motor_no', 0, 23),
+        ('motor_no', 1, 21),
+        ('motor_2rate', 0, 54.66),
+        ('motor_2rate', 1, 27.00),
+        ('motor_3rate', 0, 72.46),
+        ('motor_3rate', 1, 46.84),
+        ('boat_no', 0, 34),
+        ('boat_no', 1, 73),
+        ('boat_2rate', 0, 15.05),
+        ('boat_2rate', 1, 32.32),
+        ('boat_3rate', 0, 33.33),
+        ('boat_3rate', 1, 52.53)
     ])
     def test_p_inf_program(self, waku, idx, expected, programinfo):
         assert programinfo[idx][waku] == expected
 
-    # @pytest.mark.parametrize("idx, expected", [
-    #     ('taikai_name', 'スポーツ報知　ビクトリーカップ'),
-    #     ('grade', 'is-ippan'),
-    #     ('race_type', '予選'),
-    #     ('race_kyori', 1800),
-    #     ('is_antei', False)
-    # ])
-    # def test_raceinfo(self, idx, expected, raceinfo):
-    #     assert raceinfo[idx] == expected
+    @pytest.mark.parametrize("idx, expected", [
+        ('taikai_name', 'スポーツ報知　ビクトリーカップ'),
+        ('grade', 'is-ippan'),
+        ('race_type', '予選'),
+        ('race_kyori', 1800),
+        ('is_antei', False),
+        ('is_shinnyukotei', False)
+    ])
+    def test_raceinfo(self, idx, expected, raceinfo):
+        assert raceinfo[idx] == expected
