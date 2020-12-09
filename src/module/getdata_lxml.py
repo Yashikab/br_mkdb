@@ -557,89 +557,85 @@ class OfficialProgram(CommonMethods4Official):
         return el_list
 
 
-# class OfficialChokuzen(CommonMethods4Official):
+class OfficialChokuzen(CommonMethods4Official):
 
-#     def __init__(self,
-#                  race_no: int,
-#                  jyo_code: int,
-#                  date: int) -> None:
-#         """
-#         競艇公式サイトの直前情報からのデータ取得
-#         レース番，場コード，日付を入力し公式サイトへアクセス
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 date: int) -> None:
+        """
+        競艇公式サイトの直前情報からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
 
-#         Parameters
-#         ----------
-#         race_no : int
-#             何レース目か
-#         jyo_code : int
-#             会場コード
-#         date : int
-#             yyyymmdd形式で入力
+        Parameters
+        ----------
+        race_no : int
+            何レース目か
+        jyo_code : int
+            会場コード
+        date : int
+            yyyymmdd形式で入力
 
-#         """
-#         self.logger = \
-#             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-#         # htmlをload
-#         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
-#         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-#         self.__lx_content = super()._url2lxml(target_url)
+        """
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        # htmlをload
+        base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
+        self.__lx_content = super()._url2lxml(target_url)
 
-#     def getplayerinfo2dict(self, waku: int) -> dict:
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 選手直前情報を選択 css selectorより
-#         target_p_table_selector = \
-#             'body > main > div > div > div > div.contentsFrame1_inner > '\
-#             'div.grid.is-type3.h-clear > div:nth-child(1) > div.table1 > table'
-#         p_chokuzen_html_list = \
-#             super()._getplayertable2list(
-#                 self.__lx_content,
-#                 target_p_table_selector
-#             )
+    def getplayerinfo2dict(self, waku: int) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 選手直前情報を選択 css selectorより
+        target_p_table_xpath = f"/html/body/main/div/div/div/div[2]/div[4]"\
+                               f"/div[1]/div[1]/table/tbody[{waku}]"
 
-#         p_html = p_chokuzen_html_list[waku - 1]
-#         # 選手情報は1番目のtr
-#         p_chokuzen = p_html.select_one("tr")
-#         p_chokuzen_list = p_chokuzen.select("td")
+        # 名前
+        p_name_xpath = "/".join([target_p_table_xpath, "tr[1]/td[3]/a"])
+        name = self.__lx_content.xpath(p_name_xpath)[0].text
+        name = name.replace('\u3000', '')
 
-#         # 名前の欄は3番目
-#         name = p_chokuzen_list[2].text.replace('\u3000', '')
+        # 体重
+        p_weight_xpath = "/".join([target_p_table_xpath, "tr[1]/td[4]"])
+        weight = self.__lx_content.xpath(p_weight_xpath)[0].text
+        weight = super()._rmletter2float(weight)
 
-#         # 体重は4番目
-#         weight = p_chokuzen_list[3].text
-#         # 'kg'を取り除く
-#         weight = super()._rmletter2float(weight)
-#         # 調整体重だけ3番目のtr, 1番目td
-#         p_chokuzen4chosei = p_html.select("tr")[2]
-#         chosei_weight = p_chokuzen4chosei.select_one("td").text
-#         chosei_weight = super()._rmletter2float(chosei_weight)
-#         # 展示タイムは5番目td (調整体重の方じゃないので注意)
-#         tenji_T = p_chokuzen_list[4].text
-#         tenji_T = super()._rmletter2float(tenji_T)
-#         # チルトは6番目
-#         tilt = p_chokuzen_list[5].text
-#         tilt = super()._rmletter2float(tilt)
+        # 調整体重
+        p_chosei_xpath = "/".join([target_p_table_xpath, "tr[3]/td[1]"])
+        chosei_weight = self.__lx_content.xpath(p_chosei_xpath)[0].text
+        chosei_weight = super()._rmletter2float(chosei_weight)
 
-#         # スタート展示テーブルの選択
-#         target_ST_table_selector = \
-#             'body > main > div > div > div > div.contentsFrame1_inner '\
-#             '> div.grid.is-type3.h-clear > div:nth-child(2) '\
-#             '> div.table1 > table'
-#         tenji_C, tenji_ST = super()._getSTtable2tuple(
-#             self.__lx_content,
-#             target_ST_table_selector,
-#             waku
-#         )
+        # 展示タイムは5番目td (調整体重の方じゃないので注意)
+        p_tenji_xpath = "/".join([target_p_table_xpath, "tr[1]/td[5]"])
+        tenji_T = self.__lx_content.xpath(p_tenji_xpath)[0].text
+        tenji_T = super()._rmletter2float(tenji_T)
 
-#         content_dict = {
-#             'name': name,
-#             'weight': weight,
-#             'chosei_weight': chosei_weight,
-#             'tenji_time': tenji_T,
-#             'tilt': tilt,
-#             'tenji_course': tenji_C,
-#             'tenji_st': tenji_ST
-#         }
-#         return content_dict
+        # チルトは6番目
+        p_tilt_xpath = "/".join([target_p_table_xpath, "tr[1]/td[6]"])
+        tilt = self.__lx_content.xpath(p_tilt_xpath)[0].text
+        tilt = super()._rmletter2float(tilt)
+
+        # スタート展示テーブルの選択
+        # target_ST_table_selector = \
+        #     'body > main > div > div > div > div.contentsFrame1_inner '\
+        #     '> div.grid.is-type3.h-clear > div:nth-child(2) '\
+        #     '> div.table1 > table'
+        # tenji_C, tenji_ST = super()._getSTtable2tuple(
+        #     self.__lx_content,
+        #     target_ST_table_selector,
+        #     waku
+        # )
+
+        content_dict = {
+            'name': name,
+            'weight': weight,
+            'chosei_weight': chosei_weight,
+            'tenji_time': tenji_T,
+            'tilt': tilt,
+            # 'tenji_course': tenji_C,
+            # 'tenji_st': tenji_ST
+        }
+        return content_dict
 
 #     def getcommoninfo2dict(self) -> dict:
 #         """
