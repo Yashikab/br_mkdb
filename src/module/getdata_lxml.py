@@ -75,8 +75,8 @@ class CommonMethods4Official:
         return player_html_list
 
     def _getSTtable2tuple(self,
-                          soup: bs4.BeautifulSoup,
-                          table_selector: str,
+                          lx_content: lxml.HtmlComment,
+                          tbody_tr_xpath: str,
                           waku: int) -> tuple:
         """
         スタート情報のテーブルを抜き取り対象枠のコースとSTタイムを
@@ -96,29 +96,40 @@ class CommonMethods4Official:
                 対象枠のコースとSTタイムをタプルで返す
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        target_table_html = soup.select_one(table_selector)
-        st_html = target_table_html.select_one('tbody')
-        st_html_list = st_html.select('tr > td')
+
+        tr_xpath = "/".join([tbody_tr_xpath, "tr"])
+        len_course = len(lx_content.xpath(tr_xpath))
         # 欠場挺があると6挺にならないときがあるので、assertをつかわない
-        if len(st_html_list) < 6:
+        if len_course < 6:
             self.logger.warning("there are less than 6 boats.")
         # コース抜き出し
         # コースがキーで，号がvalueなので全て抜き出してから逆にする
-        waku_list = list(
-            map(lambda x: int(x.select('div > span')[0].text),
-                st_html_list))
+        waku_list = []
+        st_time_list = []
+        for i in range(1, len_course + 1):
+            waku_no_xpath = "/".join([tbody_tr_xpath, f"tr[{i}]/td/div/span[1]"])
+            st_time_xpath = "/".join([tbody_tr_xpath, f"tr[{i}]/td/div/span[3]"])
+            try:
+                waku_no = lx_content.xpath(waku_no_xpath)[0].text
+                waku_list.append(self._rmletter2int(waku_no))
+                st_time = lx_content.xpath(st_time_xpath)[0].text
+                # Fをマイナスに変換し，少数化
+                st_time = self._rmletter2float(st_time.replace('F', '-'))
+                st_time_list.append(st_time)
+            except IndexError as e:
+                self.logger.error(e)
+
+        # waku がwaku_listになければ
+        if waku not in waku_list:
+            return (None, None)
+
         # 0~5のインデックスなので1~6へ変換のため+1
         course_idx = waku_list.index(waku)
         course = course_idx + 1
 
-        # 展示ST抜き出し
-        st_time_list = list(
-            map(lambda x: x.select('div > span')[2].text,
-                st_html_list))
-        # Fをマイナスに変換し，少数化
         # listのキーはコースであることに注意
         st_time = st_time_list[course_idx]
-        st_time = self._rmletter2float(st_time.replace('F', '-'))
+
         return (course, st_time)
 
     def _getweatherinfo2dict(self,
@@ -616,15 +627,13 @@ class OfficialChokuzen(CommonMethods4Official):
         tilt = super()._rmletter2float(tilt)
 
         # スタート展示テーブルの選択
-        # target_ST_table_selector = \
-        #     'body > main > div > div > div > div.contentsFrame1_inner '\
-        #     '> div.grid.is-type3.h-clear > div:nth-child(2) '\
-        #     '> div.table1 > table'
-        # tenji_C, tenji_ST = super()._getSTtable2tuple(
-        #     self.__lx_content,
-        #     target_ST_table_selector,
-        #     waku
-        # )
+        target_ST_tbody = "/html/body/main/div/div/div/div[2]/"\
+                          "div[4]/div[2]/div[1]/table/tbody"
+        tenji_C, tenji_ST = super()._getSTtable2tuple(
+            self.__lx_content,
+            target_ST_tbody,
+            waku
+        )
 
         content_dict = {
             'name': name,
@@ -632,8 +641,8 @@ class OfficialChokuzen(CommonMethods4Official):
             'chosei_weight': chosei_weight,
             'tenji_time': tenji_T,
             'tilt': tilt,
-            # 'tenji_course': tenji_C,
-            # 'tenji_st': tenji_ST
+            'tenji_course': tenji_C,
+            'tenji_st': tenji_ST
         }
         return content_dict
 
