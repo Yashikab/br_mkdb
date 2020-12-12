@@ -133,14 +133,14 @@ class CommonMethods4Official:
         return (course, st_time)
 
     def _getweatherinfo2dict(self,
-                             soup: bs4.BeautifulSoup,
-                             table_selector: str) -> dict:
+                             lx_content: lxml.HtmlElement,
+                             table_xpath: str) -> dict:
         """
         水面気象情報テーブルのスクレイパー
 
         Parameters
         ----------
-            soup : bs4.BeautifulSoup
+            lx_content: lxml.HtmlElement,
             table_selector : str
 
         Returns
@@ -148,40 +148,38 @@ class CommonMethods4Official:
             content_dict : dict
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        target_table_html = soup.select_one(table_selector)
-        condinfo_html_list = target_table_html.select('div')
-        assert len(condinfo_html_list) == 12, \
-            f"{self.__class__.__name__}: "\
-            f"lengh is not 12:{len(condinfo_html_list)}"
-        # 気温は2番目のdiv
-        tmp_info_html = condinfo_html_list[1]
-        # spanで情報がとれる (1番目： '気温', 2番目: 数字℃)
-        tmp_info = tmp_info_html.select('span')
-        temp = tmp_info[1].text
-        temp = self._rmletter2float(temp)
-        # 天気は2番目のdiv
-        weather_info_html = condinfo_html_list[2]
-        # spanのなか（1個しかない)
-        weather = weather_info_html.select_one('span').text
-        weather = weather.replace('\n', '')\
-                         .replace('\r', '')\
-                         .replace(' ', '')
-        # 風速は5番目のdiv
-        wind_v = self._choose_2nd_span(condinfo_html_list[4])
-        wind_v: int = self._rmletter2int(wind_v)
 
-        # 水温は8番目のdiv
-        w_temp = self._choose_2nd_span(condinfo_html_list[7])
+        # 気温
+        temp_xpath = "/".join([table_xpath, "div[1]/div/span[2]"])
+        temp = lx_content.xpath(temp_xpath)[0].text.strip()
+        temp = self._rmletter2float(temp)
+
+        # 天気
+        weather_xpath = "/".join([table_xpath, "div[2]/div/span"])
+        weather = lx_content.xpath(weather_xpath)[0].text.strip()
+        weather = self._getonlyzenkaku2str(weather)
+
+        # 風速
+        wind_v_xpath = "/".join([table_xpath, "div[3]/div/span[2]"])
+        wind_v = lx_content.xpath(wind_v_xpath)[0].text.strip()
+        wind_v = self._rmletter2int(wind_v)
+
+        # 水温
+        w_temp_xpath = "/".join([table_xpath, "div[5]/div/span[2]"])
+        w_temp = lx_content.xpath(w_temp_xpath)[0].text.strip()
         w_temp = self._rmletter2float(w_temp)
 
-        # 波高は10番目のdiv
-        wave = self._choose_2nd_span(condinfo_html_list[9])
+        # 波高
+        wave_xpath = "/".join([table_xpath, "div[6]/div/span[2]"])
+        wave = lx_content.xpath(wave_xpath)[0].text.strip()
         wave = self._rmletter2int(wave)
 
-        # 風向きは7番目のdiv
+        # 風向き
         # 画像のみの情報なので，16方位の数字（画像の名前）を抜く
         # p中のクラス名2番目にある
-        wind_dr = condinfo_html_list[6].select_one('p')['class'][1]
+        wind_dr_xpath = "/".join([table_xpath, "div[4]/p"])
+        wind_dr_class = lx_content.xpath(wind_dr_xpath)[0].attrib["class"]
+        wind_dr = wind_dr_class.split()[1].strip()
         wind_dr = self._rmletter2int(wind_dr)
 
         content_dict = {
@@ -646,21 +644,20 @@ class OfficialChokuzen(CommonMethods4Official):
         }
         return content_dict
 
-#     def getcommoninfo2dict(self) -> dict:
-#         """
-#         直前情報の水面気象情報を抜き出し，辞書型にする
-#         """
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         table_selector = \
-#             'body > main > div > div > div > div.contentsFrame1_inner > '\
-#             'div.grid.is-type3.h-clear > div:nth-child(2) > div.weather1 > '\
-#             'div.weather1_body'
-#         content_dict = super()._getweatherinfo2dict(
-#             soup=self.__lx_content,
-#             table_selector=table_selector
-#         )
+    def getcommoninfo2dict(self) -> dict:
+        """
+        直前情報の水面気象情報を抜き出し，辞書型にする
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        table_xpath = \
+            "/html/body/main/div/div/div/div[2]"\
+            "/div[4]/div[2]/div[2]/div[1]"
+        content_dict = super()._getweatherinfo2dict(
+            lx_content=self.__lx_content,
+            table_xpath=table_xpath
+        )
 
-#         return content_dict
+        return content_dict
 
 
 # class OfficialResults(CommonMethods4Official):

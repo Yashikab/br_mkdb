@@ -70,16 +70,16 @@ class TestOfficialChokuzen(CommonMethodForTest):
     def test_p_chokuzen(self, target, idx, expected, p_chokuzen):
         assert p_chokuzen[idx][target] == expected
 
-    # # 会場コンディション
-    # @pytest.mark.parametrize("target, expected", [
-    #     ('temp', 17.0),
-    #     ('weather', '晴'),
-    #     ('wind_v', 4),  # m
-    #     ('w_temp', 16.0),
-    #     ('wave', 2),  # cm
-    #     ('wind_dr', 13)
-    # ])
-    # def test_jyo_chokuzen(self, target, expected, calloch):
-    #     # cnd_chokuzen = 直前のコンディションの意
-    #     cnd_chokuzen = calloch.getcommoninfo2dict()
-    #     assert cnd_chokuzen[target] == expected
+    # 会場コンディション
+    @pytest.mark.parametrize("target, expected", [
+        ('temp', 17.0),
+        ('weather', '晴'),
+        ('wind_v', 4),  # m
+        ('w_temp', 16.0),
+        ('wave', 2),  # cm
+        ('wind_dr', 13)
+    ])
+    def test_jyo_chokuzen(self, target, expected, calloch):
+        # cnd_chokuzen = 直前のコンディションの意
+        cnd_chokuzen = calloch.getcommoninfo2dict()
+        assert cnd_chokuzen[target] == expected
