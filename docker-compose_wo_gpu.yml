@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     user: 1000:1000
     volumes:
-      - sourse:/home/contuser1/src
+      # - sourse:/home/contuser1/src
       # - /mnt/dataset/My Documents/Project/datasets/BoatRace/:/home/contuser1/data
       - ./.jupyter:/home/contuser1/.jupyter  # import jupyter setting
       - ./Pipfile:/home/contuser1/Pipfile
