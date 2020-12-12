@@ -4,7 +4,7 @@
 HTMLから情報をスクレイピングするためのモジュール
 """
 from datetime import datetime, timedelta
-from logging import getLogger
+from logging import getLogger, root
 from pathlib import Path
 import re
 import sys
@@ -75,8 +75,8 @@ class CommonMethods4Official:
         return player_html_list
 
     def _getSTtable2tuple(self,
-                          soup: bs4.BeautifulSoup,
-                          table_selector: str,
+                          lx_content: lxml.HtmlComment,
+                          tbody_tr_xpath: str,
                           waku: int) -> tuple:
         """
         スタート情報のテーブルを抜き取り対象枠のコースとSTタイムを
@@ -96,29 +96,40 @@ class CommonMethods4Official:
                 対象枠のコースとSTタイムをタプルで返す
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        target_table_html = soup.select_one(table_selector)
-        st_html = target_table_html.select_one('tbody')
-        st_html_list = st_html.select('tr > td')
+
+        tr_xpath = "/".join([tbody_tr_xpath, "tr"])
+        len_course = len(lx_content.xpath(tr_xpath))
         # 欠場挺があると6挺にならないときがあるので、assertをつかわない
-        if len(st_html_list) < 6:
+        if len_course < 6:
             self.logger.warning("there are less than 6 boats.")
         # コース抜き出し
         # コースがキーで，号がvalueなので全て抜き出してから逆にする
-        waku_list = list(
-            map(lambda x: int(x.select('div > span')[0].text),
-                st_html_list))
+        waku_list = []
+        st_time_list = []
+        for i in range(1, len_course + 1):
+            waku_no_xpath = "/".join([tbody_tr_xpath, f"tr[{i}]/td/div/span[1]"])
+            st_time_xpath = "/".join([tbody_tr_xpath, f"tr[{i}]/td/div/span[3]"])
+            try:
+                waku_no = lx_content.xpath(waku_no_xpath)[0].text
+                waku_list.append(self._rmletter2int(waku_no))
+                st_time = lx_content.xpath(st_time_xpath)[0].text
+                # Fをマイナスに変換し，少数化
+                st_time = self._rmletter2float(st_time.replace('F', '-'))
+                st_time_list.append(st_time)
+            except IndexError as e:
+                self.logger.error(e)
+
+        # waku がwaku_listになければ
+        if waku not in waku_list:
+            return (None, None)
+
         # 0~5のインデックスなので1~6へ変換のため+1
         course_idx = waku_list.index(waku)
         course = course_idx + 1
 
-        # 展示ST抜き出し
-        st_time_list = list(
-            map(lambda x: x.select('div > span')[2].text,
-                st_html_list))
-        # Fをマイナスに変換し，少数化
         # listのキーはコースであることに注意
         st_time = st_time_list[course_idx]
-        st_time = self._rmletter2float(st_time.replace('F', '-'))
+
         return (course, st_time)
 
     def _getweatherinfo2dict(self,
@@ -238,10 +249,11 @@ class CommonMethods4Official:
         マイナス表記は残す
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        in_str = re.search(r'-{0,1}[0-9]+', in_str)
-        if in_str is not None:
+        try:
+            in_str = re.search(r'-{0,1}[0-9]+', in_str)
             out_int = int(in_str.group(0))
-        else:
+        except AttributeError as e:
+            self.logger.error(f"in_str: {in_str}, error: {e}")
             out_int = None
         return out_int
 
@@ -273,362 +285,366 @@ class GetHoldPlacePast(CommonMethods4Official):
         self.logger.debug(f'access: {target_url}')
         self.__lx_content = super()._url2lxml(target_url)
 
-        # 抜き出すテーブルの選択
-        target_table_xpath = \
-            "/html/body/main/div/div/div/div[2]/div[3]/table"
-        target_table_content = self.__lx_content.xpath(target_table_xpath)[0]
-        
-        
+        # 抜き出すテーブルのxpath
+        target_table_xpath = "/html/body/main/div/div/div/div[2]/div[3]/table"
 
+        # 会場名のパス
+        place_name_xpath = "/".join([target_table_xpath,
+                                     "tbody/tr/td[1]/a/img"])
         self.place_name_list = \
-            list(map(lambda x: self._getplacename(x), tbody_list))
+            list(map(self._getplacename,
+                     self.__lx_content.xpath(place_name_xpath)))
+
+        # 進行状況のパス
+        shinko_info_xpath = "/".join([target_table_xpath, "tbody/tr/td[2]"])
         self.shinko_info_list = \
-            list(map(lambda x: self._getshinkoinfo(x), tbody_list))
+            list(map(self._getshinkoinfo,
+                     self.__lx_content.xpath(shinko_info_xpath)))
 
-    # def holdplace2strlist(self) -> list:
-    #     """
-    #     会場名のままset型で返す
-    #     """
-    #     self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-    #     return self.place_name_list
+    def holdplace2strlist(self) -> list:
+        """
+        会場名のままset型で返す
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        return self.place_name_list
 
-    # def holdplace2cdlist(self) -> list:
-    #     """
-    #     会場コードをset型で返す．
-    #     """
-    #     self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-    #     # jyo master取得
-    #     filepath = Path(__file__).parent.resolve().joinpath('jyo_master.csv')
-    #     jyo_master = pd.read_csv(filepath, header=0)
-    #     self.logger.debug('loading table to df done.')
-    #     # 会場名をインデックスにする
-    #     jyo_master.set_index('jyo_name', inplace=True)
-    #     # コードへ返還
-    #     code_name_list = \
-    #         list(map(
-    #             lambda x: jyo_master.at[x, 'jyo_cd'], self.place_name_list))
-    #     return code_name_list
+    def holdplace2cdlist(self) -> list:
+        """
+        会場コードをset型で返す．
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # jyo master取得
+        filepath = Path(__file__).parent.resolve().joinpath('jyo_master.csv')
+        jyo_master = pd.read_csv(filepath, header=0)
+        self.logger.debug('loading table to df done.')
+        # 会場名をインデックスにする
+        jyo_master.set_index('jyo_name', inplace=True)
+        # コードへ返還
+        code_name_list = \
+            list(map(
+                lambda x: jyo_master.at[x, 'jyo_cd'], self.place_name_list))
+        return code_name_list
 
-    # def holdinfo2dict(self, hp_name: str) -> dict:
-    #     """開催場の情報を辞書型で返す
+    def holdinfo2dict(self, hp_name: str) -> dict:
+        """開催場の情報を辞書型で返す
 
-    #     Parameters
-    #     ----------
-    #         hp_name: str
-    #             開催場名
-    #     """
-    #     self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-    #     shinko = self.shinko_info_list[self.place_name_list.index(hp_name)]
-    #     ed_race_no = self._get_end_raceno(shinko)
+        Parameters
+        ----------
+            hp_name: str
+                開催場名
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        shinko = self.shinko_info_list[self.place_name_list.index(hp_name)]
+        ed_race_no = self._get_end_raceno(shinko)
 
-    #     content_dict = {
-    #         'shinko': shinko,
-    #         'ed_race_no': ed_race_no
-    #     }
-    #     return content_dict
+        content_dict = {
+            'shinko': shinko,
+            'ed_race_no': ed_race_no
+        }
+        return content_dict
 
-    # def _get_end_raceno(self, msg: str) -> int:
-    #     """進行情報の欄をみて，その日の最終レースを返す"""
-    #     if re.search(r'1?[1-9]R以降中止', msg) is not None:
-    #         end_race = int(re.search(r'1?[1-9]', msg).group(0))
-    #     elif '中止' in msg:
-    #         end_race = 0
-    #     else:
-    #         # 通常
-    #         end_race = 12
-    #     return end_race
+    def _get_end_raceno(self, msg: str) -> int:
+        """進行情報の欄をみて，その日の最終レースを返す"""
+        if re.search(r'1?[1-9]R以降中止', msg) is not None:
+            end_race = int(re.search(r'1?[1-9]', msg).group(0))
+        elif '中止' in msg:
+            end_race = 0
+        else:
+            # 通常
+            end_race = 12
+        return end_race
 
-    # def _getplacename(self, row_html) -> str:
-    #     """
-    #     行htmlから会場名を抜き出す
-    #     """
-    #     place_name = row_html.select_one('tr > td > a > img')['alt']
-    #     place_name = super()._getonlyzenkaku2str(place_name)
-    #     return place_name
+    def _getplacename(self, target_el: lxml.Element) -> str:
+        """
+        Elementから会場名を抜き出す
+        """
+        place_name = target_el.attrib["alt"]
+        # 不要な文字を削除
+        place_name = place_name.replace(">", "")
+        place_name = super()._getonlyzenkaku2str(place_name)
+        return place_name
 
-    # def _getshinkoinfo(self, row_html) -> str:
-    #     """
-    #     中止などの情報を抜き出す
-    #     """
-    #     return row_html.select('tr > td')[1].text
-
-
-# class OfficialProgram(CommonMethods4Official):
-#     def __init__(self,
-#                  race_no: int,
-#                  jyo_code: int,
-#                  date: int) -> None:
-#         """
-#         競艇公式サイトの番組表からのデータ取得
-#         レース番，場コード，日付を入力し公式サイトへアクセス
-
-#         Parameters
-#         ----------
-#             race_no : int
-#                 何レース目か
-#             jyo_code : int
-#                 会場コード
-#             date : int
-#                 yyyymmdd形式で入力
-
-#         """
-#         # logger設定
-#         self.logger = \
-#             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-
-#         # htmlをload
-#         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
-#         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-#         self.logger.debug(f'get html: {target_url}')
-#         self.__lx_content = super()._url2lxml(target_url)
-#         self.logger.debug('get html completed.')
-
-#     def getplayerinfo2dict(self, waku: int) -> dict:
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 番組表を選択 css selectorより
-#         self.logger.debug('get table html from target url')
-#         target_table_selector = \
-#             'body > main > div > div > '\
-#             'div > div.contentsFrame1_inner > '\
-#             'div.table1.is-tableFixed__3rdadd > table'
-#         player_info_html_list = \
-#             super()._getplayertable2list(
-#                 self.__lx_content,
-#                 target_table_selector
-#             )
-#         self.logger.debug('get table html completed.')
-
-#         # waku は1からなので-1
-#         self.logger.debug(f'get target player info (waku : {waku})')
-#         player_html = player_info_html_list[waku - 1]
-#         # 選手情報は1番目のtr
-#         player_info = player_html.select_one("tr")
-#         player_info_list = player_info.select("td")
-
-#         # 名前，登録番号などの欄は3番目
-#         player_name_list = player_info_list[2].select("div")
-#         assert len(player_name_list) == 3, \
-#             f'elements of player name info is not 3: {len(player_name_list)}'
-#         # list 登録番号・級，名前，出身・年齢，体重
-#         player_no_level, name, place_age_weight = \
-#             list(map(lambda elements: elements.text, player_name_list))
-#         # 名前の取り出し
-#         name = name.replace('\n', '').replace('\u3000', '')
-#         player_id, player_level = player_no_level.replace('\r', '')\
-#                                                  .replace('\n', '')\
-#                                                  .replace(' ', '')\
-#                                                  .split('/')
-#         # 登録番号の取り出し
-#         player_id = int(player_id)
-
-#         # 出身地, 年齢, 体重の取り出し
-#         place, age_weight = place_age_weight.replace(' ', '')\
-#                                             .replace('\r', '')\
-#                                             .split('\n')[1:-1]
-#         # 支部：home, 出身地: birth_place
-#         home, birth_place = place.split('/')
-#         # 年齢:age，体重:weight
-#         age, weight = age_weight.split('/')
-#         # 数字だけ抜く
-#         age = re.match(r'[0-9]+', age)
-#         age = int(age.group(0))
-#         weight = super()._rmletter2float(weight)
-
-#         # F/L/ST平均は4番目
-#         flst = player_info_list[3]
-#         flst_list = super()._text2list_rn_split(flst, 3)
-#         # 数字のみ抜き出してキャスト
-#         # num_F = int(re.sub(r'[a-z, A-Z]', '', flst_list[0]))
-#         # num_L = int(re.sub(r'[a-z, A-Z]', '', flst_list[1]))
-#         # avg_ST = float(re.sub(r'[a-z, A-Z]', '', flst_list[2]))
-#         num_F = super()._rmletter2int(flst_list[0])
-#         num_L = super()._rmletter2int(flst_list[1])
-#         avg_ST = super()._rmletter2float(flst_list[2])
-
-#         # 全国勝率・連対率は5番目
-#         all_123_rate = player_info_list[4]
-#         all_123_list = super()._text2list_rn_split(all_123_rate, 3)
-#         all_1rate, all_2rate, all_3rate = \
-#             list(map(lambda x: float(x), all_123_list))
-
-#         # 当地勝率・連対率は6番目
-#         local_123_rate = player_info_list[5]
-#         local_123_list = super()._text2list_rn_split(local_123_rate, 3)
-#         local_1rate, local_2rate, local_3rate = \
-#             list(map(lambda x: float(x), local_123_list))
-
-#         # モーター情報は7番目
-#         motor_info = player_info_list[6]
-#         motor_info_list = super()._text2list_rn_split(motor_info, 3)
-#         motor_no = int(motor_info_list[0])
-#         motor_2rate = float(motor_info_list[1])
-#         motor_3rate = float(motor_info_list[2])
-
-#         # ボート情報は8番目
-#         boat_info = player_info_list[7]
-#         boat_info_list = super()._text2list_rn_split(boat_info, 3)
-#         boat_no = int(boat_info_list[0])
-#         boat_2rate = float(boat_info_list[1])
-#         boat_3rate = float(boat_info_list[2])
-
-#         self.logger.debug('get target player info completed.')
-
-#         content_dict = {
-#             'name': name,
-#             'id': player_id,
-#             'level': player_level,
-#             'home': home,
-#             'birth_place': birth_place,
-#             'age': age,
-#             'weight': weight,
-#             'num_F': num_F,
-#             'num_L': num_L,
-#             'avg_ST': avg_ST,
-#             'all_1rate': all_1rate,
-#             'all_2rate': all_2rate,
-#             'all_3rate': all_3rate,
-#             'local_1rate': local_1rate,
-#             'local_2rate': local_2rate,
-#             'local_3rate': local_3rate,
-#             'motor_no': motor_no,
-#             'motor_2rate': motor_2rate,
-#             'motor_3rate': motor_3rate,
-#             'boat_no': boat_no,
-#             'boat_2rate': boat_2rate,
-#             'boat_3rate': boat_3rate
-#         }
-
-#         return content_dict
-
-#     def getcommoninfo2dict(self) -> dict:
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.heading2 > div > div.heading2_title'
-#         raceinfo_html = self.__lx_content.select_one(table_selector)
-#         taikai_name = raceinfo_html.select_one('h2').text
-
-#         # SG, G1, G2, G3 一般
-#         grade = raceinfo_html['class'][1]
-
-#         # race_type : 予選 優勝戦など
-#         race_str = raceinfo_html.select_one('span').text
-#         race_str = race_str.replace('\u3000', '')
-#         race_type = super()._getonlyzenkaku2str(race_str)
-
-#         # レース距離
-#         try:
-#             race_kyori = re.search(r'[0-9]+m', race_str).group(0)
-#             race_kyori = int(race_kyori.replace('m', ''))
-#         except ValueError:
-#             race_kyori = None
-
-#         # 安定版or進入固定の有無
-#         other_labels_list = raceinfo_html.select('span.label2')
-#         if '安定板使用' in other_labels_list:
-#             is_antei = True
-#         else:
-#             is_antei = False
-#         if '進入固定' in other_labels_list:
-#             is_shinnyukotei = True
-#         else:
-#             is_shinnyukotei = False
-
-#         content_dict = {
-#             'taikai_name': taikai_name,
-#             'grade': grade,
-#             'race_type': race_type,
-#             'race_kyori': race_kyori,
-#             'is_antei': is_antei,
-#             'is_shinnyukotei': is_shinnyukotei
-#         }
-
-#         return content_dict
+    def _getshinkoinfo(self, target_el) -> str:
+        """
+        中止などの情報を抜き出す
+        """
+        return target_el.text
 
 
-# class OfficialChokuzen(CommonMethods4Official):
+class OfficialProgram(CommonMethods4Official):
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 date: int) -> None:
+        """
+        競艇公式サイトの番組表からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
 
-#     def __init__(self,
-#                  race_no: int,
-#                  jyo_code: int,
-#                  date: int) -> None:
-#         """
-#         競艇公式サイトの直前情報からのデータ取得
-#         レース番，場コード，日付を入力し公式サイトへアクセス
+        Parameters
+        ----------
+            race_no : int
+                何レース目か
+            jyo_code : int
+                会場コード
+            date : int
+                yyyymmdd形式で入力
 
-#         Parameters
-#         ----------
-#         race_no : int
-#             何レース目か
-#         jyo_code : int
-#             会場コード
-#         date : int
-#             yyyymmdd形式で入力
+        """
+        # logger設定
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
-#         """
-#         self.logger = \
-#             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-#         # htmlをload
-#         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
-#         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-#         self.__lx_content = super()._url2lxml(target_url)
+        # htmlをload
+        base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
+        self.logger.debug(f'get html: {target_url}')
+        self.__lx_content = super()._url2lxml(target_url)
+        self.logger.debug('get html completed.')
 
-#     def getplayerinfo2dict(self, waku: int) -> dict:
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 選手直前情報を選択 css selectorより
-#         target_p_table_selector = \
-#             'body > main > div > div > div > div.contentsFrame1_inner > '\
-#             'div.grid.is-type3.h-clear > div:nth-child(1) > div.table1 > table'
-#         p_chokuzen_html_list = \
-#             super()._getplayertable2list(
-#                 self.__lx_content,
-#                 target_p_table_selector
-#             )
+    def getplayerinfo2dict(self, waku: int) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
 
-#         p_html = p_chokuzen_html_list[waku - 1]
-#         # 選手情報は1番目のtr
-#         p_chokuzen = p_html.select_one("tr")
-#         p_chokuzen_list = p_chokuzen.select("td")
+        target_tbody_xpath = \
+            f"/html/body/main/div/div/div/div[2]/div[4]/table/tbody[{waku}]"
 
-#         # 名前の欄は3番目
-#         name = p_chokuzen_list[2].text.replace('\u3000', '')
+        self.logger.debug("Get player's informaiton.(id, level, name, etc)")
+        # 登録番号
+        player_id_xpath = "/".join([target_tbody_xpath, "tr[1]/td[3]/div[1]"])
+        raw_player_id = self.__lx_content.xpath(player_id_xpath)[0].text
+        player_id = super()._rmletter2int(raw_player_id)
 
-#         # 体重は4番目
-#         weight = p_chokuzen_list[3].text
-#         # 'kg'を取り除く
-#         weight = super()._rmletter2float(weight)
-#         # 調整体重だけ3番目のtr, 1番目td
-#         p_chokuzen4chosei = p_html.select("tr")[2]
-#         chosei_weight = p_chokuzen4chosei.select_one("td").text
-#         chosei_weight = super()._rmletter2float(chosei_weight)
-#         # 展示タイムは5番目td (調整体重の方じゃないので注意)
-#         tenji_T = p_chokuzen_list[4].text
-#         tenji_T = super()._rmletter2float(tenji_T)
-#         # チルトは6番目
-#         tilt = p_chokuzen_list[5].text
-#         tilt = super()._rmletter2float(tilt)
+        # 級
+        player_level_xpath = "/".join([player_id_xpath, "span"])
+        raw_player_level = self.__lx_content.xpath(player_level_xpath)[0].text
+        # 級が取りうる値かチェックする
+        try:
+            player_level = re.search(r"[A,B][1,2]", raw_player_level).group(0)
+        except AttributeError as e:
+            self.logger.error(f"player_level: {raw_player_level} error: {e}")
+            player_level = None
 
-#         # スタート展示テーブルの選択
-#         target_ST_table_selector = \
-#             'body > main > div > div > div > div.contentsFrame1_inner '\
-#             '> div.grid.is-type3.h-clear > div:nth-child(2) '\
-#             '> div.table1 > table'
-#         tenji_C, tenji_ST = super()._getSTtable2tuple(
-#             self.__lx_content,
-#             target_ST_table_selector,
-#             waku
-#         )
+        # 名前
+        player_name_xpath = "/".join([target_tbody_xpath,
+                                      "tr[1]/td[3]/div[2]/a"])
+        raw_player_name = self.__lx_content.xpath(player_name_xpath)[0].text
+        player_name = raw_player_name.replace('\n', '').replace('\u3000', '')
 
-#         content_dict = {
-#             'name': name,
-#             'weight': weight,
-#             'chosei_weight': chosei_weight,
-#             'tenji_time': tenji_T,
-#             'tilt': tilt,
-#             'tenji_course': tenji_C,
-#             'tenji_st': tenji_ST
-#         }
-#         return content_dict
+        # 所属、出身地
+        home_birth_xpath = "/".join([target_tbody_xpath,
+                                     "tr[1]/td[3]/div[3]/text()[1]"])
+        # xpathでtextまで指定されている
+        # 出力例: '\n                          愛知/愛知\n                          '
+        home_birth = self.__lx_content.xpath(home_birth_xpath)[0]
+        home, birth_place = home_birth.strip().split("/")
+
+        # 年齢、体重
+        age_weight_xpath = "/".join([target_tbody_xpath,
+                                     "tr[1]/td[3]/div[3]/text()[2]"])
+        age_weight = self.__lx_content.xpath(age_weight_xpath)[0]
+        raw_age, raw_weight = age_weight.strip().split("/")
+        age = super()._rmletter2int(raw_age)
+        weight = super()._rmletter2float(raw_weight)
+
+        # F/L数 平均ST
+        num_F_xpath = "/".join([target_tbody_xpath,
+                                "tr[1]/td[4]/text()[1]"])
+        raw_num_F = self.__lx_content.xpath(num_F_xpath)[0]
+        raw_num_F, raw_num_L, raw_avg_ST = \
+            self._box_to_three_element(target_tbody_xpath, column_no=4)
+        num_F = super()._rmletter2int(raw_num_F.strip())
+        num_L = super()._rmletter2int(raw_num_L.strip())
+        avg_ST = super()._rmletter2float(raw_avg_ST.strip())
+
+        # 全国勝率
+        raw_all_1rate, raw_all_2rate, raw_all_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=5)
+        all_1rate = super()._rmletter2float(raw_all_1rate.strip())
+        all_2rate = super()._rmletter2float(raw_all_2rate.strip())
+        all_3rate = super()._rmletter2float(raw_all_3rate.strip())
+
+        # 当地勝率
+        raw_local_1rate, raw_local_2rate, raw_local_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=6)
+        local_1rate = super()._rmletter2float(raw_local_1rate.strip())
+        local_2rate = super()._rmletter2float(raw_local_2rate.strip())
+        local_3rate = super()._rmletter2float(raw_local_3rate.strip())
+
+        # モーター情報は7番目
+        raw_motor_no, raw_motor_2rate, raw_motor_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=7)
+        motor_no = super()._rmletter2int(raw_motor_no.strip())
+        motor_2rate = super()._rmletter2float(raw_motor_2rate.strip())
+        motor_3rate = super()._rmletter2float(raw_motor_3rate.strip())
+
+        # ボート情報は8番目
+        raw_boat_no, raw_boat_2rate, raw_boat_3rate = \
+            self._box_to_three_element(target_tbody_xpath, column_no=8)
+        boat_no = super()._rmletter2int(raw_boat_no.strip())
+        boat_2rate = super()._rmletter2float(raw_boat_2rate.strip())
+        boat_3rate = super()._rmletter2float(raw_boat_3rate.strip())
+
+        self.logger.debug('get target player info completed.')
+
+        content_dict = {
+            'name': player_name,
+            'id': player_id,
+            'level': player_level,
+            'home': home,
+            'birth_place': birth_place,
+            'age': age,
+            'weight': weight,
+            'num_F': num_F,
+            'num_L': num_L,
+            'avg_ST': avg_ST,
+            'all_1rate': all_1rate,
+            'all_2rate': all_2rate,
+            'all_3rate': all_3rate,
+            'local_1rate': local_1rate,
+            'local_2rate': local_2rate,
+            'local_3rate': local_3rate,
+            'motor_no': motor_no,
+            'motor_2rate': motor_2rate,
+            'motor_3rate': motor_3rate,
+            'boat_no': boat_no,
+            'boat_2rate': boat_2rate,
+            'boat_3rate': boat_3rate
+        }
+
+        return content_dict
+
+    def getcommoninfo2dict(self) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        target_table_xpath = "/html/body/main/div/div/div/div[1]/div/div[2]"
+
+        # SG, G1, G2, G3 一般
+        raw_grade = \
+            self.__lx_content.xpath(target_table_xpath)[0].attrib["class"]
+        grade = raw_grade.split()[1].strip()
+
+        # 大会名
+        taikai_xpath = "/".join([target_table_xpath, "h2"])
+        taikai_name = self.__lx_content.xpath(taikai_xpath)[0].text
+        taikai_name = super()._getonlyzenkaku2str(taikai_name)
+
+        # race_type : 予選 優勝戦など/レース距離
+        race_type_xpath = "/".join([target_table_xpath, "span"])
+        race_str = self.__lx_content.xpath(race_type_xpath)[0].text
+        race_list = re.sub("[\u3000\t]", "", race_str).split("\n")
+        race_type, race_kyori = list(filter(lambda x: x != "", race_list))
+        race_type = super()._getonlyzenkaku2str(race_type)
+        race_kyori = super()._rmletter2int(race_kyori)
+
+        # 安定版or進入固定の有無
+        antei_shinyu_xpath = "/".join([target_table_xpath, "/div/span"])
+        antei_shinyu_el_list = self.__lx_content.xpath(antei_shinyu_xpath)
+        antei_shinyu_list = list(map(
+            lambda x: x.text.strip(), antei_shinyu_el_list))
+        if '安定板使用' in antei_shinyu_list:
+            is_antei = True
+        else:
+            is_antei = False
+        if '進入固定' in antei_shinyu_list:
+            is_shinnyukotei = True
+        else:
+            is_shinnyukotei = False
+
+        content_dict = {
+            'taikai_name': taikai_name,
+            'grade': grade,
+            'race_type': race_type,
+            'race_kyori': race_kyori,
+            'is_antei': is_antei,
+            'is_shinnyukotei': is_shinnyukotei
+        }
+
+        return content_dict
+
+    def _box_to_three_element(self, root_xpath: str, column_no: int) -> list:
+        el_list = []
+        for i in range(1, 4):
+            target_xpath = "/".join([root_xpath,
+                                     f"tr[1]/td[{column_no}]/text()[{i}]"])
+            el_list.append(self.__lx_content.xpath(target_xpath)[0])
+        return el_list
+
+
+class OfficialChokuzen(CommonMethods4Official):
+
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 date: int) -> None:
+        """
+        競艇公式サイトの直前情報からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
+
+        Parameters
+        ----------
+        race_no : int
+            何レース目か
+        jyo_code : int
+            会場コード
+        date : int
+            yyyymmdd形式で入力
+
+        """
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        # htmlをload
+        base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
+        self.__lx_content = super()._url2lxml(target_url)
+
+    def getplayerinfo2dict(self, waku: int) -> dict:
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 選手直前情報を選択 css selectorより
+        target_p_table_xpath = f"/html/body/main/div/div/div/div[2]/div[4]"\
+                               f"/div[1]/div[1]/table/tbody[{waku}]"
+
+        # 名前
+        p_name_xpath = "/".join([target_p_table_xpath, "tr[1]/td[3]/a"])
+        name = self.__lx_content.xpath(p_name_xpath)[0].text
+        name = name.replace('\u3000', '')
+
+        # 体重
+        p_weight_xpath = "/".join([target_p_table_xpath, "tr[1]/td[4]"])
+        weight = self.__lx_content.xpath(p_weight_xpath)[0].text
+        weight = super()._rmletter2float(weight)
+
+        # 調整体重
+        p_chosei_xpath = "/".join([target_p_table_xpath, "tr[3]/td[1]"])
+        chosei_weight = self.__lx_content.xpath(p_chosei_xpath)[0].text
+        chosei_weight = super()._rmletter2float(chosei_weight)
+
+        # 展示タイムは5番目td (調整体重の方じゃないので注意)
+        p_tenji_xpath = "/".join([target_p_table_xpath, "tr[1]/td[5]"])
+        tenji_T = self.__lx_content.xpath(p_tenji_xpath)[0].text
+        tenji_T = super()._rmletter2float(tenji_T)
+
+        # チルトは6番目
+        p_tilt_xpath = "/".join([target_p_table_xpath, "tr[1]/td[6]"])
+        tilt = self.__lx_content.xpath(p_tilt_xpath)[0].text
+        tilt = super()._rmletter2float(tilt)
+
+        # スタート展示テーブルの選択
+        target_ST_tbody = "/html/body/main/div/div/div/div[2]/"\
+                          "div[4]/div[2]/div[1]/table/tbody"
+        tenji_C, tenji_ST = super()._getSTtable2tuple(
+            self.__lx_content,
+            target_ST_tbody,
+            waku
+        )
+
+        content_dict = {
+            'name': name,
+            'weight': weight,
+            'chosei_weight': chosei_weight,
+            'tenji_time': tenji_T,
+            'tilt': tilt,
+            'tenji_course': tenji_C,
+            'tenji_st': tenji_ST
+        }
+        return content_dict
 
 #     def getcommoninfo2dict(self) -> dict:
 #         """
