@@ -831,8 +831,13 @@ class OfficialResults(CommonMethods4Official):
                 枠をキーとしてテーブル情報を抜く
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        target_table_selector = \
+        target_table_xpath = \
             "/html/body/main/div/div/div/div[2]/div[4]/div[1]/div/table/tbody"
+        rank_xpath = "/".join([target_table_xpath, "/tr/td[1]"])
+        rank_el_list = self.__lx_content.xpath(rank_xpath)
+        rank_list = list(map(
+            lambda x: int(x.text) if x.text.isdecimal() else -1,
+            rank_el_list))
         # player_res_html_list = \
         #     super()._getplayertable2list(self.__lx_content, target_table_selector)
         # # rank_p_html : 各順位の選手情報
