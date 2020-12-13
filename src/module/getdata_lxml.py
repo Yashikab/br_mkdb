@@ -830,11 +830,9 @@ class OfficialResults(CommonMethods4Official):
             waku_dict : dict
                 枠をキーとしてテーブル情報を抜く
         """
-        # self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # target_table_selector = \
-        #     'body > main > div > div > div > '\
-        #     'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
-        #     'div:nth-child(1) > div > table'
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        target_table_selector = \
+            "/html/body/main/div/div/div/div[2]/div[4]/div[1]/div/table/tbody"
         # player_res_html_list = \
         #     super()._getplayertable2list(self.__lx_content, target_table_selector)
         # # rank_p_html : 各順位の選手情報
