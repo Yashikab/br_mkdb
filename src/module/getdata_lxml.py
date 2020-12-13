@@ -4,6 +4,7 @@
 HTMLから情報をスクレイピングするためのモジュール
 """
 from datetime import datetime, timedelta
+import enum
 from logging import getLogger, root
 from pathlib import Path
 import re
@@ -686,39 +687,39 @@ class OfficialResults(CommonMethods4Official):
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.__lx_content = super()._url2lxml(target_url)
         # 結果テーブルだけ最初に抜く
-        # self.waku_dict = self._getresulttable2dict()
+        self.waku_dict = self._getresulttable2dict()
 
-#     def getplayerinfo2dict(self, waku: int) -> dict:
-#         """
-#         枠drivenでdictを作成する（サイトは順位drivenなのに注意)
+    def getplayerinfo2dict(self, waku: int) -> dict:
+        """
+        枠drivenでdictを作成する（サイトは順位drivenなのに注意)
 
-#         Parameters
-#         ----------
-#             waku : int
-#                 枠
+        Parameters
+        ----------
+            waku : int
+                枠
 
-#         Returns
-#         -------
-#             racerls : dict
-#         """
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 結果テーブルのキーを選択 1~6
-#         content_dict = self.waku_dict[waku]
+        Returns
+        -------
+            racerls : dict
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 結果テーブルのキーを選択 1~6
+        content_dict = self.waku_dict[waku]
 
-#         # 結果STテーブルの情報を取得
-#         target_table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.contentsFrame1_inner > '\
-#             'div.grid.is-type2.h-clear.h-mt10 > '\
-#             'div:nth-child(2) > div > table'
-#         course, st_time = super()._getSTtable2tuple(
-#             soup=self.__lx_content,
-#             table_selector=target_table_selector,
-#             waku=waku)
-#         content_dict['course'] = course
-#         content_dict['st_time'] = st_time
+        # # 結果STテーブルの情報を取得
+        # target_table_selector = \
+        #     'body > main > div > div > div > '\
+        #     'div.contentsFrame1_inner > '\
+        #     'div.grid.is-type2.h-clear.h-mt10 > '\
+        #     'div:nth-child(2) > div > table'
+        # course, st_time = super()._getSTtable2tuple(
+        #     soup=self.__lx_content,
+        #     table_selector=target_table_selector,
+        #     waku=waku)
+        # content_dict['course'] = course
+        # content_dict['st_time'] = st_time
 
-#         return content_dict
+        return content_dict
 
 #     def getcommoninfo2dict(self) -> dict:
 #         """
@@ -838,50 +839,56 @@ class OfficialResults(CommonMethods4Official):
         rank_list = list(map(
             lambda x: int(x.text) if x.text.isdecimal() else -1,
             rank_el_list))
-        # player_res_html_list = \
-        #     super()._getplayertable2list(self.__lx_content, target_table_selector)
-        # # rank_p_html : 各順位の選手情報
-        # # waku_dict : 枠をキーとしテーブル内容を入れ替える
-        # waku_dict = {}
-        # for rank_p_html in player_res_html_list:
-        #     rank, waku, name, racetime = \
-        #         list(map(lambda x: x.text, rank_p_html.select('td')))
-        #     # rankはF,L欠などが存在するためエラーハンドルがいる
-        #     try:
-        #         rank = int(rank)
-        #     except ValueError:
-        #         rank = -1
 
-        #     # レースタイムは秒に変換する
-        #     try:
-        #         t = datetime.strptime(racetime, '%M\'%S"%f')
-        #         delta = timedelta(
-        #             seconds=t.second,
-        #             microseconds=t.microsecond,
-        #             minutes=t.minute,
-        #         )
-        #         racetime_sec = delta.total_seconds()
-        #     except ValueError:
-        #         racetime_sec = -1
+        waku_xpath = "/".join([target_table_xpath, "/tr/td[2]"])
+        waku_el_list = self.__lx_content.xpath(waku_xpath)
+        waku_list = list(map(
+            lambda x: int(x.text) if x.text.isdecimal() else -1,
+            waku_el_list))
 
-        #     waku = int(waku)
-        #     name = name.replace('\u3000', '')\
-        #                .replace(' ', '')\
-        #                .replace('\r', '')
-        #     self.logger.debug(name)
-        #     no, name = name.split('\n')[1:-1]
-        #     no = int(no)
+        name_xpath = "/".join([target_table_xpath, "/tr/td[3]/span[2]"])
+        name_el_list = self.__lx_content.xpath(name_xpath)
+        name_list = list(map(
+            lambda x: x.text.replace('\u3000', '').strip(),
+            name_el_list))
 
-        #     content_dict = {
-        #         'rank': rank,
-        #         'name': name,
-        #         'no': no,
-        #         'racetime': racetime_sec
-        #     }
+        reg_no_xpath = "/".join([target_table_xpath, "/tr/td[3]/span[1]"])
+        reg_el_list = self.__lx_content.xpath(reg_no_xpath)
+        reg_no_list = list(map(
+            lambda x: int(x.text) if x.text.isdecimal() else -1,
+            reg_el_list))
 
-        #     waku_dict[waku] = content_dict
-        # return waku_dict
+        racetime_xpath = "/".join([target_table_xpath, "/tr/td[4]"])
+        racetime_el_list = self.__lx_content.xpath(racetime_xpath)
+        racetime_list = list(map(
+            lambda x: self._racetime_str_to_sec(x.text),
+            racetime_el_list))
 
+        waku_dict = {}
+        for i, waku in enumerate(waku_list):
+            waku_dict[waku] = {
+                'rank': rank_list[i],
+                'name': name_list[i],
+                'no': reg_no_list[i],
+                'racetime': racetime_list[i]
+            }
+        return waku_dict
+
+    def _racetime_str_to_sec(self, str_racetime) -> float:
+
+        # レースタイムは秒に変換する
+        try:
+            t = datetime.strptime(str_racetime, '%M\'%S"%f')
+            delta = timedelta(
+                seconds=t.second,
+                microseconds=t.microsecond,
+                minutes=t.minute,
+            )
+            racetime_sec = delta.total_seconds()
+        except ValueError:
+            racetime_sec = -1
+
+        return racetime_sec
 
 # class OfficialOdds(CommonMethods4Official):
 #     def __init__(self,
