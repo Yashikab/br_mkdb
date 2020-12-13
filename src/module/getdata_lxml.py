@@ -660,33 +660,33 @@ class OfficialChokuzen(CommonMethods4Official):
         return content_dict
 
 
-# class OfficialResults(CommonMethods4Official):
-#     def __init__(self,
-#                  race_no: int,
-#                  jyo_code: int,
-#                  date: int):
-#         """
-#         競艇公式サイトの結果からのデータ取得
-#         レース番，場コード，日付を入力し公式サイトへアクセス
+class OfficialResults(CommonMethods4Official):
+    def __init__(self,
+                 race_no: int,
+                 jyo_code: int,
+                 date: int):
+        """
+        競艇公式サイトの結果からのデータ取得
+        レース番，場コード，日付を入力し公式サイトへアクセス
 
-#         Parameters
-#         ----------
-#             race_no : int
-#                 何レース目か
-#             jyo_code : int
-#                 会場コード
-#             date : int
-#                 yyyymmdd形式で入力
+        Parameters
+        ----------
+            race_no : int
+                何レース目か
+            jyo_code : int
+                会場コード
+            date : int
+                yyyymmdd形式で入力
 
-#         """
-#         self.logger = \
-#             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-#         # htmlをload
-#         base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
-#         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-#         self.__lx_content = super()._url2lxml(target_url)
-#         # 結果テーブルだけ最初に抜く
-#         self.waku_dict = self._getresulttable2dict()
+        """
+        self.logger = \
+            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        # htmlをload
+        base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
+        target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
+        self.__lx_content = super()._url2lxml(target_url)
+        # 結果テーブルだけ最初に抜く
+        # self.waku_dict = self._getresulttable2dict()
 
 #     def getplayerinfo2dict(self, waku: int) -> dict:
 #         """
@@ -820,64 +820,64 @@ class OfficialChokuzen(CommonMethods4Official):
 #         popular = super()._rmletter2int(popular)
 #         return (payout, popular)
 
-#     def _getresulttable2dict(self) -> dict:
-#         """
-#         結果テーブルをまとめてdict作成
-#         initで呼びだし，テーブル抜きを1回で済ませる
+    def _getresulttable2dict(self) -> dict:
+        """
+        結果テーブルをまとめてdict作成
+        initで呼びだし，テーブル抜きを1回で済ませる
 
-#         Returns
-#         -------
-#             waku_dict : dict
-#                 枠をキーとしてテーブル情報を抜く
-#         """
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         target_table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
-#             'div:nth-child(1) > div > table'
-#         player_res_html_list = \
-#             super()._getplayertable2list(self.__lx_content, target_table_selector)
-#         # rank_p_html : 各順位の選手情報
-#         # waku_dict : 枠をキーとしテーブル内容を入れ替える
-#         waku_dict = {}
-#         for rank_p_html in player_res_html_list:
-#             rank, waku, name, racetime = \
-#                 list(map(lambda x: x.text, rank_p_html.select('td')))
-#             # rankはF,L欠などが存在するためエラーハンドルがいる
-#             try:
-#                 rank = int(rank)
-#             except ValueError:
-#                 rank = -1
+        Returns
+        -------
+            waku_dict : dict
+                枠をキーとしてテーブル情報を抜く
+        """
+        # self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # target_table_selector = \
+        #     'body > main > div > div > div > '\
+        #     'div.contentsFrame1_inner > div.grid.is-type2.h-clear.h-mt10 > '\
+        #     'div:nth-child(1) > div > table'
+        # player_res_html_list = \
+        #     super()._getplayertable2list(self.__lx_content, target_table_selector)
+        # # rank_p_html : 各順位の選手情報
+        # # waku_dict : 枠をキーとしテーブル内容を入れ替える
+        # waku_dict = {}
+        # for rank_p_html in player_res_html_list:
+        #     rank, waku, name, racetime = \
+        #         list(map(lambda x: x.text, rank_p_html.select('td')))
+        #     # rankはF,L欠などが存在するためエラーハンドルがいる
+        #     try:
+        #         rank = int(rank)
+        #     except ValueError:
+        #         rank = -1
 
-#             # レースタイムは秒に変換する
-#             try:
-#                 t = datetime.strptime(racetime, '%M\'%S"%f')
-#                 delta = timedelta(
-#                     seconds=t.second,
-#                     microseconds=t.microsecond,
-#                     minutes=t.minute,
-#                 )
-#                 racetime_sec = delta.total_seconds()
-#             except ValueError:
-#                 racetime_sec = -1
+        #     # レースタイムは秒に変換する
+        #     try:
+        #         t = datetime.strptime(racetime, '%M\'%S"%f')
+        #         delta = timedelta(
+        #             seconds=t.second,
+        #             microseconds=t.microsecond,
+        #             minutes=t.minute,
+        #         )
+        #         racetime_sec = delta.total_seconds()
+        #     except ValueError:
+        #         racetime_sec = -1
 
-#             waku = int(waku)
-#             name = name.replace('\u3000', '')\
-#                        .replace(' ', '')\
-#                        .replace('\r', '')
-#             self.logger.debug(name)
-#             no, name = name.split('\n')[1:-1]
-#             no = int(no)
+        #     waku = int(waku)
+        #     name = name.replace('\u3000', '')\
+        #                .replace(' ', '')\
+        #                .replace('\r', '')
+        #     self.logger.debug(name)
+        #     no, name = name.split('\n')[1:-1]
+        #     no = int(no)
 
-#             content_dict = {
-#                 'rank': rank,
-#                 'name': name,
-#                 'no': no,
-#                 'racetime': racetime_sec
-#             }
+        #     content_dict = {
+        #         'rank': rank,
+        #         'name': name,
+        #         'no': no,
+        #         'racetime': racetime_sec
+        #     }
 
-#             waku_dict[waku] = content_dict
-#         return waku_dict
+        #     waku_dict[waku] = content_dict
+        # return waku_dict
 
 
 # class OfficialOdds(CommonMethods4Official):
