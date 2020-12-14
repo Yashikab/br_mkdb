@@ -56,10 +56,10 @@ class TestOfficialResults(CommonMethodForTest):
         (1, 'racetime', -1),
         (6, 'racetime', 114.5),
         (2, 'racetime', -1),
-        # (1, 'course', 1),
-        # (6, 'course', 6),
-        # (1, 'st_time', -0.02),
-        # (6, 'st_time', 0.10)
+        (1, 'course', 1),
+        (6, 'course', 6),
+        (1, 'st_time', -0.02),
+        (6, 'st_time', 0.10)
     ])
     def test_getplayerresult2dict(self, waku, target, expected, playerrls):
         # listなのでwakuが1つずれる

@@ -77,8 +77,9 @@ class CommonMethods4Official:
 
     def _getSTtable2tuple(self,
                           lx_content: lxml.HtmlComment,
-                          tbody_tr_xpath: str,
-                          waku: int) -> tuple:
+                          tbody_xpath: str,
+                          waku: int,
+                          table_type: str = "default") -> tuple:
         """
         スタート情報のテーブルを抜き取り対象枠のコースとSTタイムを
         タプルにして返す.
@@ -90,6 +91,8 @@ class CommonMethods4Official:
                 スタート情報のテーブル
             waku : int
                 知りたい情報の枠
+            table_type
+                直前と結果で少し処理が違う
 
         Returns
         -------
@@ -98,7 +101,7 @@ class CommonMethods4Official:
         """
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
 
-        tr_xpath = "/".join([tbody_tr_xpath, "tr"])
+        tr_xpath = "/".join([tbody_xpath, "tr"])
         len_course = len(lx_content.xpath(tr_xpath))
         # 欠場挺があると6挺にならないときがあるので、assertをつかわない
         if len_course < 6:
@@ -108,12 +111,21 @@ class CommonMethods4Official:
         waku_list = []
         st_time_list = []
         for i in range(1, len_course + 1):
-            waku_no_xpath = "/".join([tbody_tr_xpath, f"tr[{i}]/td/div/span[1]"])
-            st_time_xpath = "/".join([tbody_tr_xpath, f"tr[{i}]/td/div/span[3]"])
             try:
+                waku_no_xpath = "/".join([
+                    tbody_xpath, f"tr[{i}]/td/div/span[1]"])
                 waku_no = lx_content.xpath(waku_no_xpath)[0].text
                 waku_list.append(self._rmletter2int(waku_no))
-                st_time = lx_content.xpath(st_time_xpath)[0].text
+
+                if table_type == "result":
+                    st_time_xpath = "/".join([
+                        tbody_xpath,
+                        f"tr[{i}]/td/div/span[3]/span/text()"])
+                    st_time = lx_content.xpath(st_time_xpath)[0].strip()
+                else:
+                    st_time_xpath = "/".join([
+                        tbody_xpath, f"tr[{i}]/td/div/span[3]"])
+                    st_time = lx_content.xpath(st_time_xpath)[0].text
                 # Fをマイナスに変換し，少数化
                 st_time = self._rmletter2float(st_time.replace('F', '-'))
                 st_time_list.append(st_time)
@@ -687,6 +699,7 @@ class OfficialResults(CommonMethods4Official):
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.__lx_content = super()._url2lxml(target_url)
         # 結果テーブルだけ最初に抜く
+        # xpathのインデックスで枠を取るより、最初に全部格納したほうがいい
         self.waku_dict = self._getresulttable2dict()
 
     def getplayerinfo2dict(self, waku: int) -> dict:
@@ -707,17 +720,15 @@ class OfficialResults(CommonMethods4Official):
         content_dict = self.waku_dict[waku]
 
         # # 結果STテーブルの情報を取得
-        # target_table_selector = \
-        #     'body > main > div > div > div > '\
-        #     'div.contentsFrame1_inner > '\
-        #     'div.grid.is-type2.h-clear.h-mt10 > '\
-        #     'div:nth-child(2) > div > table'
-        # course, st_time = super()._getSTtable2tuple(
-        #     soup=self.__lx_content,
-        #     table_selector=target_table_selector,
-        #     waku=waku)
-        # content_dict['course'] = course
-        # content_dict['st_time'] = st_time
+        tbody_xpath = \
+            "/html/body/main/div/div/div/div[2]/div[4]/div[2]/div/table/tbody"
+        course, st_time = super()._getSTtable2tuple(
+            lx_content=self.__lx_content,
+            tbody_xpath=tbody_xpath,
+            waku=waku,
+            table_type="result")
+        content_dict['course'] = course
+        content_dict['st_time'] = st_time
 
         return content_dict
 
