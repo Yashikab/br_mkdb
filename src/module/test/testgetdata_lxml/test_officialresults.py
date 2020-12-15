@@ -72,14 +72,14 @@ class TestOfficialResults(CommonMethodForTest):
 
     # 会場コンディション
     @pytest.mark.parametrize("target, expected", [
-        # ('temp', 16.0),
-        # ('weather', '晴'),
-        # ('wind_v', 6),  # m
-        # ('w_temp', 16.0),
-        # ('wave', 4),  # cm
-        # ('wind_dr', 3),
-        # ('henkantei_list', '1'),
-        # ('is_henkan', True),
+        ('temp', 16.0),
+        ('weather', '晴'),
+        ('wind_v', 6),  # m
+        ('w_temp', 16.0),
+        ('wave', 4),  # cm
+        ('wind_dr', 3),
+        ('henkantei_list', '1'),
+        ('is_henkan', True),
         # ('kimarite', '恵まれ'),
         # ('biko', '【返還艇あり】'),
         # ('payout_3tan', 1880),

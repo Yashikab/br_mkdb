@@ -732,55 +732,48 @@ class OfficialResults(CommonMethods4Official):
 
         return content_dict
 
-#     def getcommoninfo2dict(self) -> dict:
-#         """
-#         水面気象情報と決まり手，返還挺の有無などの選手以外のレース結果情報
-#         """
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 水面気象情報の取得
-#         table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.contentsFrame1_inner > div:nth-child(5) > '\
-#             'div:nth-child(2) > div.grid.is-type6.h-clear > '\
-#             'div:nth-child(1) > div > div.weather1_body.is-type1__3rdadd'
-#         content_dict = \
-#             super()._getweatherinfo2dict(
-#                 soup=self.__lx_content,
-#                 table_selector=table_selector
-#             )
+    def getcommoninfo2dict(self) -> dict:
+        """
+        水面気象情報と決まり手，返還挺の有無などの選手以外のレース結果情報
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 水面気象情報の取得
+        table_xpath = \
+            "/html/body/main/div/div/div/div[2]"\
+            "/div[5]/div[2]/div[1]/div[1]/div/div[1]"
+        content_dict = \
+            super()._getweatherinfo2dict(
+                lx_content=self.__lx_content,
+                table_xpath=table_xpath
+            )
 
-#         # 返還テーブルを抜く
-#         # 返還挺はリストのまま辞書に入れる
-#         # 返還艇がなければ空リスト
-#         table_selector = \
-#             'body > main > div > div > div > div.contentsFrame1_inner > '\
-#             'div:nth-child(5) > div:nth-child(2) > '\
-#             'div.grid.is-type6.h-clear > '\
-#             'div:nth-child(2) > div:nth-child(1) > '\
-#             'table > tbody > tr > td > '\
-#             'div > div span.numberSet1_number'
-#         henkantei_html_list = self.__lx_content.select(table_selector)
+        # 返還テーブルを抜く
+        # 返還挺はリストのまま辞書に入れる
+        # 返還艇がなければ空リスト
+        table_xpath = \
+            "/html/body/main/div/div/div/div[2]"\
+            "/div[5]/div[2]/div[1]/div[2]/div[1]"\
+            "/table/tbody/tr/td/div/div/span"
+        henkantei_list = self.__lx_content.xpath(table_xpath)
 
-#         # 返還艇をint型に直す，変なやつはNoneでハンドル（あんまりないけど）
-#         def teistr2str(tei_str):
-#             tei = re.search(r'[1-6]', tei_str)
-#             if tei is not None:
-#                 return str(tei.group(0))
-#             else:
-#                 return None
+        # 返還艇をint型に直す，変なやつはNoneでハンドル（ないと思う）
+        def teistr2str(tei_str):
+            tei = re.search(r'[1-6]', tei_str)
+            if tei is not None:
+                return str(tei.group(0))
+            else:
+                return None
 
-#         # 返還艇があればリスト長が1以上になる
-#         if len(henkantei_html_list) != 0:
-#             henkantei_list = list(map(
-#                 lambda x: teistr2str(x.text), henkantei_html_list))
-#             henkantei_list = [n for n in henkantei_list if n is not None]
-#             is_henkan = True
-#         else:
-#             henkantei_list = []
-#             is_henkan = False
-#         henkantei_str = ','.join(henkantei_list)
-#         content_dict['henkantei_list'] = henkantei_str
-#         content_dict['is_henkan'] = is_henkan
+        henkantei_list = list(map(lambda x: teistr2str(x.text), henkantei_list))
+
+        # 返還艇があればリスト長が1以上になる
+        if len(henkantei_list) > 0:
+            is_henkan = True
+        else:
+            is_henkan = False
+        henkantei_str = ','.join(henkantei_list)
+        content_dict['henkantei_list'] = henkantei_str
+        content_dict['is_henkan'] = is_henkan
 
 #         # 決まりて
 #         table_selector = \
@@ -821,7 +814,7 @@ class OfficialResults(CommonMethods4Official):
 #         content_dict['payout_1tan'], _ = \
 #             self._get_paypop(pay_pop_tb_list[5])
 
-#         return content_dict
+        return content_dict
 
 #     def _get_paypop(self, element_tag: bs4.element.Tag) -> tuple:
 #         """払い戻し金額と人気を取得"""
