@@ -775,55 +775,42 @@ class OfficialResults(CommonMethods4Official):
         content_dict['henkantei_list'] = henkantei_str
         content_dict['is_henkan'] = is_henkan
 
-#         # 決まりて
-#         table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.contentsFrame1_inner > div:nth-child(5) > '\
-#             'div:nth-child(2) > div.grid.is-type6.h-clear > '\
-#             'div:nth-child(2) > div:nth-child(2) > table > tbody > tr > td'
-#         kimarite = self.__lx_content.select_one(table_selector).text
-#         content_dict['kimarite'] = kimarite
+        # 決まりて
+        table_xpath = "/html/body/main/div/div/div/div[2]/div[5]"\
+                      "/div[2]/div[1]/div[2]/div[2]/table/tbody/tr/td"
+        kimarite = self.__lx_content.xpath(table_xpath)[0].text.strip()
+        content_dict['kimarite'] = kimarite
 
-#         # 備考
-#         table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.contentsFrame1_inner > div:nth-child(5) > '\
-#             'div:nth-child(2) > div.table1 > table > tbody > tr > td'
-#         biko = self.__lx_content.select_one(table_selector).text
-#         biko = biko.replace('\r', '')\
-#                    .replace('\n', '')\
-#                    .replace(' ', '')\
-#                    .replace('\xa0', '')
-#         content_dict['biko'] = biko
+        # 備考
+        table_xpath = "/html/body/main/div/div/div/div[2]/div[5]"\
+                      "/div[2]/div[2]/table/tbody/tr/td"
+        biko = self.__lx_content.xpath(table_xpath)[0].text.strip()
+        content_dict['biko'] = biko
 
-#         # 払い戻し，人気
-#         table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.contentsFrame1_inner > div:nth-child(5) > '\
-#             'div:nth-child(1) > div > table'
-#         pay_pop_tb = self.__lx_content.select_one(table_selector)
-#         pay_pop_tb_list = pay_pop_tb.select('tbody')
-#         content_dict['payout_3tan'], content_dict['popular_3tan'] = \
-#             self._get_paypop(pay_pop_tb_list[0])
-#         content_dict['payout_3fuku'], content_dict['popular_3fuku'] = \
-#             self._get_paypop(pay_pop_tb_list[1])
-#         content_dict['payout_2tan'], content_dict['popular_2tan'] = \
-#             self._get_paypop(pay_pop_tb_list[2])
-#         content_dict['payout_2fuku'], content_dict['popular_2fuku'] = \
-#             self._get_paypop(pay_pop_tb_list[3])
-#         content_dict['payout_1tan'], _ = \
-#             self._get_paypop(pay_pop_tb_list[5])
+        # 払い戻し
+        table_xpath = "/html/body/main/div/div/div/div[2]"\
+                      "/div[5]/div[1]/div/table/tbody/tr[1]/td[3]/span"
+        pay_contents = self.__lx_content.xpath(table_xpath)
+        pay_list = list(map(lambda x: int(re.sub(r"[^\d]", "", x.text)),
+                            pay_contents))
+        content_dict['payout_3tan'] = pay_list[0]
+        content_dict['payout_3fuku'] = pay_list[1]
+        content_dict['payout_2tan'] = pay_list[2]
+        content_dict['payout_2fuku'] = pay_list[3]
+        content_dict['payout_1tan'] = pay_list[5]
+
+        # 人気
+        table_xpath = "/html/body/main/div/div/div/div[2]"\
+                      "/div[5]/div[1]/div/table/tbody/tr[1]/td[4]"
+        popular_contents = self.__lx_content.xpath(table_xpath)
+        popular_list = list(map(lambda x: x.text.strip(),
+                                popular_contents))
+        content_dict['popular_3tan'] = super()._rmletter2int(popular_list[0])
+        content_dict['popular_3fuku'] = super()._rmletter2int(popular_list[1])
+        content_dict['popular_2tan'] = super()._rmletter2int(popular_list[2])
+        content_dict['popular_2fuku'] = super()._rmletter2int(popular_list[3])
 
         return content_dict
-
-#     def _get_paypop(self, element_tag: bs4.element.Tag) -> tuple:
-#         """払い戻し金額と人気を取得"""
-#         payout = element_tag.select_one('span.is-payout1').text
-#         payout = int(payout.replace('¥', '').replace(',', ''))
-#         popular = \
-#             element_tag.select_one('tr:nth-child(1) > td:nth-child(4)').text
-#         popular = super()._rmletter2int(popular)
-#         return (payout, popular)
 
     def _getresulttable2dict(self) -> dict:
         """
