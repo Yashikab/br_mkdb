@@ -1024,6 +1024,7 @@ class OfficialOdds(CommonMethods4Official):
                     renfuku_key_rv.append(f'{fst}-{snd}')
             return renfuku_key_rv
         elif rank == 3:
+            # TODO やり直し これじゃだめ
             for trd in range(6, 0, -1):
                 for snd in range(trd-1, 0, -1):
                     for fst in range(snd-1, 0, -1):
