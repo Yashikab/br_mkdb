@@ -54,19 +54,19 @@ class TestOfficialOdds(CommonMethodForTest):
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
         assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
 
-#     # 3連複
-#     @pytest.mark.parametrize("fst, snd, trd, expected", [
-#         (1, 2, 3, 2.9),
-#         (2, 3, 4, 160.2),
-#         (3, 4, 5, 200.3),
-#         (4, 5, 6, 228.9)
-#     ])
-#     def test_threerenfuku(self, fst, snd, trd, expected, odds, mocker):
-#         soup_content = super().htmlfile2bs4(
-#             f'odds_3fuku_{self.__date}{self.__jyo_code}{self.__race_no}.html')
-#         mocker.patch.object(
-#             CommonMethods4Official, "_url2soup", return_value=soup_content)
-#         assert odds.three_renfuku()[f'{fst}-{snd}-{trd}'] == expected
+    # 3連複
+    @pytest.mark.parametrize("fst, snd, trd, expected", [
+        (1, 2, 3, 2.9),
+        (2, 3, 4, 160.2),
+        (3, 4, 5, 200.3),
+        (4, 5, 6, 228.9)
+    ])
+    def test_threerenfuku(self, fst, snd, trd, expected, odds, mocker):
+        soup_content = super().htmlfile2lxcontent(
+            f'odds_3fuku_{self.__date}{self.__jyo_code}{self.__race_no}.html')
+        mocker.patch.object(
+            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+        assert odds.three_renfuku()[f'{fst}-{snd}-{trd}'] == expected
 
     # 2連単
     @pytest.mark.parametrize("fst, snd, expected", [

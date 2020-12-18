@@ -976,21 +976,21 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = list(odds_matrix.T.reshape(-1))
         return odds_list
 
-#     def _renfuku_matrix2list(self, odds_matrix: list) -> list:
-#         """
-#         連複用処理
-#         """
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 1番目の要素から抜いていく -1で空を保管し，filterで除く
-#         odds_list = []
-#         # 最後のリストが空になるまで回す
-#         # 要素があれば条件式は真
-#         while odds_matrix[-1]:
-#             odds_list += list(map(
-#                 lambda x: x.pop(0) if len(x) != 0 else -1,
-#                 odds_matrix))
-#         odds_list = list(filter(lambda x: x != -1, odds_list))
-#         return odds_list
+    def _renfuku_list(self, odds_holizontals: list) -> list:
+        """
+        連複用処理
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 1番目の要素から抜いていく -1で空を保管し，filterで除く
+        odds_list = []
+        # 最後のリストが空になるまで回す
+        # 要素があれば条件式は真
+        while odds_holizontals[-1]:
+            odds_list += list(map(
+                lambda x: x.pop(0) if len(x) != 0 else -1,
+                odds_holizontals))
+        odds_list = list(filter(lambda x: x != -1, odds_list))
+        return odds_list
 
     @classmethod
     def rentan_keylist(cls, rank: int) -> list:
@@ -1016,19 +1016,19 @@ class OfficialOdds(CommonMethods4Official):
         return rentan_key_list
 
     @classmethod
-    def renfuku_keylist(cls, rank: int) -> list:
-        renfuku_key_list = []
+    def renfuku_keyrvlist(cls, rank: int) -> list:
+        renfuku_key_rv = []
         if rank == 2:
             for fst in range(1, 6):
                 for snd in range(fst+1, 7):
-                    renfuku_key_list.append(f'{fst}-{snd}')
-            return renfuku_key_list
+                    renfuku_key_rv.append(f'{fst}-{snd}')
+            return renfuku_key_rv
         elif rank == 3:
-            for fst in range(1, 5):
-                for snd in range(fst+1, 6):
-                    for trd in range(snd+1, 7):
-                        renfuku_key_list.append(f'{fst}-{snd}-{trd}')
-            return renfuku_key_list
+            for trd in range(6, 0, -1):
+                for snd in range(trd-1, 0, -1):
+                    for fst in range(snd-1, 0, -1):
+                        renfuku_key_rv.append(f'{fst}-{snd}-{trd}')
+            return renfuku_key_rv
 
     # 3連単を集計
     def three_rentan(self) -> dict:
@@ -1048,22 +1048,28 @@ class OfficialOdds(CommonMethods4Official):
 
         return content_dict
 
-#     # 3連複を集計
-#     def three_renfuku(self) -> dict:
-#         """
-#         3連複オッズを抜き出し辞書型で返す
-#         1=2=3のオッズは return_dict[1][2][3]に格納される
-#         """
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
-#         odds_matrix = self._tanfuku_common(3, 'renfuku')
-#         odds_list = self._renfuku_matrix2list(odds_matrix)
-#         # 辞書で格納する
-#         content_dict = {}
-#         for key_name in self.renfuku_keylist(3):
-#             content_dict[key_name] = odds_list.pop(0)
+    # 3連複を集計
+    def three_renfuku(self) -> dict:
+        """
+        3連複オッズを抜き出し辞書型で返す
+        1=2=3のオッズは return_dict[1][2][3]に格納される
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
+        odds_rv = self._tanfuku_common(3, 'renfuku')
+        odds_rv.reverse()
+        # 辞書で格納する
+        content_rv_dict = {}
+        for key_name in self.renfuku_keyrvlist(3):
+            content_rv_dict[key_name] = odds_rv.pop(0)
 
-#         return content_dict
+        # キーを並び替え
+        content_dict = {}
+        for key, value in sorted(content_rv_dict.items(),
+                                 key=lambda x:x[0]):
+            content_dict[key] = value
+
+        return content_dict
 
     # 2連単を集計
     def two_rentan(self):
