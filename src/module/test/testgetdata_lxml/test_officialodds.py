@@ -83,19 +83,19 @@ class TestOfficialOdds(CommonMethodForTest):
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
         assert odds.two_rentan()[f'{fst}-{snd}'] == expected
 
-#     # 2連複
-#     @pytest.mark.parametrize("fst, snd, expected", [
-#         (1, 2, 2.0),
-#         (2, 3, 25.7),
-#         (3, 4, 47.1),
-#     ])
-#     def test_tworenfuku(self, fst, snd, expected, odds, mocker):
-#         filename = f'odds_2tanfuku_'\
-#                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-#         soup_content = super().htmlfile2bs4(filename)
-#         mocker.patch.object(
-#             CommonMethods4Official, "_url2soup", return_value=soup_content)
-#         assert odds.two_renfuku()[f'{fst}-{snd}'] == expected
+    # 2連複
+    @pytest.mark.parametrize("fst, snd, expected", [
+        (1, 2, 2.0),
+        (2, 3, 25.7),
+        (3, 4, 47.1),
+    ])
+    def test_tworenfuku(self, fst, snd, expected, odds, mocker):
+        filename = f'odds_2tanfuku_'\
+                   f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
+        soup_content = super().htmlfile2lxcontent(filename)
+        mocker.patch.object(
+            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+        assert odds.two_renfuku()[f'{fst}-{snd}'] == expected
 
 #     # 単勝
 #     @pytest.mark.parametrize("fst, expected", [

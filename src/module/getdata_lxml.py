@@ -934,9 +934,7 @@ class OfficialOdds(CommonMethods4Official):
         # oddsテーブルの抜き出し
         if num == 2 and kake == 'renfuku':
             table_xpath = \
-                'body > main > div > div > div > '\
-                'div.contentsFrame1_inner > div:nth-child(8) '\
-                '> table > tbody'
+                "/html/body/main/div/div/div/div[2]/div[8]/table/tbody"
         else:
             table_xpath = \
                 "/html/body/main/div/div/div/div[2]/div[6]/table/tbody"
@@ -976,22 +974,6 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = list(odds_matrix.T.reshape(-1))
         return odds_list
 
-    def _renfuku_list(self, odds_holizontals: list) -> list:
-        """
-        連複用処理
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # 1番目の要素から抜いていく -1で空を保管し，filterで除く
-        odds_list = []
-        # 最後のリストが空になるまで回す
-        # 要素があれば条件式は真
-        while odds_holizontals[-1]:
-            odds_list += list(map(
-                lambda x: x.pop(0) if len(x) != 0 else -1,
-                odds_holizontals))
-        odds_list = list(filter(lambda x: x != -1, odds_list))
-        return odds_list
-
     @classmethod
     def rentan_keylist(cls, rank: int) -> list:
         """連単用キーのリストを返す.
@@ -1016,22 +998,28 @@ class OfficialOdds(CommonMethods4Official):
         return rentan_key_list
 
     @classmethod
-    def renfuku_keyrvlist(cls, rank: int) -> list:
+    def renfuku_keylist(cls, rank: int) -> list:
+        renfuku_key_rv = cls._renfuku_keyrvlist(rank)
+        # rvはオッズ表用なので、辞書順ソートでもとに戻す
+        return renfuku_key_rv.sort()
+
+    def _renfuku_keyrvlist(self, rank: int) -> list:
         renfuku_key_rv = []
+        assert rank in [2, 3], "rank must be 2 or 3 as integer."
         if rank == 2:
-            for fst in range(1, 6):
-                for snd in range(fst+1, 7):
+            for snd in range(6, 0, -1):
+                for fst in range(snd-1, 0, -1):
                     renfuku_key_rv.append(f'{fst}-{snd}')
-            return renfuku_key_rv
         elif rank == 3:
             # 2位起点にすると裏返せる
             for snd in range(5, 0, -1):
                 for trd in range(6, snd, -1):
                     for fst in range(snd-1, 0, -1):
                         renfuku_key_rv.append(f'{fst}-{snd}-{trd}')
-            return renfuku_key_rv
+        return renfuku_key_rv
 
     # 3連単を集計
+    # TODO 連単共通化
     def three_rentan(self) -> dict:
         """
         3連単オッズを抜き出し辞書型で返す
@@ -1050,6 +1038,7 @@ class OfficialOdds(CommonMethods4Official):
         return content_dict
 
     # 3連複を集計
+    # TODO 連複共通化
     def three_renfuku(self) -> dict:
         """
         3連複オッズを抜き出し辞書型で返す
@@ -1061,13 +1050,13 @@ class OfficialOdds(CommonMethods4Official):
         odds_rv.reverse()
         # 辞書で格納する
         content_rv_dict = {}
-        for key_name in self.renfuku_keyrvlist(3):
+        for key_name in self._renfuku_keyrvlist(3):
             content_rv_dict[key_name] = odds_rv.pop(0)
 
         # キーを並び替え
         content_dict = {}
         for key, value in sorted(content_rv_dict.items(),
-                                 key=lambda x:x[0]):
+                                 key=lambda x: x[0]):
             content_dict[key] = value
 
         return content_dict
@@ -1085,16 +1074,24 @@ class OfficialOdds(CommonMethods4Official):
             content_dict[key_name] = odds_list.pop(0)
         return content_dict
 
-#     # 2連複を集計
-#     def two_renfuku(self):
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         odds_matrix = self._tanfuku_common(2, 'renfuku')
-#         odds_list = self._renfuku_matrix2list(odds_matrix)
-#         # 辞書で格納する
-#         content_dict = {}
-#         for key_name in self.renfuku_keylist(rank=2):
-#             content_dict[key_name] = odds_list.pop(0)
-#         return content_dict
+    # 2連複を集計
+    def two_renfuku(self):
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
+        odds_rv = self._tanfuku_common(2, 'renfuku')
+        odds_rv.reverse()
+        # 辞書で格納する
+        content_rv_dict = {}
+        for key_name in self._renfuku_keyrvlist(2):
+            content_rv_dict[key_name] = odds_rv.pop(0)
+
+        # キーを並び替え
+        content_dict = {}
+        for key, value in sorted(content_rv_dict.items(),
+                                 key=lambda x: x[0]):
+            content_dict[key] = value
+
+        return content_dict
 
 #     # 単勝
 #     def tansho(self):
