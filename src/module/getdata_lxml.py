@@ -12,8 +12,6 @@ import time
 from typing import Iterator
 from urllib.request import urlopen
 
-import bs4
-from bs4 import BeautifulSoup as bs
 import lxml.html as lxml
 import numpy as np
 import pandas as pd
@@ -50,30 +48,6 @@ class CommonMethods4Official:
 
         return lx_content
 
-    def _getplayertable2list(self,
-                             soup: bs4.BeautifulSoup,
-                             table_selector: str) -> list:
-        """
-        選手情報のテーブルを抜き出し, 行ごとのリストで返す．
-
-        Parameters
-        ----------
-            soup : bs4.BeautifulSoup
-            table_selector : str
-                bs4用テーブルのセレクタ−
-
-        Returns
-        -------
-            player_html_list : list
-                選手ごとの行のhtmlを格納したリスト
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        target_table_html = soup.select_one(table_selector)
-        player_html_list = target_table_html.select('tbody')
-        assert len(player_html_list) == 6, \
-            f"{self.__class__.__name__}:lengh is not 6:{len(player_html_list)}"
-        return player_html_list
-
     def _getSTtable2tuple(self,
                           lx_content: lxml.HtmlComment,
                           tbody_xpath: str,
@@ -85,7 +59,7 @@ class CommonMethods4Official:
 
         Parameters
         ----------
-            soup : bs4.BeautifulSoup
+            lx_content: lxml.HtmlComment
             table_selector : str
                 スタート情報のテーブル
             waku : int
@@ -203,42 +177,6 @@ class CommonMethods4Official:
             'wind_dr': wind_dr
         }
         return content_dict
-
-    def _text2list_rn_split(self,
-                            input_content: bs4.element.Tag,
-                            expect_length: int) -> list:
-        """
-        スクレイピングしたときスペースと\\r\\nで区切られた文字列をリスト化する
-
-        Parameters
-        ----------
-            input_content : beautifulsoup.element.Tag
-                入力するパースした要素
-            expect_length : int
-                期待する返却リストの長さ
-
-        Return
-        ------
-            output_list : list
-                返却するリスト
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        edit_content = input_content.text.replace(' ', '')
-        # /r/n, /rを/nに寄せる
-        edit_content = edit_content.replace('\r\n', '\n')
-        edit_content = edit_content.replace('\r', '\n')
-        output_list = edit_content.split('\n')[1:-1]
-        assert len(output_list) == expect_length,\
-            f"lengh is not {expect_length}:{len(output_list)}"
-        return output_list
-
-    def _choose_2nd_span(self, target_html: str) -> str:
-        """
-        風速・水温・波高ぬきだし用関数\n
-        spanの2つめの要素をstr で返却
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        return target_html.select('span')[1].text
 
     def _rmletter2float(self, in_str: str) -> float:
         """
@@ -539,7 +477,7 @@ class OfficialProgram(CommonMethods4Official):
         # race_type : 予選 優勝戦など/レース距離
         race_type_xpath = "/".join([target_table_xpath, "span"])
         race_str = self.__lx_content.xpath(race_type_xpath)[0].text
-        race_list = re.sub("[\u3000\t]", "", race_str).split("\n")
+        race_list = re.sub("[\u3000\t\r]", "", race_str).split("\n")
         race_type, race_kyori = list(filter(lambda x: x != "", race_list))
         race_type = super()._getonlyzenkaku2str(race_type)
         race_kyori = super()._rmletter2int(race_kyori)
@@ -549,6 +487,7 @@ class OfficialProgram(CommonMethods4Official):
         antei_shinyu_el_list = self.__lx_content.xpath(antei_shinyu_xpath)
         antei_shinyu_list = list(map(
             lambda x: x.text.strip(), antei_shinyu_el_list))
+
         if '安定板使用' in antei_shinyu_list:
             is_antei = True
         else:

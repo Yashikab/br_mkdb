@@ -110,7 +110,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         # 各種id
         race_id = int(f"{self.date}{jyo_cd:02}{race_no:02}")
         datejyo_id = int(f"{self.date}{jyo_cd:02}")
-
+        self.logger.info(tcls.getcommoninfo2dict())
         insert_col = self._info2query_col(
             # tb_name=self.__tb_name_list[0],
             id_list=[race_id, datejyo_id],
@@ -219,6 +219,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             ommit_list: list = []
                 insertしない要素
         """
+        print(info_dict)
         # idを格納する
         insert_value_list = list(map(lambda x: f"{x}", id_list))
         # python3.7から辞書型で順序を保持する
