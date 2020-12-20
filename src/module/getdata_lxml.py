@@ -731,22 +731,23 @@ class OfficialResults(CommonMethods4Official):
         pay_contents = self.__lx_content.xpath(table_xpath)
         pay_list = list(map(lambda x: int(re.sub(r"[^\d]", "", x.text)),
                             pay_contents))
-        content_dict['payout_3tan'] = pay_list[0]
-        content_dict['payout_3fuku'] = pay_list[1]
-        content_dict['payout_2tan'] = pay_list[2]
-        content_dict['payout_2fuku'] = pay_list[3]
-        content_dict['payout_1tan'] = pay_list[5]
 
         # 人気
+        # TODO 順番問題でうまくいってない可能性大
         table_xpath = "/html/body/main/div/div/div/div[2]"\
                       "/div[5]/div[1]/div/table/tbody/tr[1]/td[4]"
         popular_contents = self.__lx_content.xpath(table_xpath)
         popular_list = list(map(lambda x: x.text.strip(),
                                 popular_contents))
+        content_dict['payout_3tan'] = pay_list[0]
         content_dict['popular_3tan'] = super()._rmletter2int(popular_list[0])
+        content_dict['payout_3fuku'] = pay_list[1]
         content_dict['popular_3fuku'] = super()._rmletter2int(popular_list[1])
+        content_dict['payout_2tan'] = pay_list[2]
         content_dict['popular_2tan'] = super()._rmletter2int(popular_list[2])
+        content_dict['payout_2fuku'] = pay_list[3]
         content_dict['popular_2fuku'] = super()._rmletter2int(popular_list[3])
+        content_dict['payout_1tan'] = pay_list[5]
 
         return content_dict
 
