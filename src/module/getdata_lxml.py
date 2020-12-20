@@ -894,6 +894,136 @@ class OfficialOdds(CommonMethods4Official):
         self.jyo_code = jyo_code
         self.date = date
 
+    @classmethod
+    def rentan_keylist(cls, rank: int) -> list:
+        """連単用キーのリストを返す.
+
+        Parameters
+        ----------
+            rank : int
+                1 or 2 or 3 で単勝，2連単，3連単
+        """
+        rentan_key_list = []
+        for fst in range(1, 7):
+            if rank == 1:
+                rentan_key_list.append(f'{fst}')
+            else:
+                for snd in range(1, 7):
+                    if snd != fst and rank == 2:
+                        rentan_key_list.append(f'{fst}-{snd}')
+                    else:
+                        for trd in range(1, 7):
+                            if fst != snd and fst != trd and snd != trd:
+                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
+        return rentan_key_list
+
+    @classmethod
+    def renfuku_keylist(cls, rank: int) -> list:
+        renfuku_key_rv = cls._renfuku_keyrvlist(cls, rank)
+        # rvはオッズ表用なので、辞書順ソートでもとに戻す
+        renfuku_key_rv.sort()
+        return renfuku_key_rv
+
+    # 3連単を集計
+    def three_rentan(self) -> dict:
+        content_dict = self._rentan_common(3)
+        return content_dict
+
+    # 3連複を集計
+    def three_renfuku(self) -> dict:
+        content_dict = self._renfuku_common(3)
+        return content_dict
+
+    # 2連単を集計
+    def two_rentan(self):
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        content_dict = self._rentan_common(2)
+        return content_dict
+
+    # 2連複を集計
+    def two_renfuku(self):
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        content_dict = self._renfuku_common(2)
+        return content_dict
+
+    # 単勝
+    def tansho(self):
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # htmlをload
+        base_url = 'https://boatrace.jp/owpc/pc/race/'\
+                   'oddstf?'
+        target_url = f'{base_url}rno={self.race_no}&' \
+                     f'jcd={self.jyo_code:02}&hd={self.date}'
+        lx_content = super()._url2lxml(target_url)
+        target_xpath = \
+            "/html/body/main/div/div/div/div[2]"\
+            "/div[5]/div[1]/div[2]/table/tbody/"\
+            "tr/td[contains(@class, 'oddsPoint')]"
+
+        odds_els = lx_content.xpath(target_xpath)
+        odds_list = list(
+            map(lambda x: self._check_ketsujyo(x.text), odds_els))
+
+        content_dict = {}
+        for key_name in self.rentan_keylist(1):
+            content_dict[key_name] = odds_list.pop(0)
+
+        return content_dict
+
+    def _rentan_common(self, rank: int) -> dict:
+        """
+        2/3連単オッズを抜き出し辞書型で返す
+        1-2-3のオッズは return_dict[1][2][3]に格納される
+        """
+        assert rank in [2, 3], "rank must be in 2 or 3 as integer."
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 共通メソッドを使える
+        odds_hol_list = self._tanfuku_common(rank, 'rentan')
+        odds_list = self._rentan_list(odds_hol_list)
+
+        # 辞書で格納する
+        content_dict = {}
+        for key_name in self.rentan_keylist(rank):
+            content_dict[key_name] = odds_list.pop(0)
+        return content_dict
+
+    def _renfuku_common(self, rank: int) -> dict:
+        """
+        2/3連複オッズを抜き出し辞書型で返す
+        1=2=3のオッズは return_dict[1][2][3]に格納される
+        """
+        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
+        odds_rv = self._tanfuku_common(rank, 'renfuku')
+        odds_rv.reverse()
+        # 辞書で格納する
+        content_rv_dict = {}
+        for key_name in self._renfuku_keyrvlist(rank):
+            content_rv_dict[key_name] = odds_rv.pop(0)
+
+        # キーを並び替え
+        content_dict = {}
+        for key, value in sorted(content_rv_dict.items(),
+                                 key=lambda x: x[0]):
+            content_dict[key] = value
+        return content_dict
+
+    def _renfuku_keyrvlist(self, rank: int) -> list:
+        """スクレイプ用順番"""
+        renfuku_key_rv = []
+        assert rank in [2, 3], "rank must be 2 or 3 as integer."
+        if rank == 2:
+            for snd in range(6, 0, -1):
+                for fst in range(snd-1, 0, -1):
+                    renfuku_key_rv.append(f'{fst}-{snd}')
+        elif rank == 3:
+            # 2位起点にすると裏返せる
+            for snd in range(5, 0, -1):
+                for trd in range(6, snd, -1):
+                    for fst in range(snd-1, 0, -1):
+                        renfuku_key_rv.append(f'{fst}-{snd}-{trd}')
+        return renfuku_key_rv
+
     def _tanfuku_common(self, num: int, kake: str) -> list:
         """
         # 2 3連単，3連複共通部分を関数化
@@ -947,16 +1077,8 @@ class OfficialOdds(CommonMethods4Official):
 
         return odds_horizontals
 
-#     # oddsPointクラスを抜き，要素を少数に変換してリストで返す
-#     def _getoddsPoint2floatlist(self, odds_tr):
-#         html_list = odds_tr.select('td.oddsPoint')
-#         text_list = list(map(lambda x: x.text, html_list))
-#         float_list = list(map(
-#             lambda x: self._check_ketsujyo(x), text_list))
-#         return float_list
-
-    # 欠場をチェックする
     def _check_ketsujyo(self, float_str: str):
+        """欠場をチェックする"""
         try:
             return float(float_str)
         except ValueError:
@@ -973,149 +1095,6 @@ class OfficialOdds(CommonMethods4Official):
         # 転置を取り，つなげてリスト化
         odds_list = list(odds_matrix.T.reshape(-1))
         return odds_list
-
-    @classmethod
-    def rentan_keylist(cls, rank: int) -> list:
-        """連単用キーのリストを返す.
-
-        Parameters
-        ----------
-            rank : int
-                1 or 2 or 3 で単勝，2連単，3連単
-        """
-        rentan_key_list = []
-        for fst in range(1, 7):
-            if rank == 1:
-                rentan_key_list.append(f'{fst}')
-            else:
-                for snd in range(1, 7):
-                    if snd != fst and rank == 2:
-                        rentan_key_list.append(f'{fst}-{snd}')
-                    else:
-                        for trd in range(1, 7):
-                            if fst != snd and fst != trd and snd != trd:
-                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
-        return rentan_key_list
-
-    @classmethod
-    def renfuku_keylist(cls, rank: int) -> list:
-        renfuku_key_rv = cls._renfuku_keyrvlist(rank)
-        # rvはオッズ表用なので、辞書順ソートでもとに戻す
-        return renfuku_key_rv.sort()
-
-    def _renfuku_keyrvlist(self, rank: int) -> list:
-        renfuku_key_rv = []
-        assert rank in [2, 3], "rank must be 2 or 3 as integer."
-        if rank == 2:
-            for snd in range(6, 0, -1):
-                for fst in range(snd-1, 0, -1):
-                    renfuku_key_rv.append(f'{fst}-{snd}')
-        elif rank == 3:
-            # 2位起点にすると裏返せる
-            for snd in range(5, 0, -1):
-                for trd in range(6, snd, -1):
-                    for fst in range(snd-1, 0, -1):
-                        renfuku_key_rv.append(f'{fst}-{snd}-{trd}')
-        return renfuku_key_rv
-
-    # 3連単を集計
-    # TODO 連単共通化
-    def three_rentan(self) -> dict:
-        """
-        3連単オッズを抜き出し辞書型で返す
-        1-2-3のオッズは return_dict[1][2][3]に格納される
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
-        odds_horizontal = self._tanfuku_common(3, 'rentan')
-        odds_list = self._rentan_list(odds_horizontal)
-
-        # 辞書で格納する
-        content_dict = {}
-        for key_name in self.rentan_keylist(3):
-            content_dict[key_name] = odds_list.pop(0)
-
-        return content_dict
-
-    # 3連複を集計
-    # TODO 連複共通化
-    def three_renfuku(self) -> dict:
-        """
-        3連複オッズを抜き出し辞書型で返す
-        1=2=3のオッズは return_dict[1][2][3]に格納される
-        """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
-        odds_rv = self._tanfuku_common(3, 'renfuku')
-        odds_rv.reverse()
-        # 辞書で格納する
-        content_rv_dict = {}
-        for key_name in self._renfuku_keyrvlist(3):
-            content_rv_dict[key_name] = odds_rv.pop(0)
-
-        # キーを並び替え
-        content_dict = {}
-        for key, value in sorted(content_rv_dict.items(),
-                                 key=lambda x: x[0]):
-            content_dict[key] = value
-
-        return content_dict
-
-    # 2連単を集計
-    def two_rentan(self):
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # 共通メソッドを使える
-        odds_hol_list = self._tanfuku_common(2, 'rentan')
-        odds_list = self._rentan_list(odds_hol_list)
-
-        # 辞書で格納する
-        content_dict = {}
-        for key_name in self.rentan_keylist(2):
-            content_dict[key_name] = odds_list.pop(0)
-        return content_dict
-
-    # 2連複を集計
-    def two_renfuku(self):
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
-        odds_rv = self._tanfuku_common(2, 'renfuku')
-        odds_rv.reverse()
-        # 辞書で格納する
-        content_rv_dict = {}
-        for key_name in self._renfuku_keyrvlist(2):
-            content_rv_dict[key_name] = odds_rv.pop(0)
-
-        # キーを並び替え
-        content_dict = {}
-        for key, value in sorted(content_rv_dict.items(),
-                                 key=lambda x: x[0]):
-            content_dict[key] = value
-
-        return content_dict
-
-#     # 単勝
-#     def tansho(self):
-#         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-#         # htmlをload
-#         base_url = 'https://boatrace.jp/owpc/pc/race/'\
-#                    'oddstf?'
-#         target_url = f'{base_url}rno={self.race_no}&' \
-#                      f'jcd={self.jyo_code:02}&hd={self.date}'
-#         soup = super()._url2lxml(target_url)
-#         target_table_selector = \
-#             'body > main > div > div > div > '\
-#             'div.contentsFrame1_inner > div.grid.is-type2.h-clear '\
-#             '> div:nth-child(1) > div.table1 > table'
-#         odds_table = soup.select_one(target_table_selector)
-#         odds_html_list = odds_table.select('tbody tr td.oddsPoint')
-#         odds_list = list(
-#             map(lambda x: self._check_ketsujyo(x.text), odds_html_list))
-
-#         content_dict = {}
-#         for key_name in self.rentan_keylist(1):
-#             content_dict[key_name] = odds_list.pop(0)
-
-#         return content_dict
 
 
 class DateRange:

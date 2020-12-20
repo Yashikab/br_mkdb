@@ -6,7 +6,7 @@ odds2sqlテスト
 import pytest
 
 from module.dt2sql import Odds2sql
-from module.getdata import OfficialOdds
+from module.getdata_lxml import OfficialOdds
 from ..common import CommonMethod
 
 

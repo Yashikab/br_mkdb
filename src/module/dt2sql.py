@@ -15,7 +15,7 @@ from typing import Dict, List
 
 from module import const
 from module.connect import MysqlConnector
-from module.getdata import (
+from module.getdata_lxml import (
     GetHoldPlacePast,
     OfficialProgram,
     OfficialChokuzen,

@@ -97,17 +97,17 @@ class TestOfficialOdds(CommonMethodForTest):
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
         assert odds.two_renfuku()[f'{fst}-{snd}'] == expected
 
-#     # 単勝
-#     @pytest.mark.parametrize("fst, expected", [
-#         (1, 1.0),
-#         (2, 6.1),
-#         (3, 12.2),
-#         (6, 9.1)
-#     ])
-#     def test_tansho(self, fst, expected, odds, mocker):
-#         filename = f'odds_1tan_'\
-#                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-#         soup_content = super().htmlfile2bs4(filename)
-#         mocker.patch.object(
-#             CommonMethods4Official, "_url2soup", return_value=soup_content)
-#         assert odds.tansho()[f'{fst}'] == expected
+    # 単勝
+    @pytest.mark.parametrize("fst, expected", [
+        (1, 1.0),
+        (2, 6.1),
+        (3, 12.2),
+        (6, 9.1)
+    ])
+    def test_tansho(self, fst, expected, odds, mocker):
+        filename = f'odds_1tan_'\
+                   f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
+        soup_content = super().htmlfile2lxcontent(filename)
+        mocker.patch.object(
+            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+        assert odds.tansho()[f'{fst}'] == expected
