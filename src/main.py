@@ -6,10 +6,10 @@ MYSQLへ公式データを格納する
 import argparse
 from datetime import datetime
 from logging import (
-    DEBUG, getLogger,
+    getLogger,
     Formatter,
-    StreamHandler,
     INFO,
+    StreamHandler,
 )
 import time
 
@@ -34,6 +34,7 @@ from module.dt2sql import (
     Odds2sql
 )
 from module.getdata import DateRange as dr
+from module.log import TqdmLoggingHandler
 from module.master2sql import JyoMaster2sql
 
 # logger
@@ -116,23 +117,6 @@ def main():
 
             elapsed_time = time.time() - start_time
             logger.debug(f'completed in {elapsed_time}sec')
-            # for jyo_cd in jd2sql.map_raceno_dict.keys():
-            #     ed_race_no = jd2sql.map_raceno_dict[jyo_cd]
-            #     start_time = time.time()
-            #     for race_no in range(1, ed_race_no + 1):
-            #         logger.info(
-            #             f'data with date: {date} '
-            #             f'jyo_cd: {jyo_cd} race_no: {race_no}')
-            #         try:
-            #             time.sleep(args.wait)
-            #             rd2sql.insert2table(date, jyo_cd, race_no)
-            #             cd2sql.insert2table(date, jyo_cd, race_no)
-            #             res2sql.insert2table(date, jyo_cd, race_no)
-            #             odds2sql.insert2table(date, jyo_cd, race_no)
-            #         except Exception as e:
-            #             logger.error(f'{e}')
-            #     elapsed_time = time.time() - start_time
-            #     logger.debug(f'completed in {elapsed_time}sec')
             logger.debug('insert race data completed.')
         except Exception as e:
             logger.error(f'{e}')
@@ -148,6 +132,8 @@ def main():
 if __name__ == '__main__':
     # logging設定
     # mainのlog設定
+    main_logger = getLogger(__name__)
+    main_logger.addHandler(TqdmLoggingHandler())
     coloredlogs.CAN_USE_BOLD_FONT = True
     coloredlogs.DEFAULT_FIELD_STYLES = CL_FIELD_STYLES
     coloredlogs.DEFAULT_LEVEL_STYLES = CL_LEVEL_STYLES
@@ -165,6 +151,6 @@ if __name__ == '__main__':
     )
     handler.setFormatter(fmt)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
-    getLogger(MODULE_LOG_NAME).setLevel(DEBUG)
+    getLogger(MODULE_LOG_NAME).setLevel(INFO)
 
     main()

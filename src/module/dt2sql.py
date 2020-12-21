@@ -10,6 +10,7 @@ from abc import ABCMeta, abstractmethod
 from logging import getLogger
 # from datetime import datetime
 from pathlib import Path
+from tqdm import tqdm
 from typing import Callable, Any
 from typing import Dict, List
 
@@ -79,9 +80,16 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         self.date = date
         common_row_list = []
         waku_row_list = []
+        # tqdm用
+        total_race = 0
+        for v in raceno_dict.values():
+            total_race += len(v)
+
+        pbar = tqdm(total=total_race)
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
                 self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
+                pbar.set_description(f"Processing jyo:{jyo_cd}, race: {race_no}")
                 try:
                     common, waku = self._create_queries(jyo_cd, race_no)
                     common_row_list.append(common)
@@ -89,6 +97,9 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                 except Exception as e:
                     self.logger.error(
                         f'args: {self.date}, {jyo_cd}, {race_no} error: {e}')
+                pbar.update(1)
+        pbar.close()
+
         common_sql = self.create_insert_prefix(self.__tb_name_list[0])
         common_row = ", ".join(common_row_list)
         query = ' '.join([common_sql, common_row])
@@ -218,7 +229,6 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             ommit_list: list = []
                 insertしない要素
         """
-        print(info_dict)
         # idを格納する
         insert_value_list = list(map(lambda x: f"{x}", id_list))
         # python3.7から辞書型で順序を保持する

@@ -19,6 +19,7 @@ pytest-mock = "*"
 lxml = "*"
 pytest-ordering = "*"
 cssselect = "*"
+tqdm = "*"
 
 [requires]
 python_version = "3.7"
