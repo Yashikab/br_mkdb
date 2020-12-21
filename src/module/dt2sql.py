@@ -89,7 +89,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
                 self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
-                pbar.set_description(f"Processing jyo:{jyo_cd}, race: {race_no}")
+                pbar.set_description(
+                    f"Processing jyo:{jyo_cd}, race: {race_no}")
                 try:
                     common, waku = self._create_queries(jyo_cd, race_no)
                     common_row_list.append(common)

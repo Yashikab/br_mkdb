@@ -702,7 +702,8 @@ class OfficialResults(CommonMethods4Official):
             else:
                 return None
 
-        henkantei_list = list(map(lambda x: teistr2str(x.text), henkantei_list))
+        henkantei_list = list(map(
+            lambda x: teistr2str(x.text), henkantei_list))
 
         # 返還艇があればリスト長が1以上になる
         if len(henkantei_list) > 0:
