@@ -10,12 +10,13 @@ from abc import ABCMeta, abstractmethod
 from logging import getLogger
 # from datetime import datetime
 from pathlib import Path
+from tqdm import tqdm
 from typing import Callable, Any
 from typing import Dict, List
 
 from module import const
 from module.connect import MysqlConnector
-from module.getdata import (
+from module.getdata_lxml import (
     GetHoldPlacePast,
     OfficialProgram,
     OfficialChokuzen,
@@ -79,9 +80,17 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         self.date = date
         common_row_list = []
         waku_row_list = []
+        # tqdm用
+        total_race = 0
+        for v in raceno_dict.values():
+            total_race += len(v)
+
+        pbar = tqdm(total=total_race)
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
                 self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
+                pbar.set_description(
+                    f"Processing jyo:{jyo_cd}, race: {race_no}")
                 try:
                     common, waku = self._create_queries(jyo_cd, race_no)
                     common_row_list.append(common)
@@ -89,6 +98,9 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                 except Exception as e:
                     self.logger.error(
                         f'args: {self.date}, {jyo_cd}, {race_no} error: {e}')
+                pbar.update(1)
+        pbar.close()
+
         common_sql = self.create_insert_prefix(self.__tb_name_list[0])
         common_row = ", ".join(common_row_list)
         query = ' '.join([common_sql, common_row])
@@ -110,7 +122,6 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         # 各種id
         race_id = int(f"{self.date}{jyo_cd:02}{race_no:02}")
         datejyo_id = int(f"{self.date}{jyo_cd:02}")
-
         insert_col = self._info2query_col(
             # tb_name=self.__tb_name_list[0],
             id_list=[race_id, datejyo_id],
@@ -222,6 +233,7 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         # idを格納する
         insert_value_list = list(map(lambda x: f"{x}", id_list))
         # python3.7から辞書型で順序を保持する
+        # TODO colと照合させる（別PR対応でOKだが）
         for i_key in info_dict.keys():
             i_value = info_dict[i_key]
             i_value = self.value2query_str(i_value)
@@ -406,10 +418,18 @@ class Odds2sql(Data2MysqlTemplate):
                      raceno_dict: Dict[int, List[int]]) -> None:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         insert_rows_dict: Dict[str, List[Any]] = {}
+        # tqdm用
+        total_race = 0
+        for v in raceno_dict.values():
+            total_race += len(v)
+
+        pbar = tqdm(total=total_race)
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
                 self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
                 race_id = f"{date}{jyo_cd:02}{race_no:02}"
+                pbar.set_description(
+                    f"Processing jyo:{jyo_cd}, race: {race_no}")
                 for tb_name, content in zip(self.__tb_name_list,
                                             self._call_oddsfunc(
                                                 date,
@@ -427,7 +447,8 @@ class Odds2sql(Data2MysqlTemplate):
                     except Exception as e:
                         self.logger.error(
                             f'args: {date}, {jyo_cd}, {race_no} error: {e}')
-
+                pbar.update(1)
+        pbar.close()
         # まとめる
         for tb_name, insert_rows_list in insert_rows_dict.items():
             sql = super().create_insert_prefix(tb_name)
