@@ -418,10 +418,18 @@ class Odds2sql(Data2MysqlTemplate):
                      raceno_dict: Dict[int, List[int]]) -> None:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         insert_rows_dict: Dict[str, List[Any]] = {}
+        # tqdm用
+        total_race = 0
+        for v in raceno_dict.values():
+            total_race += len(v)
+
+        pbar = tqdm(total=total_race)
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
                 self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
                 race_id = f"{date}{jyo_cd:02}{race_no:02}"
+                pbar.set_description(
+                    f"Processing jyo:{jyo_cd}, race: {race_no}")
                 for tb_name, content in zip(self.__tb_name_list,
                                             self._call_oddsfunc(
                                                 date,
@@ -439,7 +447,8 @@ class Odds2sql(Data2MysqlTemplate):
                     except Exception as e:
                         self.logger.error(
                             f'args: {date}, {jyo_cd}, {race_no} error: {e}')
-
+                pbar.update(1)
+        pbar.close()
         # まとめる
         for tb_name, insert_rows_list in insert_rows_dict.items():
             sql = super().create_insert_prefix(tb_name)
