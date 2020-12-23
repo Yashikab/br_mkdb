@@ -20,6 +20,7 @@ lxml = "*"
 pytest-ordering = "*"
 cssselect = "*"
 tqdm = "*"
+pydantic = "*"
 
 [requires]
 python_version = "3.7"
