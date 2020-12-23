@@ -4,7 +4,6 @@
 MYSQLへ公式データを格納する
 """
 import argparse
-from datetime import datetime
 from logging import (
     getLogger,
     Formatter,
