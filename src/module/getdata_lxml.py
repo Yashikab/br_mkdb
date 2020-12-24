@@ -16,7 +16,7 @@ import lxml.html as lxml
 import numpy as np
 import pandas as pd
 
-from module import const
+from domain import const
 
 
 class CommonMethods4Official:

@@ -14,7 +14,7 @@ from tqdm import tqdm
 from typing import Callable, Any
 from typing import Dict, List
 
-from module import const
+from domain import const
 from module.connect import MysqlConnector
 from module.getdata_lxml import (
     GetHoldPlacePast,

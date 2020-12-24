@@ -13,9 +13,9 @@ from logging import (
 
 import coloredlogs
 
-from application.usecase import run
+from application.usecase import BoatRaceUsecase
 from domain.argument import Options
-from module.const import (
+from domain.const import (
     CL_FIELD_STYLES,
     CL_LEVEL_STYLES,
     DATE_FMT,
@@ -86,4 +86,13 @@ if __name__ == '__main__':
     main_logger.debug(f"options: {op}")
     main_logger.info(f'Insert data between {op.start_date} and {op.end_date}')
 
-    run(op)
+    if op.db_type == "gcs":
+        main_logger.info('use Google Cloud SQL.')
+        usecase = BoatRaceUsecase.gcpmysql()
+    elif op.db_type == "local":
+        main_logger.info('use local mysql server.')
+        usecase = BoatRaceUsecase.localmysql()
+    else:
+        raise Exception("Couldn't build sql controller")
+
+    usecase.run(op)

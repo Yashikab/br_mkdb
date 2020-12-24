@@ -12,7 +12,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import Callable
 
-from module import const
+from domain import const
 from module.connect import MysqlConnector
 from module.getdata import (
     GetHoldPlacePast,

@@ -14,39 +14,34 @@ from stat import (
 import subprocess
 from abc import ABCMeta, abstractmethod
 
-from module.const import MODULE_LOG_NAME, MYSQL_CONFIG
+from domain.dbctl import DatabaseController
+from domain.const import MODULE_LOG_NAME, MYSQL_CONFIG
 
 import mysql.connector
 import time
 
 
-class DatabaseController(metaclass=ABCMeta):
-    @abstractmethod
-    def build(self):
-        """build DB"""
-        pass
+class Common:
 
-    @abstractmethod
-    def clean(self):
-        """del DB"""
-        pass
-
-    def _check_connection(self):
+    @classmethod
+    def check_connection(cls):
+        logger = \
+            getLogger(MODULE_LOG_NAME).getChild(cls.__class__.__name__)
         # 接続を確認する(接続されていなかったら10秒待って再度try)
         # 10回やってだめならerror
         for i in range(10):
             try:
                 mysql.connector.connect(**MYSQL_CONFIG)
-                self.logger.info('Confirm connected to mysql.')
+                logger.info('Confirm connected to mysql.')
                 break
             except Exception as e:
-                self.logger.debug(e)
+                logger.debug(e)
                 if i == 9:
-                    self.logger.error(
+                    logger.error(
                         'mysql connecting comfirmation: timeouted')
                 else:
-                    self.logger.warning('Not connected to mysql yet.')
-                    self.logger.debug('wait 10sec and retry.')
+                    logger.warning('Not connected to mysql yet.')
+                    logger.debug('wait 10sec and retry.')
                     time.sleep(10)
 
 
@@ -111,7 +106,7 @@ class CloudSqlController(DatabaseController):
             )
         # wait
         time.sleep(5)
-        super()._check_connection()
+        Common.check_connection()
 
     def clean(self):
         os.chdir(self.__proxy_dir)
@@ -188,7 +183,7 @@ class LocalSqlController(DatabaseController):
             self.logger.error(e)
         # wait
         time.sleep(5)
-        super()._check_connection()
+        Common.check_connection()
 
     def clean(self):
         self.logger.info('Clean local mysql.')

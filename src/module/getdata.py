@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup as bs
 import numpy as np
 import pandas as pd
 
-from module import const
+from domain import const
 
 
 class CommonMethods4Official:

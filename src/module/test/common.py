@@ -9,7 +9,7 @@ from typing import Any
 
 from bs4 import BeautifulSoup as bs
 
-from module import const
+from domain import const
 from module.connect import MysqlConnector
 
 
