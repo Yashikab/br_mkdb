@@ -6,7 +6,7 @@ from typing import Dict, Any
 # 番組表，直前，結果，オッズを作る(抽象化)
 
 
-class ParserTemplate(meta=ABCMeta):
+class ProgramParser(meta=ABCMeta):
 
     @abstractmethod
     def getplayerinfo2dict(self) -> Dict[str, Any]:
