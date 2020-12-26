@@ -60,4 +60,3 @@ class OddsParser(meta=ABCMeta):
     @abstractmethod
     def tansho(self) -> Dict[str, float]:
         pass
-
