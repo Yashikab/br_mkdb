@@ -3,6 +3,7 @@
 """
 HTMLから情報をスクレイピングするためのモジュール
 """
+from dataclasses import asdict
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
@@ -18,6 +19,7 @@ import numpy as np
 import pandas as pd
 
 from domain import const
+from domain.model.info import ProgramPlayerInfo
 
 
 class CommonMethods4Official:
@@ -372,32 +374,32 @@ class OfficialProgram(CommonMethods4Official):
 
         self.logger.debug('get target player info completed.')
 
-        content_dict = {
-            'name': name,
-            'id': player_id,
-            'level': player_level,
-            'home': home,
-            'birth_place': birth_place,
-            'age': age,
-            'weight': weight,
-            'num_F': num_F,
-            'num_L': num_L,
-            'avg_ST': avg_ST,
-            'all_1rate': all_1rate,
-            'all_2rate': all_2rate,
-            'all_3rate': all_3rate,
-            'local_1rate': local_1rate,
-            'local_2rate': local_2rate,
-            'local_3rate': local_3rate,
-            'motor_no': motor_no,
-            'motor_2rate': motor_2rate,
-            'motor_3rate': motor_3rate,
-            'boat_no': boat_no,
-            'boat_2rate': boat_2rate,
-            'boat_3rate': boat_3rate
-        }
+        program_p_info = ProgramPlayerInfo(
+            name,
+            player_id,
+            player_level,
+            home,
+            birth_place,
+            age,
+            weight,
+            num_F,
+            num_L,
+            avg_ST,
+            all_1rate,
+            all_2rate,
+            all_3rate,
+            local_1rate,
+            local_2rate,
+            local_3rate,
+            motor_no,
+            motor_2rate,
+            motor_3rate,
+            boat_no,
+            boat_2rate,
+            boat_3rate
+        )
 
-        return content_dict
+        return asdict(program_p_info)
 
     def getcommoninfo2dict(self) -> dict:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')

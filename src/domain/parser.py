@@ -1,9 +1,25 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, Any
+from typing import Any, Dict, List
 
-# TODO ここではURLの取得は行わない
-# TODO htmlを読み込んでlxmlを使ってパースする．
+# TODO 先にgetdataのほうでdt2sqlへの受け渡しに対するドメイン化を行う．
+# 単一のユーザーに対して責任を追う．（SRP単一責任の法則）
+# ここではURLの取得は行わない
 # 番組表，直前，結果，オッズを作る(抽象化)
+
+
+class HoldPlaceParser(meta=ABCMeta):
+
+    @abstractmethod
+    def holdplace2list(self) -> List[str]:
+        pass
+
+    @abstractmethod
+    def holdplace2cdlist(self) -> List[int]:
+        pass
+
+    @abstractmethod
+    def holdinfo2dict(self, hp_name: str) -> Dict[str, Any]:
+        pass
 
 
 class ProgramParser(meta=ABCMeta):
