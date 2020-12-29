@@ -27,3 +27,13 @@ class ProgramPlayerInfo:
     boat_no: int
     boat_2rate: float
     boat_3rate: float
+
+
+@dataclass
+class ProgramCommonInfo:
+    taikai_name: str
+    grade: str
+    race_type: str
+    race_kyori: int
+    is_antei: bool
+    is_shinnyukotei: bool

@@ -19,7 +19,10 @@ import numpy as np
 import pandas as pd
 
 from domain import const
-from domain.model.info import ProgramPlayerInfo
+from domain.model.info import (
+    ProgramPlayerInfo,
+    ProgramCommonInfo
+)
 
 
 class CommonMethods4Official:
@@ -435,16 +438,16 @@ class OfficialProgram(CommonMethods4Official):
         else:
             is_shinnyukotei = False
 
-        content_dict = {
-            'taikai_name': taikai_name,
-            'grade': grade,
-            'race_type': race_type,
-            'race_kyori': race_kyori,
-            'is_antei': is_antei,
-            'is_shinnyukotei': is_shinnyukotei
-        }
+        pci = ProgramCommonInfo(
+            taikai_name,
+            grade,
+            race_type,
+            race_kyori,
+            is_antei,
+            is_shinnyukotei
+        )
 
-        return content_dict
+        return asdict(pci)
 
 
 class OfficialChokuzen(CommonMethods4Official):
