@@ -37,3 +37,14 @@ class ProgramCommonInfo:
     race_kyori: int
     is_antei: bool
     is_shinnyukotei: bool
+
+
+@dataclass
+class ChokuzenPlayerInfo:
+    name: str
+    weight: float
+    chosei_weight: float
+    tenji_time: float
+    tilt: float
+    tenji_course: int
+    tenji_st: float

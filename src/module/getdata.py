@@ -20,6 +20,7 @@ import pandas as pd
 
 from domain import const
 from domain.model.info import (
+    ChokuzenPlayerInfo,
     ProgramPlayerInfo,
     ProgramCommonInfo
 )
@@ -523,16 +524,16 @@ class OfficialChokuzen(CommonMethods4Official):
             waku
         )
 
-        content_dict = {
-            'name': name,
-            'weight': weight,
-            'chosei_weight': chosei_weight,
-            'tenji_time': tenji_T,
-            'tilt': tilt,
-            'tenji_course': tenji_C,
-            'tenji_st': tenji_ST
-        }
-        return content_dict
+        cpi = ChokuzenPlayerInfo(
+            name,
+            weight,
+            chosei_weight,
+            tenji_T,
+            tilt,
+            tenji_C,
+            tenji_ST
+        )
+        return asdict(cpi)
 
     def getcommoninfo2dict(self) -> dict:
         """
