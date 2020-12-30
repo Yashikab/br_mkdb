@@ -1,3 +1,4 @@
+from sys import float_info
 from pydantic.dataclasses import dataclass
 
 
@@ -48,3 +49,13 @@ class ChokuzenPlayerInfo:
     tilt: float
     tenji_course: int
     tenji_st: float
+
+
+@dataclass
+class WeatherInfo:
+    temp: float
+    weather: str
+    wind_v: int
+    w_temp: float
+    wave: int
+    wind_dr: int

@@ -22,7 +22,8 @@ from domain import const
 from domain.model.info import (
     ChokuzenPlayerInfo,
     ProgramPlayerInfo,
-    ProgramCommonInfo
+    ProgramCommonInfo,
+    WeatherInfo
 )
 
 
@@ -178,15 +179,15 @@ class CommonMethods4Official:
         wind_dr = condinfo_html_list[6].select_one('p')['class'][1]
         wind_dr = self._rmletter2int(wind_dr)
 
-        content_dict = {
-            'temp': temp,
-            'weather': weather,
-            'wind_v': wind_v,
-            'w_temp': w_temp,
-            'wave': wave,
-            'wind_dr': wind_dr
-        }
-        return content_dict
+        wi = WeatherInfo(
+            temp,
+            weather,
+            wind_v,
+            w_temp,
+            wave,
+            wind_dr
+        )
+        return asdict(wi)
 
     def _text2list_rn_split(self,
                             input_content: bs4.element.Tag,
