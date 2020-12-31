@@ -59,3 +59,13 @@ class WeatherInfo:
     w_temp: float
     wave: int
     wind_dr: int
+
+
+@dataclass
+class ResultPlayerInfo:
+    rank: int
+    name: str
+    no: int
+    racetime: float
+    course: int
+    st_time: float

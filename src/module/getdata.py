@@ -23,6 +23,7 @@ from domain.model.info import (
     ChokuzenPlayerInfo,
     ProgramPlayerInfo,
     ProgramCommonInfo,
+    ResultPlayerInfo,
     WeatherInfo
 )
 
@@ -611,7 +612,8 @@ class OfficialResults(CommonMethods4Official):
         content_dict['course'] = course
         content_dict['st_time'] = st_time
 
-        return content_dict
+        rpi = ResultPlayerInfo(**content_dict)
+        return asdict(rpi)
 
     def getcommoninfo2dict(self) -> dict:
         """
