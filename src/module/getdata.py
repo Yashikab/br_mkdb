@@ -22,7 +22,7 @@ from domain import const
 from domain.model.info import (
     ChokuzenPlayerInfo,
     ProgramPlayerInfo,
-    ProgramCommonInfo,
+    ProgramCommonInfo, ResultCommonInfo,
     ResultPlayerInfo,
     WeatherInfo
 )
@@ -704,7 +704,9 @@ class OfficialResults(CommonMethods4Official):
         content_dict['payout_1tan'], _ = \
             self._get_paypop(pay_pop_tb_list[5])
 
-        return content_dict
+        rci = ResultCommonInfo(**content_dict)
+
+        return asdict(rci)
 
     def _get_paypop(self, element_tag: bs4.element.Tag) -> tuple:
         """払い戻し金額と人気を取得"""

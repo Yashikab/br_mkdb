@@ -1,4 +1,3 @@
-from sys import float_info
 from pydantic.dataclasses import dataclass
 
 
@@ -69,3 +68,26 @@ class ResultPlayerInfo:
     racetime: float
     course: int
     st_time: float
+
+
+@dataclass
+class ResultCommonInfo:
+    temp: float
+    weather: str
+    wind_v: int
+    w_temp: float
+    wave: int
+    wind_dr: int
+    henkantei_list: str  # カンマ区切り
+    is_henkan: bool
+    kimarite: str
+    biko: str
+    payout_3tan: int
+    popular_3tan: int
+    payout_3fuku: int
+    popular_3fuku: int
+    payout_2tan: int
+    popular_2tan: int
+    payout_2fuku: int
+    popular_2fuku: int
+    payout_1tan: int
