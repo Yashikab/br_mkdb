@@ -24,7 +24,8 @@ from domain.model.info import (
     ProgramPlayerInfo,
     ProgramCommonInfo, ResultCommonInfo,
     ResultPlayerInfo,
-    WeatherInfo
+    WeatherInfo,
+    ThreeRentan,
 )
 
 
@@ -954,7 +955,9 @@ class OfficialOdds(CommonMethods4Official):
         #                 if trd != fst and trd != snd:
         #                     content_dict[fst][snd][trd] = \
         #                         odds_list.pop(0)
-
+        # キーが違うためまだ変換できない
+        # TODO キーを新しいのにする
+        # tr = ThreeRentan(**content_dict)
         return content_dict
 
     # 3連複を集計

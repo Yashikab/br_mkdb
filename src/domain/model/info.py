@@ -1,3 +1,5 @@
+from dataclasses import make_dataclass
+
 from pydantic.dataclasses import dataclass
 
 
@@ -91,3 +93,35 @@ class ResultCommonInfo:
     payout_2fuku: int
     popular_2fuku: int
     payout_1tan: int
+
+
+# 連単キー生成
+def rentan_keylist(rank: int) -> list:
+    """連単用キーのリストを返す.
+
+    Parameters
+    ----------
+        rank : int
+            1 or 2 or 3 で単勝，2連単，3連単
+    """
+    rentan_key_list = []
+    for fst in range(1, 7):
+        if rank == 1:
+            rentan_key_list.append(f'comb_{fst}')
+        else:
+            for snd in range(1, 7):
+                if snd != fst and rank == 2:
+                    rentan_key_list.append(f'comb_{fst}{snd}')
+                else:
+                    for trd in range(1, 7):
+                        if fst != snd and fst != trd and snd != trd:
+                            rentan_key_list.append(f'comb_{fst}{snd}{trd}')
+    return rentan_key_list
+
+
+ThreeRentan = make_dataclass(
+    "ThreeRentan",
+    [(key_name, float) for key_name in rentan_keylist(3)]
+)
+# pydanticに装着
+ThreeRentan = dataclass(ThreeRentan)
