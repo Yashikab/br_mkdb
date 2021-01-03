@@ -39,7 +39,7 @@ class TestOfficialOdds(CommonMethod):
             f'odds_3tan_{self.__date}{self.__jyo_code}{self.__race_no}.html')
         mocker.patch.object(
             CommonMethods4Official, "_url2soup", return_value=soup_content)
-        assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
+        assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連単(欠場を試行)
     @pytest.mark.parametrize("fst, snd, trd, expected", [
@@ -51,7 +51,7 @@ class TestOfficialOdds(CommonMethod):
         soup_content = super().htmlfile2bs4('odds_3tan_20190103222.html')
         mocker.patch.object(
             CommonMethods4Official, "_url2soup", return_value=soup_content)
-        assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
+        assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連複
     @pytest.mark.parametrize("fst, snd, trd, expected", [
@@ -80,7 +80,7 @@ class TestOfficialOdds(CommonMethod):
         soup_content = super().htmlfile2bs4(filename)
         mocker.patch.object(
             CommonMethods4Official, "_url2soup", return_value=soup_content)
-        assert odds.two_rentan()[f'{fst}-{snd}'] == expected
+        assert odds.two_rentan()[f'comb_{fst}{snd}'] == expected
 
     # 2連複
     @pytest.mark.parametrize("fst, snd, expected", [
@@ -109,4 +109,4 @@ class TestOfficialOdds(CommonMethod):
         soup_content = super().htmlfile2bs4(filename)
         mocker.patch.object(
             CommonMethods4Official, "_url2soup", return_value=soup_content)
-        assert odds.tansho()[f'{fst}'] == expected
+        assert odds.tansho()[f'comb_{fst}'] == expected

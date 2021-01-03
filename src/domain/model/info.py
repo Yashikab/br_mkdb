@@ -125,3 +125,17 @@ ThreeRentan = make_dataclass(
 )
 # pydanticに装着
 ThreeRentan = dataclass(ThreeRentan)
+
+TwoRentan = make_dataclass(
+    "TwoRentan",
+    [(key_name, float) for key_name in rentan_keylist(2)]
+)
+# pydanticに装着
+TwoRentan = dataclass(TwoRentan)
+
+Tansho = make_dataclass(
+    "Tansho",
+    [(key_name, float) for key_name in rentan_keylist(1)]
+)
+# pydanticに装着
+Tansho = dataclass(Tansho)
