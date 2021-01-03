@@ -15,6 +15,11 @@ from typing import Callable, Any
 from typing import Dict, List
 
 from domain import const
+from domain.model.info import (
+    Tansho,
+    ThreeRentan,
+    TwoRentan,
+)
 from module.connect import MysqlConnector
 from module.getdata_lxml import (
     GetHoldPlacePast,
@@ -388,11 +393,11 @@ class Odds2sql(Data2MysqlTemplate):
                                'odds_2tan_tb',
                                "odds_2fuku_tb",
                                "odds_1tan_tb"]
-        self.__key_value_list = [ood.rentan_keylist(3),
+        self.__key_value_list = [ThreeRentan.__annotations__.keys(),
                                  ood.renfuku_keylist(3),
-                                 ood.rentan_keylist(2),
+                                 TwoRentan.__annotations__.keys(),
                                  ood.renfuku_keylist(2),
-                                 ood.rentan_keylist(1)]
+                                 Tansho.__annotations__.keys()]
 
     # オーバーライド
     def create_table_if_not_exists(self):

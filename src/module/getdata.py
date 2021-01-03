@@ -893,22 +893,22 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = list(filter(lambda x: x != -1, odds_list))
         return odds_list
 
-    @classmethod
-    def rentan_keylist(cls, rank: int) -> list:
-        """連単用キーのリストを返す.
+    # @classmethod
+    # def rentan_keylist(cls, rank: int) -> list:
+    #     """連単用キーのリストを返す.
 
-        Parameters
-        ----------
-            rank : int
-                1 or 2 or 3 で単勝，2連単，3連単
-        """
-        if rank == 1:
-            return Tansho.__annotations__.keys()
-        elif rank == 2:
-            return TwoRentan.__annotations__.keys()
-        elif rank == 3:
-            return ThreeRentan.__annotations__.keys()
-        return None
+    #     Parameters
+    #     ----------
+    #         rank : int
+    #             1 or 2 or 3 で単勝，2連単，3連単
+    #     """
+    #     if rank == 1:
+    #         return Tansho.__annotations__.keys()
+    #     elif rank == 2:
+    #         return TwoRentan.__annotations__.keys()
+    #     elif rank == 3:
+    #         return ThreeRentan.__annotations__.keys()
+    #     return None
 
     @classmethod
     def renfuku_keylist(cls, rank: int) -> list:
@@ -938,7 +938,8 @@ class OfficialOdds(CommonMethods4Official):
 
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.rentan_keylist(3):
+        keys = ThreeRentan.__annotations__.keys()
+        for key_name in keys:
             content_dict[key_name] = odds_list.pop(0)
         # for fst in range(1, 7):
         #     if fst not in content_dict.keys():
@@ -953,8 +954,8 @@ class OfficialOdds(CommonMethods4Official):
         #                         odds_list.pop(0)
         # キーが違うためまだ変換できない
         # TODO キーを新しいのにする
-        # tr = ThreeRentan(**content_dict)
-        return content_dict
+        tr = ThreeRentan(**content_dict)
+        return asdict(tr)
 
     # 3連複を集計
     def three_renfuku(self) -> dict:
@@ -982,9 +983,11 @@ class OfficialOdds(CommonMethods4Official):
 
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.rentan_keylist(2):
+        keys = TwoRentan.__annotations__.keys()
+        for key_name in keys:
             content_dict[key_name] = odds_list.pop(0)
-        return content_dict
+        tr = TwoRentan(**content_dict)
+        return asdict(tr)
 
     # 2連複を集計
     def two_renfuku(self):
@@ -1016,10 +1019,12 @@ class OfficialOdds(CommonMethods4Official):
             map(lambda x: self._check_ketsujyo(x.text), odds_html_list))
 
         content_dict = {}
-        for key_name in self.rentan_keylist(1):
+        keys = Tansho.__annotations__.keys()
+        for key_name in keys:
             content_dict[key_name] = odds_list.pop(0)
 
-        return content_dict
+        tr = Tansho(**content_dict)
+        return asdict(tr)
 
 
 class GetHoldPlacePast(CommonMethods4Official):

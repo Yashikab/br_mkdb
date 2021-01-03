@@ -17,6 +17,11 @@ import numpy as np
 import pandas as pd
 
 from domain import const
+from domain.model.info import (
+    Tansho,
+    ThreeRentan,
+    TwoRentan
+)
 
 
 class CommonMethods4Official:
@@ -844,19 +849,13 @@ class OfficialOdds(CommonMethods4Official):
             rank : int
                 1 or 2 or 3 で単勝，2連単，3連単
         """
-        rentan_key_list = []
-        for fst in range(1, 7):
-            if rank == 1:
-                rentan_key_list.append(f'{fst}')
-            else:
-                for snd in range(1, 7):
-                    if snd != fst and rank == 2:
-                        rentan_key_list.append(f'{fst}-{snd}')
-                    else:
-                        for trd in range(1, 7):
-                            if fst != snd and fst != trd and snd != trd:
-                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
-        return rentan_key_list
+        if rank == 1:
+            return Tansho.__annotations__.keys()
+        elif rank == 2:
+            return TwoRentan.__annotations__.keys()
+        elif rank == 3:
+            return ThreeRentan.__annotations__.keys()
+        return None
 
     @classmethod
     def renfuku_keylist(cls, rank: int) -> list:
