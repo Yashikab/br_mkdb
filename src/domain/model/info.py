@@ -139,3 +139,34 @@ Tansho = make_dataclass(
 )
 # pydanticに装着
 Tansho = dataclass(Tansho)
+
+
+# 連複キーリスト
+def renfuku_keylist(rank: int) -> list:
+    renfuku_key_list = []
+    if rank == 2:
+        for fst in range(1, 6):
+            for snd in range(fst+1, 7):
+                renfuku_key_list.append(f'comb_{fst}{snd}')
+        return renfuku_key_list
+    elif rank == 3:
+        for fst in range(1, 5):
+            for snd in range(fst+1, 6):
+                for trd in range(snd+1, 7):
+                    renfuku_key_list.append(f'comb_{fst}{snd}{trd}')
+        return renfuku_key_list
+
+
+ThreeRenfuku = make_dataclass(
+    "ThreeRenfuku",
+    [(key_name, float) for key_name in renfuku_keylist(3)]
+)
+# pydanticに装着
+ThreeRenfuku = dataclass(ThreeRenfuku)
+
+TwoRenfuku = make_dataclass(
+    "TwoRenfuku",
+    [(key_name, float) for key_name in renfuku_keylist(2)]
+)
+# pydanticに装着
+TwoRenfuku = dataclass(TwoRenfuku)

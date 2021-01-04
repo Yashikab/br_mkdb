@@ -22,11 +22,14 @@ from domain import const
 from domain.model.info import (
     ChokuzenPlayerInfo,
     ProgramPlayerInfo,
-    ProgramCommonInfo, ResultCommonInfo,
+    ProgramCommonInfo,
+    ResultCommonInfo,
     ResultPlayerInfo,
     WeatherInfo,
     Tansho,
+    ThreeRenfuku,
     ThreeRentan,
+    TwoRenfuku,
     TwoRentan,
 )
 
@@ -893,23 +896,6 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = list(filter(lambda x: x != -1, odds_list))
         return odds_list
 
-    # @classmethod
-    # def rentan_keylist(cls, rank: int) -> list:
-    #     """連単用キーのリストを返す.
-
-    #     Parameters
-    #     ----------
-    #         rank : int
-    #             1 or 2 or 3 で単勝，2連単，3連単
-    #     """
-    #     if rank == 1:
-    #         return Tansho.__annotations__.keys()
-    #     elif rank == 2:
-    #         return TwoRentan.__annotations__.keys()
-    #     elif rank == 3:
-    #         return ThreeRentan.__annotations__.keys()
-    #     return None
-
     @classmethod
     def renfuku_keylist(cls, rank: int) -> list:
         renfuku_key_list = []
@@ -969,10 +955,11 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.renfuku_keylist(3):
+        for key_name in ThreeRenfuku.__annotations__.keys():
             content_dict[key_name] = odds_list.pop(0)
 
-        return content_dict
+        tr = ThreeRenfuku(**content_dict)
+        return asdict(tr)
 
     # 2連単を集計
     def two_rentan(self):
@@ -996,9 +983,10 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.renfuku_keylist(rank=2):
+        for key_name in TwoRenfuku.__annotations__.keys():
             content_dict[key_name] = odds_list.pop(0)
-        return content_dict
+        tr = TwoRenfuku(**content_dict)
+        return asdict(tr)
 
     # 単勝
     def tansho(self):
