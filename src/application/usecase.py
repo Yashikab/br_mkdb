@@ -62,7 +62,8 @@ class BoatRaceUsecase:
                 logger.debug('Start to insert chokuzen data')
                 cd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
                 logger.debug('Start to insert result data')
-                res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                res2sql.insert2table(date, jyo_cd_list,
+                                     jd2sql.map_raceno_dict)
                 logger.debug('Start to insert odds data')
                 odds2sql.insert2table(
                     date, jyo_cd_list, jd2sql.map_raceno_dict)
