@@ -5,6 +5,14 @@ odds2sqlテスト
 """
 import pytest
 
+
+from domain.model.info import (
+    Tansho,
+    ThreeRenfuku,
+    ThreeRentan,
+    TwoRenfuku,
+    TwoRentan
+)
 from module.dt2sql import Odds2sql
 from module.getdata_lxml import OfficialOdds
 from ..common import CommonMethod
@@ -29,11 +37,11 @@ class TestOdds2sql(CommonMethod):
             {self.__jyo_cd: [self.__race_no]})
 
     key_set = {'race_id'}
-    three_rentan_key = key_set.union(set(__ood.rentan_keylist(3)))
-    three_renfuku_key = key_set.union(set(__ood.renfuku_keylist(3)))
-    two_rentan_key = key_set.union(set(__ood.rentan_keylist(2)))
-    two_renfuku_key = key_set.union(set(__ood.renfuku_keylist(2)))
-    one_rentan_key = key_set.union(set(__ood.rentan_keylist(1)))
+    three_rentan_key = key_set.union(set(ThreeRentan.__annotations__.keys()))
+    three_renfuku_key = key_set.union(set(ThreeRenfuku.__annotations__.keys()))
+    two_rentan_key = key_set.union(set(TwoRentan.__annotations__.keys()))
+    two_renfuku_key = key_set.union(set(TwoRenfuku.__annotations__.keys()))
+    one_rentan_key = key_set.union(set(Tansho.__annotations__.keys()))
 
     @pytest.mark.parametrize("tb_name, col_set", [
         ('odds_3tan_tb', three_rentan_key),
@@ -48,15 +56,15 @@ class TestOdds2sql(CommonMethod):
         assert get_set == col_set
 
     race_id = int(f"{__target_date}{__jyo_cd:02}{__race_no:02}")
-    three_tan_col_list = ["race_id", "`1-2-3`", "`4-5-6`", "`6-5-4`"]
+    three_tan_col_list = ["race_id", "`comb_123`", "`comb_456`", "`comb_654`"]
     three_tan_expected = (race_id, 31.9, 157.4, 544.4)
-    three_fuku_col_list = ["race_id", "`1-2-3`", "`2-3-4`", "`4-5-6`"]
+    three_fuku_col_list = ["race_id", "`comb_123`", "`comb_234`", "`comb_456`"]
     three_fuku_expected = (race_id, 7.6, 24.4, 38.3)
-    two_tan_col_list = ["race_id", "`1-2`", "`4-5`", "`6-5`"]
+    two_tan_col_list = ["race_id", "`comb_12`", "`comb_45`", "`comb_65`"]
     two_tan_expected = (race_id, 10.2, 28.0, 108.3)
-    two_fuku_col_list = ["race_id", "`1-2`", "`2-3`", "`4-5`"]
+    two_fuku_col_list = ["race_id", "`comb_12`", "`comb_23`", "`comb_45`"]
     two_fuku_expected = (race_id, 7.9, 14.7, 11.6)
-    one_tan_col_list = ["race_id", "`1`", "`5`"]
+    one_tan_col_list = ["race_id", "`comb_1`", "`comb_5`"]
     one_tan_expected = (race_id, 2.7, 1.8)
 
     @pytest.mark.parametrize("tb_nm, col_list, expected", [

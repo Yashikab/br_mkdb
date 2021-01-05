@@ -8,7 +8,7 @@ from logging import getLogger
 import pandas as pd
 from pathlib import Path
 
-from module import const
+from domain import const
 from module.dt2sql import Data2MysqlTemplate
 
 

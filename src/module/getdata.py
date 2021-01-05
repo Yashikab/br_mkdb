@@ -3,6 +3,7 @@
 """
 HTMLから情報をスクレイピングするためのモジュール
 """
+from dataclasses import asdict
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
@@ -17,7 +18,20 @@ from bs4 import BeautifulSoup as bs
 import numpy as np
 import pandas as pd
 
-from module import const
+from domain import const
+from domain.model.info import (
+    ChokuzenPlayerInfo,
+    ProgramPlayerInfo,
+    ProgramCommonInfo,
+    ResultCommonInfo,
+    ResultPlayerInfo,
+    WeatherInfo,
+    Tansho,
+    ThreeRenfuku,
+    ThreeRentan,
+    TwoRenfuku,
+    TwoRentan,
+)
 
 
 class CommonMethods4Official:
@@ -172,15 +186,15 @@ class CommonMethods4Official:
         wind_dr = condinfo_html_list[6].select_one('p')['class'][1]
         wind_dr = self._rmletter2int(wind_dr)
 
-        content_dict = {
-            'temp': temp,
-            'weather': weather,
-            'wind_v': wind_v,
-            'w_temp': w_temp,
-            'wave': wave,
-            'wind_dr': wind_dr
-        }
-        return content_dict
+        wi = WeatherInfo(
+            temp,
+            weather,
+            wind_v,
+            w_temp,
+            wave,
+            wind_dr
+        )
+        return asdict(wi)
 
     def _text2list_rn_split(self,
                             input_content: bs4.element.Tag,
@@ -372,32 +386,32 @@ class OfficialProgram(CommonMethods4Official):
 
         self.logger.debug('get target player info completed.')
 
-        content_dict = {
-            'name': name,
-            'id': player_id,
-            'level': player_level,
-            'home': home,
-            'birth_place': birth_place,
-            'age': age,
-            'weight': weight,
-            'num_F': num_F,
-            'num_L': num_L,
-            'avg_ST': avg_ST,
-            'all_1rate': all_1rate,
-            'all_2rate': all_2rate,
-            'all_3rate': all_3rate,
-            'local_1rate': local_1rate,
-            'local_2rate': local_2rate,
-            'local_3rate': local_3rate,
-            'motor_no': motor_no,
-            'motor_2rate': motor_2rate,
-            'motor_3rate': motor_3rate,
-            'boat_no': boat_no,
-            'boat_2rate': boat_2rate,
-            'boat_3rate': boat_3rate
-        }
+        program_p_info = ProgramPlayerInfo(
+            name,
+            player_id,
+            player_level,
+            home,
+            birth_place,
+            age,
+            weight,
+            num_F,
+            num_L,
+            avg_ST,
+            all_1rate,
+            all_2rate,
+            all_3rate,
+            local_1rate,
+            local_2rate,
+            local_3rate,
+            motor_no,
+            motor_2rate,
+            motor_3rate,
+            boat_no,
+            boat_2rate,
+            boat_3rate
+        )
 
-        return content_dict
+        return asdict(program_p_info)
 
     def getcommoninfo2dict(self) -> dict:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
@@ -433,16 +447,16 @@ class OfficialProgram(CommonMethods4Official):
         else:
             is_shinnyukotei = False
 
-        content_dict = {
-            'taikai_name': taikai_name,
-            'grade': grade,
-            'race_type': race_type,
-            'race_kyori': race_kyori,
-            'is_antei': is_antei,
-            'is_shinnyukotei': is_shinnyukotei
-        }
+        pci = ProgramCommonInfo(
+            taikai_name,
+            grade,
+            race_type,
+            race_kyori,
+            is_antei,
+            is_shinnyukotei
+        )
 
-        return content_dict
+        return asdict(pci)
 
 
 class OfficialChokuzen(CommonMethods4Official):
@@ -518,16 +532,16 @@ class OfficialChokuzen(CommonMethods4Official):
             waku
         )
 
-        content_dict = {
-            'name': name,
-            'weight': weight,
-            'chosei_weight': chosei_weight,
-            'tenji_time': tenji_T,
-            'tilt': tilt,
-            'tenji_course': tenji_C,
-            'tenji_st': tenji_ST
-        }
-        return content_dict
+        cpi = ChokuzenPlayerInfo(
+            name,
+            weight,
+            chosei_weight,
+            tenji_T,
+            tilt,
+            tenji_C,
+            tenji_ST
+        )
+        return asdict(cpi)
 
     def getcommoninfo2dict(self) -> dict:
         """
@@ -604,7 +618,8 @@ class OfficialResults(CommonMethods4Official):
         content_dict['course'] = course
         content_dict['st_time'] = st_time
 
-        return content_dict
+        rpi = ResultPlayerInfo(**content_dict)
+        return asdict(rpi)
 
     def getcommoninfo2dict(self) -> dict:
         """
@@ -695,7 +710,9 @@ class OfficialResults(CommonMethods4Official):
         content_dict['payout_1tan'], _ = \
             self._get_paypop(pay_pop_tb_list[5])
 
-        return content_dict
+        rci = ResultCommonInfo(**content_dict)
+
+        return asdict(rci)
 
     def _get_paypop(self, element_tag: bs4.element.Tag) -> tuple:
         """払い戻し金額と人気を取得"""
@@ -880,29 +897,6 @@ class OfficialOdds(CommonMethods4Official):
         return odds_list
 
     @classmethod
-    def rentan_keylist(cls, rank: int) -> list:
-        """連単用キーのリストを返す.
-
-        Parameters
-        ----------
-            rank : int
-                1 or 2 or 3 で単勝，2連単，3連単
-        """
-        rentan_key_list = []
-        for fst in range(1, 7):
-            if rank == 1:
-                rentan_key_list.append(f'{fst}')
-            else:
-                for snd in range(1, 7):
-                    if snd != fst and rank == 2:
-                        rentan_key_list.append(f'{fst}-{snd}')
-                    else:
-                        for trd in range(1, 7):
-                            if fst != snd and fst != trd and snd != trd:
-                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
-        return rentan_key_list
-
-    @classmethod
     def renfuku_keylist(cls, rank: int) -> list:
         renfuku_key_list = []
         if rank == 2:
@@ -930,7 +924,8 @@ class OfficialOdds(CommonMethods4Official):
 
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.rentan_keylist(3):
+        keys = ThreeRentan.__annotations__.keys()
+        for key_name in keys:
             content_dict[key_name] = odds_list.pop(0)
         # for fst in range(1, 7):
         #     if fst not in content_dict.keys():
@@ -943,8 +938,10 @@ class OfficialOdds(CommonMethods4Official):
         #                 if trd != fst and trd != snd:
         #                     content_dict[fst][snd][trd] = \
         #                         odds_list.pop(0)
-
-        return content_dict
+        # キーが違うためまだ変換できない
+        # TODO キーを新しいのにする
+        tr = ThreeRentan(**content_dict)
+        return asdict(tr)
 
     # 3連複を集計
     def three_renfuku(self) -> dict:
@@ -958,10 +955,11 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.renfuku_keylist(3):
+        for key_name in ThreeRenfuku.__annotations__.keys():
             content_dict[key_name] = odds_list.pop(0)
 
-        return content_dict
+        tr = ThreeRenfuku(**content_dict)
+        return asdict(tr)
 
     # 2連単を集計
     def two_rentan(self):
@@ -972,9 +970,11 @@ class OfficialOdds(CommonMethods4Official):
 
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.rentan_keylist(2):
+        keys = TwoRentan.__annotations__.keys()
+        for key_name in keys:
             content_dict[key_name] = odds_list.pop(0)
-        return content_dict
+        tr = TwoRentan(**content_dict)
+        return asdict(tr)
 
     # 2連複を集計
     def two_renfuku(self):
@@ -983,9 +983,10 @@ class OfficialOdds(CommonMethods4Official):
         odds_list = self._renfuku_matrix2list(odds_matrix)
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.renfuku_keylist(rank=2):
+        for key_name in TwoRenfuku.__annotations__.keys():
             content_dict[key_name] = odds_list.pop(0)
-        return content_dict
+        tr = TwoRenfuku(**content_dict)
+        return asdict(tr)
 
     # 単勝
     def tansho(self):
@@ -1006,10 +1007,12 @@ class OfficialOdds(CommonMethods4Official):
             map(lambda x: self._check_ketsujyo(x.text), odds_html_list))
 
         content_dict = {}
-        for key_name in self.rentan_keylist(1):
+        keys = Tansho.__annotations__.keys()
+        for key_name in keys:
             content_dict[key_name] = odds_list.pop(0)
 
-        return content_dict
+        tr = Tansho(**content_dict)
+        return asdict(tr)
 
 
 class GetHoldPlacePast(CommonMethods4Official):

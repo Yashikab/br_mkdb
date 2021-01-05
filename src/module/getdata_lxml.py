@@ -3,6 +3,7 @@
 """
 HTMLから情報をスクレイピングするためのモジュール
 """
+from dataclasses import asdict
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
@@ -16,7 +17,12 @@ import lxml.html as lxml
 import numpy as np
 import pandas as pd
 
-from module import const
+from domain import const
+from domain.model.info import (
+    Tansho, ThreeRenfuku,
+    ThreeRentan, TwoRenfuku,
+    TwoRentan
+)
 
 
 class CommonMethods4Official:
@@ -835,57 +841,31 @@ class OfficialOdds(CommonMethods4Official):
         self.jyo_code = jyo_code
         self.date = date
 
-    @classmethod
-    def rentan_keylist(cls, rank: int) -> list:
-        """連単用キーのリストを返す.
-
-        Parameters
-        ----------
-            rank : int
-                1 or 2 or 3 で単勝，2連単，3連単
-        """
-        rentan_key_list = []
-        for fst in range(1, 7):
-            if rank == 1:
-                rentan_key_list.append(f'{fst}')
-            else:
-                for snd in range(1, 7):
-                    if snd != fst and rank == 2:
-                        rentan_key_list.append(f'{fst}-{snd}')
-                    else:
-                        for trd in range(1, 7):
-                            if fst != snd and fst != trd and snd != trd:
-                                rentan_key_list.append(f'{fst}-{snd}-{trd}')
-        return rentan_key_list
-
-    @classmethod
-    def renfuku_keylist(cls, rank: int) -> list:
-        renfuku_key_rv = cls._renfuku_keyrvlist(cls, rank)
-        # rvはオッズ表用なので、辞書順ソートでもとに戻す
-        renfuku_key_rv.sort()
-        return renfuku_key_rv
-
     # 3連単を集計
     def three_rentan(self) -> dict:
         content_dict = self._rentan_common(3)
-        return content_dict
+        tr = ThreeRentan(**content_dict)
+        return asdict(tr)
 
     # 3連複を集計
     def three_renfuku(self) -> dict:
         content_dict = self._renfuku_common(3)
-        return content_dict
+        tr = ThreeRenfuku(**content_dict)
+        return asdict(tr)
 
     # 2連単を集計
     def two_rentan(self):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         content_dict = self._rentan_common(2)
-        return content_dict
+        tr = TwoRentan(**content_dict)
+        return asdict(tr)
 
     # 2連複を集計
     def two_renfuku(self):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
         content_dict = self._renfuku_common(2)
-        return content_dict
+        tr = TwoRenfuku(**content_dict)
+        return asdict(tr)
 
     # 単勝
     def tansho(self):
@@ -906,10 +886,10 @@ class OfficialOdds(CommonMethods4Official):
             map(lambda x: self._check_ketsujyo(x.text), odds_els))
 
         content_dict = {}
-        for key_name in self.rentan_keylist(1):
+        for key_name in self._rentan_keylist(1):
             content_dict[key_name] = odds_list.pop(0)
-
-        return content_dict
+        tan = Tansho(**content_dict)
+        return asdict(tan)
 
     def _rentan_common(self, rank: int) -> dict:
         """
@@ -924,7 +904,7 @@ class OfficialOdds(CommonMethods4Official):
 
         # 辞書で格納する
         content_dict = {}
-        for key_name in self.rentan_keylist(rank):
+        for key_name in self._rentan_keylist(rank):
             content_dict[key_name] = odds_list.pop(0)
         return content_dict
 
@@ -949,6 +929,22 @@ class OfficialOdds(CommonMethods4Official):
             content_dict[key] = value
         return content_dict
 
+    def _rentan_keylist(cls, rank: int) -> list:
+        """連単用キーのリストを返す.
+
+        Parameters
+        ----------
+            rank : int
+                1 or 2 or 3 で単勝，2連単，3連単
+        """
+        if rank == 1:
+            return Tansho.__annotations__.keys()
+        elif rank == 2:
+            return TwoRentan.__annotations__.keys()
+        elif rank == 3:
+            return ThreeRentan.__annotations__.keys()
+        return None
+
     def _renfuku_keyrvlist(self, rank: int) -> list:
         """スクレイプ用順番"""
         renfuku_key_rv = []
@@ -956,13 +952,13 @@ class OfficialOdds(CommonMethods4Official):
         if rank == 2:
             for snd in range(6, 0, -1):
                 for fst in range(snd-1, 0, -1):
-                    renfuku_key_rv.append(f'{fst}-{snd}')
+                    renfuku_key_rv.append(f'comb_{fst}{snd}')
         elif rank == 3:
             # 2位起点にすると裏返せる
             for snd in range(5, 0, -1):
                 for trd in range(6, snd, -1):
                     for fst in range(snd-1, 0, -1):
-                        renfuku_key_rv.append(f'{fst}-{snd}-{trd}')
+                        renfuku_key_rv.append(f'comb_{fst}{snd}{trd}')
         return renfuku_key_rv
 
     def _tanfuku_common(self, num: int, kake: str) -> list:

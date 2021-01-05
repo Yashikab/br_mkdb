@@ -14,7 +14,14 @@ from tqdm import tqdm
 from typing import Callable, Any
 from typing import Dict, List
 
-from module import const
+from domain import const
+from domain.model.info import (
+    Tansho,
+    ThreeRenfuku,
+    ThreeRentan,
+    TwoRenfuku,
+    TwoRentan,
+)
 from module.connect import MysqlConnector
 from module.getdata_lxml import (
     GetHoldPlacePast,
@@ -382,17 +389,16 @@ class Odds2sql(Data2MysqlTemplate):
     def __init__(self):
         self.logger = \
             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-        ood = OfficialOdds
         self.__tb_name_list = ['odds_3tan_tb',
                                "odds_3fuku_tb",
                                'odds_2tan_tb',
                                "odds_2fuku_tb",
                                "odds_1tan_tb"]
-        self.__key_value_list = [ood.rentan_keylist(3),
-                                 ood.renfuku_keylist(3),
-                                 ood.rentan_keylist(2),
-                                 ood.renfuku_keylist(2),
-                                 ood.rentan_keylist(1)]
+        self.__key_value_list = [ThreeRentan.__annotations__.keys(),
+                                 ThreeRenfuku.__annotations__.keys(),
+                                 TwoRentan.__annotations__.keys(),
+                                 TwoRenfuku.__annotations__.keys(),
+                                 Tansho.__annotations__.keys()]
 
     # オーバーライド
     def create_table_if_not_exists(self):

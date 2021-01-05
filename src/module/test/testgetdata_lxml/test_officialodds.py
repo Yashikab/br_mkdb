@@ -40,7 +40,7 @@ class TestOfficialOdds(CommonMethodForTest):
         mocker.patch.object(
             CommonMethods4Official, "_url2lxml",
             return_value=lx_content)
-        assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
+        assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連単(欠場を試行)
     @pytest.mark.parametrize("fst, snd, trd, expected", [
@@ -52,7 +52,7 @@ class TestOfficialOdds(CommonMethodForTest):
         soup_content = super().htmlfile2lxcontent('odds_3tan_20190103222.html')
         mocker.patch.object(
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
-        assert odds.three_rentan()[f'{fst}-{snd}-{trd}'] == expected
+        assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連複
     @pytest.mark.parametrize("fst, snd, trd, expected", [
@@ -66,7 +66,7 @@ class TestOfficialOdds(CommonMethodForTest):
             f'odds_3fuku_{self.__date}{self.__jyo_code}{self.__race_no}.html')
         mocker.patch.object(
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
-        assert odds.three_renfuku()[f'{fst}-{snd}-{trd}'] == expected
+        assert odds.three_renfuku()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 2連単
     @pytest.mark.parametrize("fst, snd, expected", [
@@ -81,7 +81,7 @@ class TestOfficialOdds(CommonMethodForTest):
         soup_content = super().htmlfile2lxcontent(filename)
         mocker.patch.object(
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
-        assert odds.two_rentan()[f'{fst}-{snd}'] == expected
+        assert odds.two_rentan()[f'comb_{fst}{snd}'] == expected
 
     # 2連複
     @pytest.mark.parametrize("fst, snd, expected", [
@@ -95,7 +95,7 @@ class TestOfficialOdds(CommonMethodForTest):
         soup_content = super().htmlfile2lxcontent(filename)
         mocker.patch.object(
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
-        assert odds.two_renfuku()[f'{fst}-{snd}'] == expected
+        assert odds.two_renfuku()[f'comb_{fst}{snd}'] == expected
 
     # 単勝
     @pytest.mark.parametrize("fst, expected", [
@@ -110,4 +110,4 @@ class TestOfficialOdds(CommonMethodForTest):
         soup_content = super().htmlfile2lxcontent(filename)
         mocker.patch.object(
             CommonMethods4Official, "_url2lxml", return_value=soup_content)
-        assert odds.tansho()[f'{fst}'] == expected
+        assert odds.tansho()[f'comb_{fst}'] == expected
