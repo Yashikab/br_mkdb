@@ -4,10 +4,6 @@ import time
 from domain.argument import Options, DBType
 from domain.dbctl import DatabaseController
 from domain.const import MAIN_LOGNAME
-from module.dbcontroller import (
-    LocalSqlController,
-    CloudSqlController
-)
 from module.dt2sql import (
     JyoData2sql,
     RaceData2sql,
@@ -29,7 +25,6 @@ class BoatRaceUsecase:
         self.__dbctl = dbctl
 
     def run(self, op: Options):
-
         logger.info('Connect MySQL server.')
         self.__dbctl.build()
         logger.info('Done')
@@ -69,7 +64,8 @@ class BoatRaceUsecase:
                 logger.debug('Start to insert result data')
                 res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
                 logger.debug('Start to insert odds data')
-                odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                odds2sql.insert2table(
+                    date, jyo_cd_list, jd2sql.map_raceno_dict)
 
                 elapsed_time = time.time() - start_time
                 logger.debug(f'completed in {elapsed_time}sec')
@@ -86,8 +82,10 @@ class BoatRaceUsecase:
 
     @classmethod
     def localmysql(cls):
+        from module.dbcontroller import LocalSqlController
         return BoatRaceUsecase(LocalSqlController())
 
     @classmethod
     def gcpmysql(cls):
+        from module.dbcontroller import CloudSqlController
         return BoatRaceUsecase(CloudSqlController())
