@@ -5,17 +5,14 @@ from pathlib import PosixPath
 import lxml.html as lxml
 # URLの取得を行う
 # lxml or bs4で返す(一旦lxmlのみ)
+# SRP単一責任の法則(報告先が一緒)
 
 
-class GetUrl(meta=ABCMeta):
+class GetLxml(meta=ABCMeta):
+    # report先はlxmlを使った各種parser
 
     @abstractmethod
     def url_to_lxml(self, url: str) -> lxml.HtmlComment:
-        pass
-
-    @abstractmethod
-    def url_to_file(self, url: str, filepath: PosixPath) -> None:
-        # TODO: 不要な場合消す
         pass
 
     @abstractmethod
