@@ -14,7 +14,7 @@ from logging import (
 import coloredlogs
 
 from application.usecase import BoatRaceUsecase
-from domain.argument import Options
+from application.argument import Options
 from domain.const import (
     CL_FIELD_STYLES,
     CL_LEVEL_STYLES,
