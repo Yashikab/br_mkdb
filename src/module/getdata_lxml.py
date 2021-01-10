@@ -23,6 +23,7 @@ from domain.model.info import (
     ThreeRentan, TwoRenfuku,
     TwoRentan
 )
+from module.getter import GetContentFromURL
 
 
 class CommonMethods4Official:
@@ -31,27 +32,10 @@ class CommonMethods4Official:
             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
     def _url2lxml(self, url) -> lxml.HtmlComment:
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # 5回リトライする
-        success_flg = False
-        html_content = None
-        for i in range(5):
-            with urlopen(url, timeout=10.) as f:
-                if f.status == 200:
-                    html_content = f.read()
-                    success_flg = True
-                else:
-                    self.logger.warning(f"Not completed to download: {url}")
-                    self.logger.warning(f"{f.status}: {f.reason}")
-            if success_flg:
-                break
-            self.logger.debug("retry")
-            time.sleep(0.5)
-        if not success_flg:
-            raise self.logger.error("Didn't succeed in 5 times retry.")
-
-        lx_content = lxml.fromstring(html_content)
-
+        lx_content = GetContentFromURL.url_to_content(
+            url=url,
+            content_type="lxml"
+        )
         return lx_content
 
     def _getSTtable2tuple(self,
@@ -224,6 +208,7 @@ class GetHoldPlacePast(CommonMethods4Official):
     指定した日付での開催会場を取得する
     開催中のレースは無理
     """
+
     def __init__(self, target_date: int):
         """
         Parameters

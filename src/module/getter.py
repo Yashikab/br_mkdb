@@ -25,13 +25,10 @@ class ContentTypes(str, Enum):
         return Union[bs, lxml.HtmlElement]
 
 
-class GetLxml:
+class GetContentFromURL:
     # report先はlxmlを使った各種parser
-    def __init__(self):
-        self.logger = \
-            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-
-    def url_to_content(self,
+    @classmethod
+    def url_to_content(cls,
                        url: str,
                        content_type: ContentTypes
                        ) -> ContentTypes.get_content():
@@ -54,8 +51,7 @@ class GetLxml:
         NameError
             content_typeが指定外のときエラーとなる．
         """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        html_content = self._get_htlm_from_url(url)
+        html_content = cls._get_htlm_from_url(cls, url)
 
         if content_type == ContentTypes.bs4:
             content = bs(html_content, "lxml")
@@ -64,13 +60,6 @@ class GetLxml:
         else:
             raise NameError(f"Unavailable content_type: {content_type}")
         return content
-
-    def file_to_lxml(self,
-                     filepath: PosixPath,
-                     content_type: ContentTypes
-                     ) -> ContentTypes.get_content():
-        # test用
-        pass
 
     def _get_htlm_from_url(self, url: str, num_retry: int = 5) -> bytes:
         success_flg = False

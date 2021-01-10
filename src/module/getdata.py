@@ -32,6 +32,7 @@ from domain.model.info import (
     TwoRenfuku,
     TwoRentan,
 )
+from module.getter import GetContentFromURL
 
 
 class CommonMethods4Official:
@@ -41,26 +42,10 @@ class CommonMethods4Official:
 
     def _url2soup(self, url):
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        # 5回リトライする
-        success_flg = False
-        html_content = None
-        for i in range(5):
-            with urlopen(url, timeout=10.) as f:
-                if f.status == 200:
-                    html_content = f.read()
-                    success_flg = True
-                else:
-                    self.logger.warning(f"Not completed to download: {url}")
-                    self.logger.warning(f"{f.status}: {f.reason}")
-            if success_flg:
-                break
-            self.logger.debug("retry")
-            time.sleep(0.5)
-        if not success_flg:
-            raise self.logger.error("Didn't succeed in 5 times retry.")
-
-        soup = bs(html_content, 'lxml')
-
+        soup = GetContentFromURL.url_to_content(
+            url=url,
+            content_type="soup"
+        )
         return soup
 
     def _getplayertable2list(self,
@@ -1020,6 +1005,7 @@ class GetHoldPlacePast(CommonMethods4Official):
     指定した日付での開催会場を取得する
     開催中のレースは無理
     """
+
     def __init__(self, target_date: int):
         """
         Parameters
