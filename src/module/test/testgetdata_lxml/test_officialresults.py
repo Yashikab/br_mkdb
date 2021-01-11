@@ -5,10 +5,8 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module.getdata_lxml import (
-    CommonMethods4Official,
-    OfficialResults
-)
+from module.getdata_lxml import OfficialResults
+from module.getter import GetContentFromURL
 from .common import CommonMethodForTest
 
 
@@ -27,12 +25,12 @@ class TestOfficialResults(CommonMethodForTest):
         # day 2020/04/08
         date = 20200410
 
-        lxml_content = super().htmlfile2lxcontent(
+        lx_content = super().htmlfile2lxcontent(
             f"res_{date}{jyo_code}{race_no}.html"
         )
-        mocker.patch.object(CommonMethods4Official,
-                            "_url2lxml",
-                            return_value=lxml_content)
+        mocker.patch.object(
+            GetContentFromURL, "url_to_content",
+            return_value=lx_content)
         ors = OfficialResults(
             race_no, jyo_code, date)
         return ors

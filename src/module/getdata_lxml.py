@@ -31,13 +31,6 @@ class CommonMethods4Official:
         self.logger = \
             getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
-    def _url2lxml(self, url) -> lxml.HtmlComment:
-        lx_content = GetContentFromURL.url_to_content(
-            url=url,
-            content_type="lxml"
-        )
-        return lx_content
-
     def _getSTtable2tuple(self,
                           lx_content: lxml.HtmlComment,
                           tbody_xpath: str,
@@ -222,7 +215,10 @@ class GetHoldPlacePast(CommonMethods4Official):
         base_url = 'https://www.boatrace.jp/owpc/pc/race/index?'
         target_url = f'{base_url}hd={target_date}'
         self.logger.debug(f'access: {target_url}')
-        self.__lx_content = super()._url2lxml(target_url)
+        self.__lx_content = GetContentFromURL.url_to_content(
+            url=target_url,
+            content_type="lxml"
+        )
 
         # 抜き出すテーブルのxpath
         target_table_xpath = "/html/body/main/div/div/div/div[2]/div[3]/table"
@@ -337,7 +333,10 @@ class OfficialProgram(CommonMethods4Official):
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.logger.debug(f'get html: {target_url}')
-        self.__lx_content = super()._url2lxml(target_url)
+        self.__lx_content = GetContentFromURL.url_to_content(
+            url=target_url,
+            content_type="lxml"
+        )
         self.logger.debug('get html completed.')
 
     def getplayerinfo2dict(self, waku: int) -> dict:
@@ -533,7 +532,10 @@ class OfficialChokuzen(CommonMethods4Official):
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-        self.__lx_content = super()._url2lxml(target_url)
+        self.__lx_content = GetContentFromURL.url_to_content(
+            url=target_url,
+            content_type="lxml"
+        )
 
     def getplayerinfo2dict(self, waku: int) -> dict:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
@@ -626,7 +628,10 @@ class OfficialResults(CommonMethods4Official):
         # htmlをload
         base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-        self.__lx_content = super()._url2lxml(target_url)
+        self.__lx_content = GetContentFromURL.url_to_content(
+            url=target_url,
+            content_type="lxml"
+        )
         # 結果テーブルだけ最初に抜く
         # xpathのインデックスで枠を取るより、最初に全部格納したほうがいい
         self.waku_dict = self._getresulttable2dict()
@@ -860,7 +865,10 @@ class OfficialOdds(CommonMethods4Official):
                    'oddstf?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.date}'
-        lx_content = super()._url2lxml(target_url)
+        lx_content = GetContentFromURL.url_to_content(
+            url=target_url,
+            content_type="lxml"
+        )
         target_xpath = \
             "/html/body/main/div/div/div/div[2]"\
             "/div[5]/div[1]/div[2]/table/tbody/"\
@@ -981,7 +989,10 @@ class OfficialOdds(CommonMethods4Official):
                    f'odds{num}{html_type}?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.date}'
-        lx_content = super()._url2lxml(target_url)
+        lx_content = GetContentFromURL.url_to_content(
+            url=target_url,
+            content_type="lxml"
+        )
         # 3連単と共通--------------------
         # oddsテーブルの抜き出し
         if num == 2 and kake == 'renfuku':

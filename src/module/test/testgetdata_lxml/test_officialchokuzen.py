@@ -4,10 +4,8 @@
 getdataモジュール用単体テスト
 """
 import pytest
-from module.getdata_lxml import (
-    CommonMethods4Official,
-    OfficialChokuzen
-)
+from module.getdata_lxml import OfficialChokuzen
+from module.getter import GetContentFromURL
 from .common import CommonMethodForTest
 
 
@@ -33,8 +31,7 @@ class TestOfficialChokuzen(CommonMethodForTest):
         lxml_content = super().htmlfile2lxcontent(
             f"choku_{date}{jyo_code}{race_no}.html"
         )
-        mocker.patch.object(CommonMethods4Official,
-                            '_url2lxml',
+        mocker.patch.object(GetContentFromURL, "url_to_content",
                             return_value=lxml_content)
         och = OfficialChokuzen(race_no, jyo_code, date)
         return och
