@@ -5,10 +5,8 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module.getdata import (
-    CommonMethods4Official,
-    OfficialProgram
-)
+from module.getdata import OfficialProgram
+from module.getter import GetContentFromURL
 from ..common import CommonMethod
 
 
@@ -36,8 +34,7 @@ class TestOfficialProgram(CommonMethod):
         soup_content = super().htmlfile2bs4(
             f"pro_{date}{jyo_code}{race_no}.html"
         )
-        mocker.patch.object(CommonMethods4Official,
-                            '_url2soup',
+        mocker.patch.object(GetContentFromURL, "url_to_content",
                             return_value=soup_content)
 
         op = OfficialProgram(

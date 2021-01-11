@@ -1,15 +1,10 @@
 from enum import Enum
-from logging import getLogger
-from pathlib import PosixPath
-import sys
 import time
 from typing import Union
 from urllib.request import urlopen
-from _pytest.compat import cached_property
 
 from bs4 import BeautifulSoup as bs
 
-from domain import const
 import lxml.html as lxml
 # URLの取得を行う
 # lxml or bs4で返す(一旦lxmlのみ)

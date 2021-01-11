@@ -4,10 +4,8 @@
 getdataモジュール用単体テスト
 """
 import pytest
-from module.getdata import (
-    CommonMethods4Official,
-    GetHoldPlacePast
-)
+from module.getdata import GetHoldPlacePast
+from module.getter import GetContentFromURL
 from ..common import CommonMethod
 
 
@@ -61,7 +59,7 @@ class TestGetHoldPlace(CommonMethod):
     def _ghp(self, date, mocker):
         """mock用に共通項にする"""
         soup_content = super().htmlfile2bs4(f'ghp_{date}.html')
-        mocker.patch.object(CommonMethods4Official, "_url2soup",
+        mocker.patch.object(GetContentFromURL, "url_to_content",
                             return_value=soup_content)
         ghp = GetHoldPlacePast(date)
         return ghp

@@ -4,10 +4,8 @@
 getdataモジュール用単体テスト
 """
 import pytest
-from module.getdata import (
-    CommonMethods4Official,
-    OfficialOdds
-)
+from module.getdata import OfficialOdds
+from module.getter import GetContentFromURL
 from ..common import CommonMethod
 
 
@@ -37,8 +35,8 @@ class TestOfficialOdds(CommonMethod):
     def test_threerentan(self, fst, snd, trd, expected, odds, mocker):
         soup_content = super().htmlfile2bs4(
             f'odds_3tan_{self.__date}{self.__jyo_code}{self.__race_no}.html')
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        mocker.patch.object(GetContentFromURL, "url_to_content",
+                            return_value=soup_content)
         assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連単(欠場を試行)
@@ -49,8 +47,8 @@ class TestOfficialOdds(CommonMethod):
     ])
     def test_threerentan_ketsujyo(self, fst, snd, trd, expected, odds, mocker):
         soup_content = super().htmlfile2bs4('odds_3tan_20190103222.html')
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        mocker.patch.object(GetContentFromURL, "url_to_content",
+                            return_value=soup_content)
         assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連複
@@ -63,8 +61,8 @@ class TestOfficialOdds(CommonMethod):
     def test_threerenfuku(self, fst, snd, trd, expected, odds, mocker):
         soup_content = super().htmlfile2bs4(
             f'odds_3fuku_{self.__date}{self.__jyo_code}{self.__race_no}.html')
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        mocker.patch.object(GetContentFromURL, "url_to_content",
+                            return_value=soup_content)
         assert odds.three_renfuku()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 2連単
@@ -78,8 +76,8 @@ class TestOfficialOdds(CommonMethod):
         filename = f'odds_2tanfuku_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
         soup_content = super().htmlfile2bs4(filename)
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        mocker.patch.object(GetContentFromURL, "url_to_content",
+                            return_value=soup_content)
         assert odds.two_rentan()[f'comb_{fst}{snd}'] == expected
 
     # 2連複
@@ -92,8 +90,8 @@ class TestOfficialOdds(CommonMethod):
         filename = f'odds_2tanfuku_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
         soup_content = super().htmlfile2bs4(filename)
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        mocker.patch.object(GetContentFromURL, "url_to_content",
+                            return_value=soup_content)
         assert odds.two_renfuku()[f'comb_{fst}{snd}'] == expected
 
     # 単勝
@@ -107,6 +105,6 @@ class TestOfficialOdds(CommonMethod):
         filename = f'odds_1tan_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
         soup_content = super().htmlfile2bs4(filename)
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        mocker.patch.object(GetContentFromURL, "url_to_content",
+                            return_value=soup_content)
         assert odds.tansho()[f'comb_{fst}'] == expected

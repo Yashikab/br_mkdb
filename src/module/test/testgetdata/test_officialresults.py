@@ -5,10 +5,8 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module.getdata import (
-    CommonMethods4Official,
-    OfficialResults
-)
+from module.getdata import OfficialResults
+from module.getter import GetContentFromURL
 from ..common import CommonMethod
 
 
@@ -18,7 +16,7 @@ class TestOfficialResults(CommonMethod):
     http://boatrace.jp/owpc/pc/race/raceresult?rno=9&jcd=06&hd=20200410
     '''
     # 選手直前情報取得のための前処理
-    @pytest.fixture(scope='function')
+    @ pytest.fixture(scope='function')
     def getcls(self, mocker):
         # 5R
         race_no = 9
@@ -30,15 +28,14 @@ class TestOfficialResults(CommonMethod):
         soup_content = super().htmlfile2bs4(
             f"res_{date}{jyo_code}{race_no}.html"
         )
-        mocker.patch.object(CommonMethods4Official,
-                            "_url2soup",
+        mocker.patch.object(GetContentFromURL, "url_to_content",
                             return_value=soup_content)
         ors = OfficialResults(
             race_no, jyo_code, date)
         return ors
 
     # 選手結果
-    @pytest.fixture(scope='function')
+    @ pytest.fixture(scope='function')
     def playerrls(self, getcls):
         # 各行呼び出し可能
         p_rls = []
@@ -46,7 +43,7 @@ class TestOfficialResults(CommonMethod):
             p_rls.append(getcls.getplayerinfo2dict(waku=i))
         return p_rls
 
-    @pytest.mark.parametrize("waku, target, expected", [
+    @ pytest.mark.parametrize("waku, target, expected", [
         (1, 'name', '萬正嗣'),
         (6, 'name', '川合理司'),
         (1, 'no', 4177),
@@ -66,12 +63,12 @@ class TestOfficialResults(CommonMethod):
         assert playerrls[waku - 1][target] == expected
 
     # レース結果
-    @pytest.fixture(scope='function')
+    @ pytest.fixture(scope='function')
     def racerls(self, getcls):
         return getcls.getcommoninfo2dict()
 
     # 会場コンディション
-    @pytest.mark.parametrize("target, expected", [
+    @ pytest.mark.parametrize("target, expected", [
         ('temp', 16.0),
         ('weather', '晴'),
         ('wind_v', 6),  # m
