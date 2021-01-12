@@ -23,7 +23,7 @@ from domain.model.info import (
     ThreeRentan, TwoRenfuku,
     TwoRentan
 )
-from module.getter import GetContentFromURL
+from module.getter import GetParserContent
 
 
 class CommonMethods4Official:
@@ -215,7 +215,7 @@ class GetHoldPlacePast(CommonMethods4Official):
         base_url = 'https://www.boatrace.jp/owpc/pc/race/index?'
         target_url = f'{base_url}hd={target_date}'
         self.logger.debug(f'access: {target_url}')
-        self.__lx_content = GetContentFromURL.url_to_content(
+        self.__lx_content = GetParserContent.url_to_content(
             url=target_url,
             content_type="lxml"
         )
@@ -333,7 +333,7 @@ class OfficialProgram(CommonMethods4Official):
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.logger.debug(f'get html: {target_url}')
-        self.__lx_content = GetContentFromURL.url_to_content(
+        self.__lx_content = GetParserContent.url_to_content(
             url=target_url,
             content_type="lxml"
         )
@@ -532,7 +532,7 @@ class OfficialChokuzen(CommonMethods4Official):
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-        self.__lx_content = GetContentFromURL.url_to_content(
+        self.__lx_content = GetParserContent.url_to_content(
             url=target_url,
             content_type="lxml"
         )
@@ -628,7 +628,7 @@ class OfficialResults(CommonMethods4Official):
         # htmlをload
         base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-        self.__lx_content = GetContentFromURL.url_to_content(
+        self.__lx_content = GetParserContent.url_to_content(
             url=target_url,
             content_type="lxml"
         )
@@ -865,7 +865,7 @@ class OfficialOdds(CommonMethods4Official):
                    'oddstf?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.date}'
-        lx_content = GetContentFromURL.url_to_content(
+        lx_content = GetParserContent.url_to_content(
             url=target_url,
             content_type="lxml"
         )
@@ -989,7 +989,7 @@ class OfficialOdds(CommonMethods4Official):
                    f'odds{num}{html_type}?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.date}'
-        lx_content = GetContentFromURL.url_to_content(
+        lx_content = GetParserContent.url_to_content(
             url=target_url,
             content_type="lxml"
         )

@@ -6,11 +6,11 @@ getdataモジュール用単体テスト
 
 import pytest
 from module.getdata_lxml import OfficialProgram
-from module.getter import GetContentFromURL
-from .common import CommonMethodForTest
+from module.getter import GetParserContent
+from ..common import CommonMethod
 
 
-class TestOfficialProgram(CommonMethodForTest):
+class TestOfficialProgram(CommonMethod):
     """
     番組表\n
     2020 4月8日 浜名湖(06) 3レースの情報でテスト\n
@@ -31,11 +31,12 @@ class TestOfficialProgram(CommonMethodForTest):
         date = 20200408
 
         # mocking
-        lx_content = super().htmlfile2lxcontent(
+        filepath = super().get_html_filepath(
             f"pro_{date}{jyo_code}{race_no}.html"
         )
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
-            GetContentFromURL, "url_to_content",
+            GetParserContent, "url_to_content",
             return_value=lx_content)
 
         op = OfficialProgram(

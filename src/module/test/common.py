@@ -62,13 +62,5 @@ class CommonMethod:
         finally:
             return res_tpl
 
-    def htmlfile2bs4(self, filename: str) -> bs:
-        """mock用htmlをsoupにいれる"""
-        currentdir = Path(__file__).resolve().parent
-        filepath = currentdir.joinpath('test_html', filename)
-
-        with open(filepath, 'r') as f:
-            html_content = f.read()
-        soup_content = bs(html_content, "lxml")
-
-        return soup_content
+    def get_html_filepath(self, filename: Path) -> Path:
+        return Path(__file__).resolve().parent.joinpath("test_html", filename)

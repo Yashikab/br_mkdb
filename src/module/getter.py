@@ -1,4 +1,5 @@
 from enum import Enum
+from pathlib import Path
 import time
 from typing import Union
 from urllib.request import urlopen
@@ -20,7 +21,7 @@ class ContentTypes(str, Enum):
         return Union[bs, lxml.HtmlElement]
 
 
-class GetContentFromURL:
+class GetParserContent:
     # report先はlxmlを使った各種parser
     @classmethod
     def url_to_content(cls,
@@ -46,17 +47,41 @@ class GetContentFromURL:
         NameError
             content_typeが指定外のときエラーとなる．
         """
-        html_content = cls._get_htlm_from_url(cls, url)
-
-        if content_type == ContentTypes.bs4:
-            content = bs(html_content, "lxml")
-        elif content_type == ContentTypes.lxml:
-            content = lxml.fromstring(html_content)
-        else:
-            raise NameError(f"Unavailable content_type: {content_type}")
+        html_content = cls._get_html_from_url(cls, url)
+        content = cls._html_to_content(cls, html_content, content_type)
         return content
 
-    def _get_htlm_from_url(self, url: str, num_retry: int = 5) -> bytes:
+    @classmethod
+    def file_to_content(cls,
+                        filepath: Path,
+                        content_type: ContentTypes
+                        ) -> ContentTypes.get_content():
+        """HTMLファイルを読み込んで指定した種類のparser contentを返す
+
+        Parameters
+        ----------
+        filepath : Path
+            読み込むHTMLファイル
+
+        content_type : ContentTypes
+            "soup" or "lxml"
+
+        Returns
+        -------
+        content : bs4.BeautifulSoup or lxml.HtmlElement
+            htmlをparserように変更したcontent
+
+        Raises
+        ------
+        NameError
+            content_typeが指定外のときエラーとなる．
+        """
+        with open(filepath, "r") as f:
+            html_content = f.read()
+        content = cls._html_to_content(cls, html_content, content_type)
+        return content
+
+    def _get_html_from_url(self, url: str, num_retry: int = 5) -> bytes:
         success_flg = False
         html_content = None
         for i in range(num_retry):
@@ -75,3 +100,14 @@ class GetContentFromURL:
             raise self.logger.error(
                 f"Didn't succeed in {num_retry} times retry.")
         return html_content
+
+    def _html_to_content(self, html_content: str,
+                         content_type: ContentTypes
+                         ) -> ContentTypes.get_content():
+        if content_type == ContentTypes.bs4:
+            content = bs(html_content, "lxml")
+        elif content_type == ContentTypes.lxml:
+            content = lxml.fromstring(html_content)
+        else:
+            raise NameError(f"Unavailable content_type: {content_type}")
+        return content

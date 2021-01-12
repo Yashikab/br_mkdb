@@ -5,11 +5,11 @@ getdataモジュール用単体テスト
 """
 import pytest
 from module.getdata_lxml import OfficialChokuzen
-from module.getter import GetContentFromURL
-from .common import CommonMethodForTest
+from module.getter import GetParserContent
+from ..common import CommonMethod
 
 
-class TestOfficialChokuzen(CommonMethodForTest):
+class TestOfficialChokuzen(CommonMethod):
     '''
     2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
     直前情報\n
@@ -28,11 +28,12 @@ class TestOfficialChokuzen(CommonMethodForTest):
         date = 20200408
 
         # mocking
-        lxml_content = super().htmlfile2lxcontent(
+        filepath = super().get_html_filepath(
             f"choku_{date}{jyo_code}{race_no}.html"
         )
-        mocker.patch.object(GetContentFromURL, "url_to_content",
-                            return_value=lxml_content)
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
+        mocker.patch.object(GetParserContent, "url_to_content",
+                            return_value=lx_content)
         och = OfficialChokuzen(race_no, jyo_code, date)
         return och
 

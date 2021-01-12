@@ -29,7 +29,7 @@ from domain.model.info import (
     TwoRenfuku,
     TwoRentan,
 )
-from module.getter import GetContentFromURL
+from module.getter import GetParserContent
 
 
 class CommonMethods4Official:
@@ -267,7 +267,7 @@ class OfficialProgram(CommonMethods4Official):
         base_url = 'https://boatrace.jp/owpc/pc/race/racelist?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
         self.logger.debug(f'get html: {target_url}')
-        self.__soup = GetContentFromURL.url_to_content(target_url, "soup")
+        self.__soup = GetParserContent.url_to_content(target_url, "soup")
         self.logger.debug('get html completed.')
 
     def getplayerinfo2dict(self, waku: int) -> dict:
@@ -458,7 +458,7 @@ class OfficialChokuzen(CommonMethods4Official):
         # htmlをload
         base_url = 'https://boatrace.jp/owpc/pc/race/beforeinfo?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-        self.__soup = GetContentFromURL.url_to_content(target_url, "soup")
+        self.__soup = GetParserContent.url_to_content(target_url, "soup")
 
     def getplayerinfo2dict(self, waku: int) -> dict:
         self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
@@ -558,7 +558,7 @@ class OfficialResults(CommonMethods4Official):
         # htmlをload
         base_url = 'http://boatrace.jp/owpc/pc/race/raceresult?'
         target_url = f'{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}'
-        self.__soup = GetContentFromURL.url_to_content(target_url, "soup")
+        self.__soup = GetParserContent.url_to_content(target_url, "soup")
         # 結果テーブルだけ最初に抜く
         self.waku_dict = self._getresulttable2dict()
 
@@ -805,7 +805,7 @@ class OfficialOdds(CommonMethods4Official):
                    f'odds{num}{html_type}?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.date}'
-        soup = GetContentFromURL.url_to_content(target_url, "soup")
+        soup = GetParserContent.url_to_content(target_url, "soup")
         # 3連単と共通--------------------
         # oddsテーブルの抜き出し
         if num == 2 and kake == 'renfuku':
@@ -970,7 +970,7 @@ class OfficialOdds(CommonMethods4Official):
                    'oddstf?'
         target_url = f'{base_url}rno={self.race_no}&' \
                      f'jcd={self.jyo_code:02}&hd={self.date}'
-        soup = GetContentFromURL.url_to_content(target_url, "soup")
+        soup = GetParserContent.url_to_content(target_url, "soup")
         target_table_selector = \
             'body > main > div > div > div > '\
             'div.contentsFrame1_inner > div.grid.is-type2.h-clear '\
@@ -1008,7 +1008,7 @@ class GetHoldPlacePast(CommonMethods4Official):
         base_url = 'https://www.boatrace.jp/owpc/pc/race/index?'
         target_url = f'{base_url}hd={target_date}'
         self.logger.debug(f'access: {target_url}')
-        self.__soup = GetContentFromURL.url_to_content(target_url, "soup")
+        self.__soup = GetParserContent.url_to_content(target_url, "soup")
 
         # 抜き出すテーブルの選択
         target_table_selector = \

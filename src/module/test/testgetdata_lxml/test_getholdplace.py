@@ -5,11 +5,11 @@ getdataモジュール用単体テスト
 """
 import pytest
 from module.getdata_lxml import GetHoldPlacePast
-from module.getter import GetContentFromURL
-from .common import CommonMethodForTest
+from module.getter import GetParserContent
+from ..common import CommonMethod
 
 
-class TestGetHoldPlace(CommonMethodForTest):
+class TestGetHoldPlace(CommonMethod):
     """
     本日のレーステーブルから開催会場を取得
     URL: https://www.boatrace.jp/owpc/pc/race/index?hd=20110311
@@ -57,8 +57,9 @@ class TestGetHoldPlace(CommonMethodForTest):
 
     def _ghp(self, date, mocker):
         """mock用に共通項にする"""
-        lx_content = super().htmlfile2lxcontent(f'ghp_{date}.html')
-        mocker.patch.object(GetContentFromURL, "url_to_content",
+        filepath = super().get_html_filepath(f'ghp_{date}.html')
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
+        mocker.patch.object(GetParserContent, "url_to_content",
                             return_value=lx_content)
         ghp = GetHoldPlacePast(date)
         return ghp

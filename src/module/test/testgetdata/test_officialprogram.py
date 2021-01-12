@@ -6,7 +6,7 @@ getdataモジュール用単体テスト
 
 import pytest
 from module.getdata import OfficialProgram
-from module.getter import GetContentFromURL
+from module.getter import GetParserContent
 from ..common import CommonMethod
 
 
@@ -31,10 +31,11 @@ class TestOfficialProgram(CommonMethod):
         date = 20200408
 
         # mocking
-        soup_content = super().htmlfile2bs4(
+        filepath = super().get_html_filepath(
             f"pro_{date}{jyo_code}{race_no}.html"
         )
-        mocker.patch.object(GetContentFromURL, "url_to_content",
+        soup_content = GetParserContent.file_to_content(filepath, "soup")
+        mocker.patch.object(GetParserContent, "url_to_content",
                             return_value=soup_content)
 
         op = OfficialProgram(
