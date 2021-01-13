@@ -5,14 +5,12 @@ getdataモジュール用単体テスト
 """
 
 import pytest
-from module.getdata_lxml import (
-    CommonMethods4Official,
-    OfficialResults
-)
-from .common import CommonMethodForTest
+from module.getdata_lxml import OfficialResults
+from module.getter import GetParserContent
+from ..common import CommonMethod
 
 
-class TestOfficialResults(CommonMethodForTest):
+class TestOfficialResults(CommonMethod):
     '''
     2020 4月10日 浜名湖(06) 9レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/raceresult?rno=9&jcd=06&hd=20200410
@@ -27,12 +25,13 @@ class TestOfficialResults(CommonMethodForTest):
         # day 2020/04/08
         date = 20200410
 
-        lxml_content = super().htmlfile2lxcontent(
+        filepath = super().get_html_filepath(
             f"res_{date}{jyo_code}{race_no}.html"
         )
-        mocker.patch.object(CommonMethods4Official,
-                            "_url2lxml",
-                            return_value=lxml_content)
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
+        mocker.patch.object(
+            GetParserContent, "url_to_content",
+            return_value=lx_content)
         ors = OfficialResults(
             race_no, jyo_code, date)
         return ors

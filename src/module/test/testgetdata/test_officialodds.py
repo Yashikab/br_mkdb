@@ -4,10 +4,8 @@
 getdataモジュール用単体テスト
 """
 import pytest
-from module.getdata import (
-    CommonMethods4Official,
-    OfficialOdds
-)
+from module.getdata import OfficialOdds
+from module.getter import GetParserContent
 from ..common import CommonMethod
 
 
@@ -35,10 +33,11 @@ class TestOfficialOdds(CommonMethod):
         (6, 5, 4, 810.9)
     ])
     def test_threerentan(self, fst, snd, trd, expected, odds, mocker):
-        soup_content = super().htmlfile2bs4(
+        filepath = super().get_html_filepath(
             f'odds_3tan_{self.__date}{self.__jyo_code}{self.__race_no}.html')
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        soup_content = GetParserContent.file_to_content(filepath, "soup")
+        mocker.patch.object(GetParserContent, "url_to_content",
+                            return_value=soup_content)
         assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連単(欠場を試行)
@@ -48,9 +47,10 @@ class TestOfficialOdds(CommonMethod):
         (3, 1, 4, 30.2),
     ])
     def test_threerentan_ketsujyo(self, fst, snd, trd, expected, odds, mocker):
-        soup_content = super().htmlfile2bs4('odds_3tan_20190103222.html')
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        filepath = super().get_html_filepath('odds_3tan_20190103222.html')
+        soup_content = GetParserContent.file_to_content(filepath, "soup")
+        mocker.patch.object(GetParserContent, "url_to_content",
+                            return_value=soup_content)
         assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連複
@@ -61,10 +61,11 @@ class TestOfficialOdds(CommonMethod):
         (4, 5, 6, 228.9)
     ])
     def test_threerenfuku(self, fst, snd, trd, expected, odds, mocker):
-        soup_content = super().htmlfile2bs4(
+        filepath = super().get_html_filepath(
             f'odds_3fuku_{self.__date}{self.__jyo_code}{self.__race_no}.html')
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        soup_content = GetParserContent.file_to_content(filepath, "soup")
+        mocker.patch.object(GetParserContent, "url_to_content",
+                            return_value=soup_content)
         assert odds.three_renfuku()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 2連単
@@ -77,9 +78,10 @@ class TestOfficialOdds(CommonMethod):
     def test_tworentan(self, fst, snd, expected, odds, mocker):
         filename = f'odds_2tanfuku_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-        soup_content = super().htmlfile2bs4(filename)
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        filepath = super().get_html_filepath(filename)
+        soup_content = GetParserContent.file_to_content(filepath, "soup")
+        mocker.patch.object(GetParserContent, "url_to_content",
+                            return_value=soup_content)
         assert odds.two_rentan()[f'comb_{fst}{snd}'] == expected
 
     # 2連複
@@ -91,9 +93,10 @@ class TestOfficialOdds(CommonMethod):
     def test_tworenfuku(self, fst, snd, expected, odds, mocker):
         filename = f'odds_2tanfuku_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-        soup_content = super().htmlfile2bs4(filename)
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        filepath = super().get_html_filepath(filename)
+        soup_content = GetParserContent.file_to_content(filepath, "soup")
+        mocker.patch.object(GetParserContent, "url_to_content",
+                            return_value=soup_content)
         assert odds.two_renfuku()[f'comb_{fst}{snd}'] == expected
 
     # 単勝
@@ -106,7 +109,8 @@ class TestOfficialOdds(CommonMethod):
     def test_tansho(self, fst, expected, odds, mocker):
         filename = f'odds_1tan_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-        soup_content = super().htmlfile2bs4(filename)
-        mocker.patch.object(
-            CommonMethods4Official, "_url2soup", return_value=soup_content)
+        filepath = super().get_html_filepath(filename)
+        soup_content = GetParserContent.file_to_content(filepath, "soup")
+        mocker.patch.object(GetParserContent, "url_to_content",
+                            return_value=soup_content)
         assert odds.tansho()[f'comb_{fst}'] == expected

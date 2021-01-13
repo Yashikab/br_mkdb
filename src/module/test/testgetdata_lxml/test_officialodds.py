@@ -4,14 +4,12 @@
 getdataモジュール用単体テスト
 """
 import pytest
-from module.getdata_lxml import (
-    CommonMethods4Official,
-    OfficialOdds
-)
-from .common import CommonMethodForTest
+from module.getdata_lxml import OfficialOdds
+from module.getter import GetParserContent
+from ..common import CommonMethod
 
 
-class TestOfficialOdds(CommonMethodForTest):
+class TestOfficialOdds(CommonMethod):
     '''
     2020 4月8日 浜名湖(06) 9レースの情報でテスト\n
     http://boatrace.jp/owpc/pc/race/odds3t?rno=9&jcd=06&hd=20200408
@@ -35,10 +33,11 @@ class TestOfficialOdds(CommonMethodForTest):
         (6, 5, 4, 810.9)
     ])
     def test_threerentan(self, fst, snd, trd, expected, odds, mocker):
-        lx_content = super().htmlfile2lxcontent(
+        filepath = super().get_html_filepath(
             f'odds_3tan_{self.__date}{self.__jyo_code}{self.__race_no}.html')
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
-            CommonMethods4Official, "_url2lxml",
+            GetParserContent, "url_to_content",
             return_value=lx_content)
         assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
@@ -49,9 +48,11 @@ class TestOfficialOdds(CommonMethodForTest):
         (3, 1, 4, 30.2),
     ])
     def test_threerentan_ketsujyo(self, fst, snd, trd, expected, odds, mocker):
-        soup_content = super().htmlfile2lxcontent('odds_3tan_20190103222.html')
+        filepath = super().get_html_filepath('odds_3tan_20190103222.html')
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
-            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+            GetParserContent, "url_to_content",
+            return_value=lx_content)
         assert odds.three_rentan()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 3連複
@@ -62,10 +63,12 @@ class TestOfficialOdds(CommonMethodForTest):
         (4, 5, 6, 228.9)
     ])
     def test_threerenfuku(self, fst, snd, trd, expected, odds, mocker):
-        soup_content = super().htmlfile2lxcontent(
+        filepath = super().get_html_filepath(
             f'odds_3fuku_{self.__date}{self.__jyo_code}{self.__race_no}.html')
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
-            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+            GetParserContent, "url_to_content",
+            return_value=lx_content)
         assert odds.three_renfuku()[f'comb_{fst}{snd}{trd}'] == expected
 
     # 2連単
@@ -78,9 +81,11 @@ class TestOfficialOdds(CommonMethodForTest):
     def test_tworentan(self, fst, snd, expected, odds, mocker):
         filename = f'odds_2tanfuku_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-        soup_content = super().htmlfile2lxcontent(filename)
+        filepath = super().get_html_filepath(filename)
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
-            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+            GetParserContent, "url_to_content",
+            return_value=lx_content)
         assert odds.two_rentan()[f'comb_{fst}{snd}'] == expected
 
     # 2連複
@@ -92,9 +97,11 @@ class TestOfficialOdds(CommonMethodForTest):
     def test_tworenfuku(self, fst, snd, expected, odds, mocker):
         filename = f'odds_2tanfuku_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-        soup_content = super().htmlfile2lxcontent(filename)
+        filepath = super().get_html_filepath(filename)
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
-            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+            GetParserContent, "url_to_content",
+            return_value=lx_content)
         assert odds.two_renfuku()[f'comb_{fst}{snd}'] == expected
 
     # 単勝
@@ -107,7 +114,9 @@ class TestOfficialOdds(CommonMethodForTest):
     def test_tansho(self, fst, expected, odds, mocker):
         filename = f'odds_1tan_'\
                    f'{self.__date}{self.__jyo_code}{self.__race_no}.html'
-        soup_content = super().htmlfile2lxcontent(filename)
+        filepath = super().get_html_filepath(filename)
+        lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
-            CommonMethods4Official, "_url2lxml", return_value=soup_content)
+            GetParserContent, "url_to_content",
+            return_value=lx_content)
         assert odds.tansho()[f'comb_{fst}'] == expected

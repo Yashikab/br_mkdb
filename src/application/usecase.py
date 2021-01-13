@@ -1,7 +1,7 @@
 from logging import getLogger
 import time
 
-from domain.argument import Options, DBType
+from application.argument import Options, DBType
 from domain.dbctl import DatabaseController
 from domain.const import MAIN_LOGNAME
 from module.dt2sql import (
