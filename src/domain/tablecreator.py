@@ -2,7 +2,14 @@
 from abc import ABCMeta, abstractmethod
 
 
-class JyoDataTableCreator(meta=ABCMeta):
+class JyoMasterTableCreator(metaclass=ABCMeta):
+
+    @abstractmethod
+    def create_table(self):
+        pass
+
+
+class JyoDataTableCreator(metaclass=ABCMeta):
 
     @abstractmethod
     def create_table(self):
@@ -10,7 +17,7 @@ class JyoDataTableCreator(meta=ABCMeta):
         pass
 
 
-class RaceInfoTableCreator(meta=ABCMeta):
+class RaceInfoTableCreator(metaclass=ABCMeta):
 
     @abstractmethod
     def create_commoninfo_table(self):
@@ -23,7 +30,7 @@ class RaceInfoTableCreator(meta=ABCMeta):
         pass
 
 
-class ChokuzenTableCreator(meta=ABCMeta):
+class ChokuzenTableCreator(metaclass=ABCMeta):
 
     @abstractmethod
     def create_commoninfo_table(self):
@@ -36,7 +43,7 @@ class ChokuzenTableCreator(meta=ABCMeta):
         pass
 
 
-class ResultTableCreator(meta=ABCMeta):
+class ResultTableCreator(metaclass=ABCMeta):
 
     @abstractmethod
     def create_commoninfo_table(self):
@@ -49,7 +56,7 @@ class ResultTableCreator(meta=ABCMeta):
         pass
 
 
-class OddsTableCreator(meta=ABCMeta):
+class OddsTableCreator(metaclass=ABCMeta):
 
     @abstractmethod
     def create_threerentan_table(self):

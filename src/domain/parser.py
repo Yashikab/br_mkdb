@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 # 番組表，直前，結果，オッズを作る(抽象化)
 
 
-class HoldPlaceParser(meta=ABCMeta):
+class HoldPlaceParser(metaclass=ABCMeta):
 
     @abstractmethod
     def holdplace2list(self) -> List[str]:
@@ -22,7 +22,7 @@ class HoldPlaceParser(meta=ABCMeta):
         pass
 
 
-class ProgramParser(meta=ABCMeta):
+class ProgramParser(metaclass=ABCMeta):
 
     @abstractmethod
     def getplayerinfo2dict(self, waku) -> Dict[str, Any]:
@@ -33,7 +33,7 @@ class ProgramParser(meta=ABCMeta):
         pass
 
 
-class ChokuzenParser(meta=ABCMeta):
+class ChokuzenParser(metaclass=ABCMeta):
 
     @abstractmethod
     def getplayerinfo2dict(self, waku: int) -> Dict[str, Any]:
@@ -44,7 +44,7 @@ class ChokuzenParser(meta=ABCMeta):
         pass
 
 
-class ResultsParser(meta=ABCMeta):
+class ResultsParser(metaclass=ABCMeta):
 
     @abstractmethod
     def getplayerinfo2dict(self, waku: int) -> Dict[str, Any]:
@@ -55,7 +55,7 @@ class ResultsParser(meta=ABCMeta):
         pass
 
 
-class OddsParser(meta=ABCMeta):
+class OddsParser(metaclass=ABCMeta):
 
     @abstractmethod
     def three_rentan(self) -> Dict[str, float]:
