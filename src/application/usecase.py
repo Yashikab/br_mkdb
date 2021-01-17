@@ -2,7 +2,7 @@ from logging import getLogger
 import time
 
 from application.argument import Options, DBType
-from domain.dbctl import DatabaseController
+from domain.dbcontroller import DatabaseController
 from domain.const import MAIN_LOGNAME
 from module.dt2sql import (
     JyoData2sql,
@@ -83,10 +83,10 @@ class BoatRaceUsecase:
 
     @classmethod
     def localmysql(cls):
-        from module.dbcontroller import LocalSqlController
+        from infrastructure.dbcontroller import LocalSqlController
         return BoatRaceUsecase(LocalSqlController())
 
     @classmethod
     def gcpmysql(cls):
-        from module.dbcontroller import CloudSqlController
+        from infrastructure.dbcontroller import CloudSqlController
         return BoatRaceUsecase(CloudSqlController())

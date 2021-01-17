@@ -6,7 +6,7 @@ pythonスクリプトを使ってDBを立てる＆削除する
 import argparse
 from logging import getLogger, DEBUG, basicConfig
 from domain.const import MODULE_LOG_NAME
-from module.dbcontroller import (
+from infrastructure.dbcontroller import (
     LocalSqlController,
     CloudSqlController
 )

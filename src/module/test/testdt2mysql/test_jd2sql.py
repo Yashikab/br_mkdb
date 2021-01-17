@@ -23,7 +23,7 @@ class TestJyoData2sql(CommonMethod):
 
     def test_exist_table(self):
         # カラム名の一致でテスト
-        get_set = super().get_columns2set('holdjyo_tb')
+        get_set = super().get_columns('holdjyo_tb')
 
         expected_set = {'datejyo_id', 'holddate', 'jyo_cd',
                         'jyo_name', 'shinko', 'ed_race_no'}
@@ -35,7 +35,7 @@ class TestJyoData2sql(CommonMethod):
         id_name = "datejyo_id"
         target_id = f"{self.__target_date}{self.__jyo_cd:02}"
         col_list = ["datejyo_id", "jyo_cd", "shinko", "ed_race_no"]
-        res_tpl = super().getdata2tuple(
+        res_tpl = super().get_targetdata(
             tb_name,
             id_name,
             target_id,

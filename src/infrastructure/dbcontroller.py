@@ -6,15 +6,15 @@ google cloud sql proxyを通して, データを格納する
 from logging import getLogger
 import json
 import os
+from pathlib import Path
 from stat import (
     S_IXUSR,
     S_IXGRP,
     S_IXOTH
 )
 import subprocess
-from abc import ABCMeta, abstractmethod
 
-from domain.dbctl import DatabaseController
+from domain.dbcontroller import DatabaseController
 from domain.const import MODULE_LOG_NAME, MYSQL_CONFIG
 
 import mysql.connector
@@ -47,17 +47,14 @@ class Common:
 
 class CloudSqlController(DatabaseController):
     """use cloud sql mysql"""
+
     def __init__(self):
         self.logger = \
             getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
         self.logger.info('Set path to proxy.')
-        pwd = os.path.abspath(__file__)
-        this_filename = os.path.basename(__file__)
-        this_dir = pwd.replace(this_filename, '')
-        diff_dir_for_sql = 'src/module'
-        self.__proxy_dir = \
-            this_dir.replace(diff_dir_for_sql, 'proxy')
-        if not os.path.exists(self.__proxy_dir):
+        pwd = Path(__file__).resolve()
+        self.__proxy_dir = pwd.parents[2].joinpath("proxy")
+        if not self.__proxy_dir.exists():
             self.logger.debug('Path not exists then create.')
             os.mkdir(self.__proxy_dir)
         self.logger.debug(f'proxy path: {self.__proxy_dir}')
@@ -103,7 +100,7 @@ class CloudSqlController(DatabaseController):
             ["./cloud_sql_proxy",
              f"-instances={self.__instance_name}=tcp:3306",
              f"-credential_file={self.__key_name_json}"]
-            )
+        )
         # wait
         time.sleep(5)
         Common.check_connection()
@@ -155,15 +152,12 @@ class CloudSqlController(DatabaseController):
 
 class LocalSqlController(DatabaseController):
     """use local mysql db"""
+
     def __init__(self):
         self.logger = \
             getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
-        pwd = os.path.abspath(__file__)
-        this_filename = os.path.basename(__file__)
-        this_dir = pwd.replace(this_filename, '')
-        diff_dir_for_sql = 'src/module'
-        self.__sql_dir = \
-            this_dir.replace(diff_dir_for_sql, 'local_mysql')
+        pwd = Path(__file__).resolve()
+        self.__sql_dir = pwd.parents[2].joinpath("local_mysql")
         self.logger.debug(f'sql dir is {self.__sql_dir}')
 
     def build(self):

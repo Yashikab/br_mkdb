@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Any
 
 from domain import const
-from infrastructure.connect import MysqlConnector
+from infrastructure.connector import MysqlConnector
 
 
 class CommonMethod:
     logger = getLogger(__name__)
 
-    def get_columns2set(self, tb_name: str) -> Any:
+    def get_columns(self, tb_name: str) -> Any:
         """テーブル名のカラムを取得
 
         Parameters
@@ -39,8 +39,8 @@ class CommonMethod:
         finally:
             return get_set
 
-    def getdata2tuple(self, tb_name: str, id_name: str,
-                      target_id: int, col_list: list) -> tuple:
+    def get_targetdata(self, tb_name: str, id_name: str,
+                       target_id: int, col_list: list) -> tuple:
         """
         idのcol_listのデータを取得しタプルで返す
         """

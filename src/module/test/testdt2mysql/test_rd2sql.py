@@ -45,7 +45,7 @@ class TestRaceInfo2sql(CommonMethod):
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト
-        get_set = super().get_columns2set(tb_name)
+        get_set = super().get_columns(tb_name)
         assert get_set == col_set
 
     race_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}"
@@ -58,18 +58,18 @@ class TestRaceInfo2sql(CommonMethod):
     waku_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}1"
     waku_col_list = ["waku_id", "p_id", "p_all_1rate", "boat_2rate"]
     waku_expected = (
-            int(waku_id),
-            4713,
-            6.72,
-            18.18
-        )
+        int(waku_id),
+        4713,
+        6.72,
+        18.18
+    )
 
     @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
         ("raceinfo_tb", "race_id", race_id, race_col_list, race_expected),
         ("program_tb", "waku_id", waku_id, waku_col_list, waku_expected)
     ])
     def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
-        res_tpl = super().getdata2tuple(
+        res_tpl = super().get_targetdata(
             tb_nm,
             id_nm,
             t_id,

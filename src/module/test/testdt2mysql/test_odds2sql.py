@@ -52,7 +52,7 @@ class TestOdds2sql(CommonMethod):
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト
-        get_set = super().get_columns2set(tb_name)
+        get_set = super().get_columns(tb_name)
         assert get_set == col_set
 
     race_id = int(f"{__target_date}{__jyo_cd:02}{__race_no:02}")
@@ -75,7 +75,7 @@ class TestOdds2sql(CommonMethod):
         ("odds_1tan_tb", one_tan_col_list, one_tan_expected),
     ])
     def test_insert2table(self, tb_nm, col_list, expected):
-        res_tpl = super().getdata2tuple(
+        res_tpl = super().get_targetdata(
             tb_nm,
             "race_id",
             self.race_id,

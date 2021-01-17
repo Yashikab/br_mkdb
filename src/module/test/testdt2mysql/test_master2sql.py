@@ -19,13 +19,13 @@ class TestJyoMaster2sql(CommonMethod):
         jm2sql.create_table_if_not_exists()
 
     def test_exist_table(self):
-        get_set = super().get_columns2set(self.__table_name)
+        get_set = super().get_columns(self.__table_name)
         expected_set = {'jyo_name', 'jyo_cd'}
         # カラム名確認
         assert get_set == expected_set
 
     def test_inserteddata(self):
-        res_tpl = super().getdata2tuple(
+        res_tpl = super().get_targetdata(
             tb_name=self.__table_name,
             id_name='jyo_cd',
             target_id=1,
