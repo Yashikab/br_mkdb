@@ -1,12 +1,12 @@
+import time
 from enum import Enum
 from pathlib import Path
-import time
 from typing import Union
 from urllib.request import urlopen
 
+import lxml.html as lxml
 from bs4 import BeautifulSoup as bs
 
-import lxml.html as lxml
 # URLの取得を行う
 # lxml or bs4で返す(一旦lxmlのみ)
 # SRP単一責任の法則(報告先が一緒)

@@ -6,6 +6,7 @@ chokuseninfoo2sqlテスト
 import pytest
 
 from module.dt2sql import ChokuzenData2sql
+
 from ..common import CommonMethod
 
 WAIT = 0.5

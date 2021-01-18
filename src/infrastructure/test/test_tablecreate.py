@@ -4,8 +4,10 @@
 master2sqlモジュール用単体テスト
 """
 import pytest
-from .common import CommonMethod
+
 from infrastructure.tablecreator import JyoMasterTableCreatorImpl
+
+from .common import CommonMethod
 
 
 @pytest.mark.run(order=1)

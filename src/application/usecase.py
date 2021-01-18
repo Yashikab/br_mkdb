@@ -1,16 +1,11 @@
-from logging import getLogger
 import time
+from logging import getLogger
 
-from application.argument import Options, DBType
-from domain.dbcontroller import DatabaseController
+from application.argument import DBType, Options
 from domain.const import MAIN_LOGNAME
-from module.dt2sql import (
-    JyoData2sql,
-    RaceData2sql,
-    ChokuzenData2sql,
-    ResultData2sql,
-    Odds2sql
-)
+from domain.dbcontroller import DatabaseController
+from module.dt2sql import (ChokuzenData2sql, JyoData2sql, Odds2sql,
+                           RaceData2sql, ResultData2sql)
 from module.getdata import DateRange as dr
 from module.master2sql import JyoMaster2sql
 

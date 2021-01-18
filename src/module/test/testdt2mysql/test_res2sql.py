@@ -6,6 +6,7 @@ chokuseninfoo2sqlテスト
 import pytest
 
 from module.dt2sql import ResultData2sql
+
 from ..common import CommonMethod
 
 

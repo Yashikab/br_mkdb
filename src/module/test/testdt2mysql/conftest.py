@@ -4,6 +4,7 @@
 ここでmysqlにテスト用データを格納する
 """
 import os
+
 import pytest
 
 from infrastructure.dbcontroller import LocalSqlController

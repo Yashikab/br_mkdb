@@ -5,8 +5,9 @@ fixされたデータをsqlへ保存する。
 jyo_masterを入れる
 """
 from logging import getLogger
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 from domain import const
 from module.dt2sql import Data2MysqlTemplate

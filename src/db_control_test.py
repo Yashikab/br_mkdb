@@ -4,13 +4,11 @@
 pythonスクリプトを使ってDBを立てる＆削除する
 '''
 import argparse
-from logging import getLogger, DEBUG, basicConfig
-from domain.const import MODULE_LOG_NAME
-from infrastructure.dbcontroller import (
-    LocalSqlController,
-    CloudSqlController
-)
 import time
+from logging import DEBUG, basicConfig, getLogger
+
+from domain.const import MODULE_LOG_NAME
+from infrastructure.dbcontroller import CloudSqlController, LocalSqlController
 
 # logger
 logger = getLogger(MODULE_LOG_NAME)

@@ -3,22 +3,18 @@
 '''
 google cloud sql proxyを通して, データを格納する
 '''
-from logging import getLogger
 import json
 import os
-from pathlib import Path
-from stat import (
-    S_IXUSR,
-    S_IXGRP,
-    S_IXOTH
-)
 import subprocess
-
-from domain.dbcontroller import DatabaseController
-from domain.const import MODULE_LOG_NAME, MYSQL_CONFIG
+import time
+from logging import getLogger
+from pathlib import Path
+from stat import S_IXGRP, S_IXOTH, S_IXUSR
 
 import mysql.connector
-import time
+
+from domain.const import MODULE_LOG_NAME, MYSQL_CONFIG
+from domain.dbcontroller import DatabaseController
 
 
 class Common:

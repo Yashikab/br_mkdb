@@ -10,26 +10,17 @@ from abc import ABCMeta, abstractmethod
 from logging import getLogger
 # from datetime import datetime
 from pathlib import Path
+from typing import Any, Callable, Dict, List
+
 from tqdm import tqdm
-from typing import Callable, Any
-from typing import Dict, List
 
 from domain import const
-from domain.model.info import (
-    Tansho,
-    ThreeRenfuku,
-    ThreeRentan,
-    TwoRenfuku,
-    TwoRentan,
-)
+from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
+                               TwoRentan)
 from module.connect import MysqlConnector
-from module.getdata_lxml import (
-    GetHoldPlacePast,
-    OfficialProgram,
-    OfficialChokuzen,
-    OfficialResults,
-    OfficialOdds
-)
+from module.getdata_lxml import (GetHoldPlacePast, OfficialChokuzen,
+                                 OfficialOdds, OfficialProgram,
+                                 OfficialResults)
 
 
 class Data2sqlAbstract(metaclass=ABCMeta):

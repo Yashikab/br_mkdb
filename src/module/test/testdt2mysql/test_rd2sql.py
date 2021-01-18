@@ -6,6 +6,7 @@ raceinfo2sqlテスト
 import pytest
 
 from module.dt2sql import RaceData2sql
+
 from ..common import CommonMethod
 
 
