@@ -1,4 +1,3 @@
-from .creator import SqlCreator
-from .executer import Mysql
+from .executer import MysqlExecuter
 
-__all__ = ["SqlCreator", "Mysql"]
+__all__ = ["MysqlExecuter"]

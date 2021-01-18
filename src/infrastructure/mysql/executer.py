@@ -1,14 +1,15 @@
 from logging import getLogger
 
 from domain import const
+from domain.sql import SqlExecuter
 from infrastructure.connector import MysqlConnector
 
 logger = getLogger(__name__)
 
 
-class Mysql:
+class MysqlExecuter(SqlExecuter):
     @classmethod
-    def run_query(self, query: str) -> None:
+    def run_query(cls, query: str) -> None:
         try:
             logger.debug('connecteng Mysql.')
             with MysqlConnector(const.MYSQL_CONFIG) as conn:

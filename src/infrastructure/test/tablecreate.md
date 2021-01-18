@@ -1,6 +1,6 @@
 ## テーブル存在確認
 
-- [ ] jyomaster
+- [x] jyomaster
 - [ ] jyodata
 - [ ] raceinfo_common
 - [ ] raceinfo_player

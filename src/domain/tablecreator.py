@@ -1,12 +1,24 @@
 # テーブル作成用ドメイン
 from abc import ABCMeta, abstractmethod
 
+from domain.sql import SqlCreator, SqlExecuter
+
 
 class JyoMasterTableCreator(metaclass=ABCMeta):
+    sql_executer: SqlExecuter
+    tb_name: str = "jyo_master"
 
-    @abstractmethod
-    def create_table(self):
-        pass
+    def __init__(self, sql_executer: SqlExecuter):
+        self.sql_executer = sql_executer
+
+    def create_table(self) -> None:
+        schemas = [
+            ("jyo_name", "VARCHAR(100)"),
+            ("jyo_cd", "INT", "PRIMARY KEY")
+        ]
+        query = SqlCreator.sql_for_create_table(
+            self.tb_name, schemas)
+        self.sql_executer.run_query(query)
 
 
 class JyoDataTableCreator(metaclass=ABCMeta):
