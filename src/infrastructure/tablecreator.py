@@ -17,5 +17,8 @@ class JyoMasterTableCreatorImpl(JyoMasterTableCreator):
 
 class JyoDataTableCreatorImpl(JyoDataTableCreator):
 
-    def create_table(self):
-        pass
+    def __init__(self):
+        super().__init__(MysqlExecuter)
+
+    def create_table(self) -> None:
+        return super().create_table()

@@ -22,11 +22,30 @@ class JyoMasterTableCreator(metaclass=ABCMeta):
 
 
 class JyoDataTableCreator(metaclass=ABCMeta):
+    sql_executer: SqlExecuter
+    tb_name: str = "holdjyo_tb"
+
+    def __init__(self, sql_executer: SqlExecuter):
+        self.sql_executer = sql_executer
 
     @abstractmethod
     def create_table(self):
         """開催場情報"""
-        pass
+        schemas = [
+            ("datejyo_id", "INT", "PRIMARY KEY"),
+            ("holddate", "DATE"),
+            ("jyo_cd", "INT"),
+            ("jyo_name", "VARCHAR(30)"),
+            ("shinko", "VARCHAR(100)"),
+            ("ed_race_no", "INT"),
+
+        ]
+        foreign_keys = ["jyo_cd"]
+        refs = ["jyo_master"]
+        query = SqlCreator.sql_for_create_table(
+            self.tb_name, schemas, foreign_keys, refs
+        )
+        self.sql_executer.run_query(query)
 
 
 class RaceInfoTableCreator(metaclass=ABCMeta):
