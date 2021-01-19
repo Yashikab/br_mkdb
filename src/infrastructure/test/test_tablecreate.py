@@ -5,7 +5,8 @@ master2sqlモジュール用単体テスト
 """
 import pytest
 
-from infrastructure.tablecreator import JyoMasterTableCreatorImpl, JyoDataTableCreatorImpl
+from infrastructure.tablecreator import (JyoDataTableCreatorImpl,
+                                         JyoMasterTableCreatorImpl)
 
 from .common import CommonMethod
 
