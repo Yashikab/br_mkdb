@@ -28,7 +28,6 @@ class JyoDataTableCreator(metaclass=ABCMeta):
     def __init__(self, sql_executer: SqlExecuter):
         self.sql_executer = sql_executer
 
-    @abstractmethod
     def create_table(self):
         """開催場情報"""
         schemas = [

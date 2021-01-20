@@ -62,7 +62,7 @@ class SqlCreator:
             foreign_phrase = ""
 
         sql = f"CREATE TABLE {replace_txt} {tb_name}"\
-              f"( {schema_phrase} {foreign_phrase}) " \
+              f"( {schema_phrase} {foreign_phrase} ) " \
               f"CHARACTER SET utf8;"
         logger.debug(sql)
         return sql
