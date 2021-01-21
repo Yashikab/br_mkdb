@@ -10,7 +10,7 @@ class SqlCreator:
     def sql_for_create_table(
         cls,
         tb_name: str,
-        schemas: List[Tuple[str, ...]],
+        schema: List[Tuple[str, ...]],
         foreign_keys: Optional[List[str]] = None,
         refs: Optional[List[str]] = None,
         replace: bool = True
@@ -21,7 +21,7 @@ class SqlCreator:
         ----------
         tb_name : str
             テーブル名
-        schemas : List[Tuple[str, ...]]
+        schema : List[Tuple[str, ...]]
             スキーマのリスト ("変数名", "型", "外部キー(任意)")を1セットとし、
             テーブルに定義するスキーマをリストで入れる。
             各スキーマはスペースでjoinされ、スキーマ間は", \\n"でジョインする。
@@ -37,7 +37,7 @@ class SqlCreator:
         str
             テーブル作成のためのクエリ
         """
-        schema_phrase = ", \n".join(list(map(lambda s: " ".join(s), schemas)))
+        schema_phrase = ", \n".join(list(map(lambda s: " ".join(s), schema)))
         replace_txt = ""
         if replace:
             replace_txt = "IF NOT EXISTS"
@@ -49,7 +49,7 @@ class SqlCreator:
             assert refs, "You have to set references, if foreign_keys are set."
             assert len(foreign_keys) == len(refs), \
                 "Length between foreign_keys and references must be same."
-            schema_names = set(map(lambda s: s[0], schemas))
+            schema_names = set(map(lambda s: s[0], schema))
             assert set(foreign_keys) <= schema_names, \
                 "foregin key must be in the set of columns."
             for f, r in zip(foreign_keys, refs):

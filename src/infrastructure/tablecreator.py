@@ -9,7 +9,7 @@ logger = getLogger(__name__)
 
 class JyoMasterTableCreatorImpl(JyoMasterTableCreator):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(MysqlExecuter)
 
     def create_table(self) -> None:
@@ -18,7 +18,7 @@ class JyoMasterTableCreatorImpl(JyoMasterTableCreator):
 
 class JyoDataTableCreatorImpl(JyoDataTableCreator):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(MysqlExecuter)
 
     def create_table(self) -> None:
@@ -28,10 +28,10 @@ class JyoDataTableCreatorImpl(JyoDataTableCreator):
 class RaceDataTableCreatorImpl(RaceInfoTableCreator):
 
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__(MysqlExecuter)
 
-    def create_commoninfo_table(self):
+    def create_commoninfo_table(self) -> None:
         return super().create_commoninfo_table()
 
-    def create_playerinfo_table(self):
+    def create_playerinfo_table(self) -> None:
         return super().create_playerinfo_table()
