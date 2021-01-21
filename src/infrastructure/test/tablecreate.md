@@ -1,8 +1,8 @@
 ## テーブル存在確認
 
 - [x] jyomaster
-- [ ] jyodata
-- [ ] raceinfo_common
+- [x] jyodata
+- [x] raceinfo_common
 - [ ] raceinfo_player
 - [ ] chokuzeninfo_common
 - [ ] chokuzeninfo_player
