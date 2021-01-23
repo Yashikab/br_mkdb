@@ -1,14 +1,13 @@
 from logging import getLogger
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 logger = getLogger(__name__)
 
 
 class SqlCreator:
 
-    @classmethod
     def sql_for_create_table(
-        cls,
+        self,
         tb_name: str,
         schema: List[Tuple[str, ...]],
         foreign_keys: Optional[List[str]] = None,
@@ -66,3 +65,18 @@ class SqlCreator:
               f"CHARACTER SET utf8;"
         logger.debug(sql)
         return sql
+
+    def get_sqltype_from_pytype(
+        self,
+        py_type: type,
+    ) -> str:
+        sqltype = None
+        if py_type == int:
+            sqltype = "INT"
+        elif py_type == float:
+            sqltype = "FLOAT"
+        elif py_type == str:
+            sqltype = "VARCHAR(100)"
+        elif py_type == bool:
+            sqltype = "BOOLEAN"
+        return sqltype
