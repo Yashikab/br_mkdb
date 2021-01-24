@@ -3,13 +3,15 @@
 """
 master2sqlモジュール用単体テスト
 """
+# TODO domainへ移動する。（impl必要ない)
 import pytest
 
 from domain.model.info import (
-    ProgramCommonInfo,
-    ProgramPlayerInfo
+    ChokuzenPlayerInfo, ProgramCommonInfo,
+    ProgramPlayerInfo, WeatherInfo
 )
 from infrastructure.tablecreator import (
+    ChokuzenTableCreatorImpl,
     JyoDataTableCreatorImpl,
     JyoMasterTableCreatorImpl,
     RaceDataTableCreatorImpl
@@ -72,6 +74,32 @@ class TestRaceInfoTableCreatorImpl(CommonMethod):
     @pytest.mark.parametrize("tb_name, col_set", [
         ('raceinfo_tb', ri_col_set),
         ('program_tb', pr_col_set)
+    ])
+    def test_exist_table_raceinfo(self, tb_name, col_set):
+        # カラム名の一致でテスト
+        get_set = super().get_columns(tb_name)
+        assert get_set == col_set
+
+
+@pytest.mark.run(order=4)
+class TestChokuzenInfo2sql(CommonMethod):
+
+    @pytest.fixture(scope='class', autouse=True)
+    def insertdata(self):
+        chokutc = ChokuzenTableCreatorImpl()
+        chokutc.create_commoninfo_table()
+        chokutc.create_playerinfo_table()
+
+    cc_col_set = {'race_id', 'datejyo_id'}.union(
+        set(WeatherInfo.__annotations__.keys())
+    )
+    cp_col_set = {'waku_id', 'race_id'}.union(
+        set(ChokuzenPlayerInfo.__annotations__.keys())
+    )
+
+    @ pytest.mark.parametrize("tb_name, col_set", [
+        ('chokuzen_cond_tb', cc_col_set),
+        ('chokuzen_player_tb', cp_col_set)
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト

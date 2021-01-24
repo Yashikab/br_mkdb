@@ -2,42 +2,49 @@
 from abc import ABCMeta, abstractmethod
 
 from domain.model.info import (
-    ProgramCommonInfo,
-    ProgramPlayerInfo,
+    ChokuzenPlayerInfo, ProgramCommonInfo,
+    ProgramPlayerInfo, WeatherInfo,
 )
 from domain.sql import SqlCreator, SqlExecuter
 
+# TODO クラスごと外部キーで依存してていいのか？
 
-class JyoMasterTableCreator:
+
+class TableCreator:
     sql_executer: SqlExecuter
     sql_creator: SqlCreator
-    tb_name: str = "jyo_master"
 
     def __init__(self, sql_executer: SqlExecuter):
         self.sql_executer = sql_executer
         self.sql_creator = SqlCreator()
 
+    def run_create_table(self,
+                         tb_name,
+                         schema,
+                         foreign_keys=None,
+                         refs=None) -> None:
+        query = self.sql_creator.sql_for_create_table(
+            tb_name, schema, foreign_keys, refs
+        )
+        self.sql_executer.run_query(query)
+
+
+class JyoMasterTableCreator(TableCreator):
+
     def create_table(self) -> None:
+        tb_name = "jyo_master"
         schema = [
             ("jyo_name", "VARCHAR(100)"),
             ("jyo_cd", "INT", "PRIMARY KEY")
         ]
-        query = self.sql_creator.sql_for_create_table(
-            self.tb_name, schema)
-        self.sql_executer.run_query(query)
+        super().run_create_table(tb_name, schema)
 
 
-class JyoDataTableCreator:
-    sql_executer: SqlExecuter
-    sql_creator: SqlCreator
-    tb_name: str = "holdjyo_tb"
-
-    def __init__(self, sql_executer: SqlExecuter):
-        self.sql_executer = sql_executer
-        self.sql_creator = SqlCreator()
+class JyoDataTableCreator(TableCreator):
 
     def create_table(self):
         """開催場情報"""
+        tb_name: str = "holdjyo_tb"
         schema = [
             ("datejyo_id", "INT", "PRIMARY KEY"),
             ("holddate", "DATE"),
@@ -49,19 +56,15 @@ class JyoDataTableCreator:
         ]
         foreign_keys = ["jyo_cd"]
         refs = ["jyo_master"]
-        query = self.sql_creator.sql_for_create_table(
-            self.tb_name, schema, foreign_keys, refs
+        super().run_create_table(
+            tb_name,
+            schema,
+            foreign_keys,
+            refs
         )
-        self.sql_executer.run_query(query)
 
 
-class RaceInfoTableCreator:
-    sql_executer: SqlExecuter
-    sql_creator: SqlCreator
-
-    def __init__(self, sql_executer: SqlExecuter):
-        self.sql_executer = sql_executer
-        self.sql_creator = SqlCreator()
+class RaceInfoTableCreator(TableCreator):
 
     def create_commoninfo_table(self):
         """レース共通情報"""
@@ -78,9 +81,12 @@ class RaceInfoTableCreator:
             )
         foreign_keys = ["datejyo_id"]
         refs = ["holdjyo_tb"]
-        query = self.sql_creator.sql_for_create_table(
-            tb_name, schema, foreign_keys, refs)
-        self.sql_executer.run_query(query)
+        super().run_create_table(
+            tb_name,
+            schema,
+            foreign_keys,
+            refs
+        )
 
     def create_playerinfo_table(self):
         """番組表情報"""
@@ -95,47 +101,62 @@ class RaceInfoTableCreator:
                  self.sql_creator.get_sqltype_from_pytype(var_type)
                  )
             )
-        #     ("p_name", "VARCHAR(100)"),
-        #     ("p_id", "INT"),
-        #     ("p_level", "VARCHAR(30)"),
-        #     ("p_home", "VARCHAR(30)"),
-        #     ("p_birthplace", "VARCHAR(30)"),
-        #     ("p_age", "INT"),
-        #     ("p_weight", "FLOAT"),
-        #     ("p_num_f", "INT"),
-        #     ("p_num_l", "INT"),
-        #     ("p_avg_st", "FLOAT"),
-        #     ("p_all_1rate", "FLOAT"),
-        #     ("p_all_2rate", "FLOAT"),
-        #     ("p_all_3rate", "FLOAT"),
-        #     ("p_local_1rate", "FLOAT"),
-        #     ("p_local_2rate", "FLOAT"),
-        #     ("p_local_3rate", "FLOAT"),
-        #     ("motor_no", "INT"),
-        #     ("motor_2rate", "FLOAT"),
-        #     ("motor_3rate", "FLOAT"),
-        #     ("boat_no", "INT"),
-        #     ("boat_2rate", "FLOAT"),
-        #     ("boat_3rate", "FLOAT")
-        # ]
         foreign_keys = ["race_id"]
         refs = ["raceinfo_tb"]
-        query = self.sql_creator.sql_for_create_table(
-            tb_name, schema, foreign_keys, refs)
-        self.sql_executer.run_query(query)
+        super().run_create_table(
+            tb_name,
+            schema,
+            foreign_keys,
+            refs
+        )
 
 
-class ChokuzenTableCreator(metaclass=ABCMeta):
+class ChokuzenTableCreator(TableCreator):
 
-    @ abstractmethod
     def create_commoninfo_table(self):
         """直前共通情報"""
-        pass
+        tb_name = "chokuzen_cond_tb"
+        schema = [
+            ("race_id", "BIGINT", "PRIMARY KEY"),
+            ("datejyo_id", "INT"),
+        ]
+        # annotationを使う
+        for var_name, var_type in WeatherInfo.__annotations__.items():
+            schema.append(
+                (var_name,
+                 self.sql_creator.get_sqltype_from_pytype(var_type))
+            )
+        foreign_keys = ["race_id"]
+        refs = ["raceinfo_tb"]
+        super().run_create_table(
+            tb_name,
+            schema,
+            foreign_keys,
+            refs
+        )
 
     @ abstractmethod
     def create_playerinfo_table(self):
         """直前選手情報"""
-        pass
+        tb_name = "chokuzen_player_tb"
+        schema = [
+            ("waku_id", "BIGINT", "PRIMARY KEY"),
+            ("race_id", "BIGINT"),
+        ]
+        # annotationを使う
+        for var_name, var_type in ChokuzenPlayerInfo.__annotations__.items():
+            schema.append(
+                (var_name,
+                 self.sql_creator.get_sqltype_from_pytype(var_type))
+            )
+        foreign_keys = ["waku_id", "race_id"]
+        refs = ["program_tb", "chokuzen_cond_tb"]
+        super().run_create_table(
+            tb_name,
+            schema,
+            foreign_keys,
+            refs
+        )
 
 
 class ResultTableCreator(metaclass=ABCMeta):

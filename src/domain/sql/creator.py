@@ -43,7 +43,7 @@ class SqlCreator:
 
         # foregin key(option)
         # schemaからつなぐカンマを入れておく
-        foreign_phases = [", "]
+        foreign_phases = [""]
         if foreign_keys:
             assert refs, "You have to set references, if foreign_keys are set."
             assert len(foreign_keys) == len(refs), \
@@ -56,7 +56,7 @@ class SqlCreator:
                     f"FOREIGN KEY ({f}) REFERENCES {r} ({f})")
 
         if len(foreign_phases) > 1:
-            foreign_phrase = " ".join(foreign_phases)
+            foreign_phrase = ", ".join(foreign_phases)
         else:
             foreign_phrase = ""
 
