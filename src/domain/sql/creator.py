@@ -42,7 +42,7 @@ class SqlCreator:
             replace_txt = "IF NOT EXISTS"
 
         # foregin key(option)
-        # schemaからつなぐカンマを入れておく
+        # schemaからつなぐカンマをjoin時に入れるため、から文字列を入れておく
         foreign_phases = [""]
         if foreign_keys:
             assert refs, "You have to set references, if foreign_keys are set."
