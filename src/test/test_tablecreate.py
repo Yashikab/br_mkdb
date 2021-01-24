@@ -3,31 +3,31 @@
 """
 master2sqlモジュール用単体テスト
 """
-# TODO domainへ移動する。（impl必要ない)
 import pytest
 
 from domain.model.info import (
     ChokuzenPlayerInfo, ProgramCommonInfo,
-    ProgramPlayerInfo, WeatherInfo
+    ProgramPlayerInfo, ResultCommonInfo, ResultPlayerInfo, WeatherInfo
 )
-from infrastructure.tablecreator import (
-    ChokuzenTableCreatorImpl,
-    JyoDataTableCreatorImpl,
-    JyoMasterTableCreatorImpl,
-    RaceDataTableCreatorImpl
+from infrastructure.mysql import MysqlExecuter
+from domain.tablecreator import (
+    ChokuzenTableCreator,
+    JyoDataTableCreator,
+    JyoMasterTableCreator,
+    RaceInfoTableCreator, ResultTableCreator
 )
 
 from .common import CommonMethod
 
 
 @pytest.mark.run(order=1)
-class TestJyoMasterTableCreatorImpl(CommonMethod):
+class TestJyoMasterTableCreator(CommonMethod):
     __table_name: str = 'jyo_master'
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
         # jyomaster
-        jmtc = JyoMasterTableCreatorImpl()
+        jmtc = JyoMasterTableCreator(MysqlExecuter)
         jmtc.create_table()
 
     def test_exist_table(self):
@@ -38,11 +38,11 @@ class TestJyoMasterTableCreatorImpl(CommonMethod):
 
 
 @pytest.mark.run(order=2)
-class TestJyoDataTableCreatorImpl(CommonMethod):
+class TestJyoDataTableCreator(CommonMethod):
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
-        jdtc = JyoDataTableCreatorImpl()
+        jdtc = JyoDataTableCreator(MysqlExecuter)
         jdtc.create_table()
 
     def test_exist_table(self):
@@ -55,11 +55,11 @@ class TestJyoDataTableCreatorImpl(CommonMethod):
 
 
 @pytest.mark.run(order=3)
-class TestRaceInfoTableCreatorImpl(CommonMethod):
+class TestRaceInfoTableCreator(CommonMethod):
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
-        rdtc = RaceDataTableCreatorImpl()
+        rdtc = RaceInfoTableCreator(MysqlExecuter)
         rdtc.create_commoninfo_table()
         rdtc.create_playerinfo_table()
 
@@ -86,7 +86,7 @@ class TestChokuzenInfo2sql(CommonMethod):
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
-        chokutc = ChokuzenTableCreatorImpl()
+        chokutc = ChokuzenTableCreator(MysqlExecuter)
         chokutc.create_commoninfo_table()
         chokutc.create_playerinfo_table()
 
@@ -100,6 +100,32 @@ class TestChokuzenInfo2sql(CommonMethod):
     @ pytest.mark.parametrize("tb_name, col_set", [
         ('chokuzen_cond_tb', cc_col_set),
         ('chokuzen_player_tb', cp_col_set)
+    ])
+    def test_exist_table_raceinfo(self, tb_name, col_set):
+        # カラム名の一致でテスト
+        get_set = super().get_columns(tb_name)
+        assert get_set == col_set
+
+
+@pytest.mark.run(order=5)
+class TestResultInfoTableCreator(CommonMethod):
+
+    @pytest.fixture(scope='class', autouse=True)
+    def insertdata(self):
+        restc = ResultTableCreator(MysqlExecuter)
+        restc.create_commoninfo_table()
+        restc.create_playerinfo_table()
+
+    rr_col_set = {'race_id', 'datejyo_id'}.union(
+        set(ResultCommonInfo.__annotations__.keys())
+    )
+    rp_col_set = {'waku_id', 'race_id'}.union(
+        set(ResultPlayerInfo.__annotations__.keys())
+    )
+
+    @ pytest.mark.parametrize("tb_name, col_set", [
+        ('race_result_tb', rr_col_set),
+        ('p_result_tb', rp_col_set)
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト

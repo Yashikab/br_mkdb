@@ -1,9 +1,7 @@
 # テーブル作成用ドメイン
-from abc import ABCMeta, abstractmethod
-
 from domain.model.info import (
     ChokuzenPlayerInfo, ProgramCommonInfo,
-    ProgramPlayerInfo, WeatherInfo,
+    ProgramPlayerInfo, ResultCommonInfo, ResultPlayerInfo, WeatherInfo,
 )
 from domain.sql import SqlCreator, SqlExecuter
 
@@ -135,7 +133,6 @@ class ChokuzenTableCreator(TableCreator):
             refs
         )
 
-    @ abstractmethod
     def create_playerinfo_table(self):
         """直前選手情報"""
         tb_name = "chokuzen_player_tb"
@@ -159,42 +156,71 @@ class ChokuzenTableCreator(TableCreator):
         )
 
 
-class ResultTableCreator(metaclass=ABCMeta):
+class ResultTableCreator(TableCreator):
 
-    @ abstractmethod
     def create_commoninfo_table(self):
         """結果共通情報"""
-        pass
+        tb_name = "race_result_tb"
+        schema = [
+            ("race_id", "BIGINT", "PRIMARY KEY"),
+            ("datejyo_id", "INT"),
+        ]
+        # annotationを使う
+        for var_name, var_type in ResultCommonInfo.__annotations__.items():
+            schema.append(
+                (var_name,
+                 self.sql_creator.get_sqltype_from_pytype(var_type))
+            )
+        foreign_keys = ["race_id"]
+        refs = ["raceinfo_tb"]
+        super().run_create_table(
+            tb_name,
+            schema,
+            foreign_keys,
+            refs
+        )
 
-    @ abstractmethod
     def create_playerinfo_table(self):
         """結果選手情報"""
-        pass
+        tb_name = "p_result_tb"
+        schema = [
+            ("waku_id", "BIGINT", "PRIMARY KEY"),
+            ("race_id", "BIGINT"),
+        ]
+        # annotationを使う
+        for var_name, var_type in ResultPlayerInfo.__annotations__.items():
+            schema.append(
+                (var_name,
+                 self.sql_creator.get_sqltype_from_pytype(var_type))
+            )
+        foreign_keys = ["race_id", "waku_id"]
+        refs = ["race_result_tb", "program_tb"]
+        super().run_create_table(
+            tb_name,
+            schema,
+            foreign_keys,
+            refs
+        )
 
 
-class OddsTableCreator(metaclass=ABCMeta):
+class OddsTableCreator:
 
-    @ abstractmethod
     def create_threerentan_table(self):
         """3連単情報"""
         pass
 
-    @ abstractmethod
     def create_threefuku_table(self):
         """3連複情報"""
         pass
 
-    @ abstractmethod
     def create_tworentan_table(self):
         """2連単情報"""
         pass
 
-    @ abstractmethod
     def create_twofuku_table(self):
         """2連複情報"""
         pass
 
-    @ abstractmethod
     def create_tansho_table(self):
         """単勝情報"""
         pass

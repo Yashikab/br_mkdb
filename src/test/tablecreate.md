@@ -3,10 +3,10 @@
 - [x] jyomaster
 - [x] jyodata
 - [x] raceinfo_common
-- [ ] raceinfo_player
-- [ ] chokuzeninfo_common
-- [ ] chokuzeninfo_player
-- [ ] resultinfo_common
+- [x] raceinfo_player
+- [x] chokuzeninfo_common
+- [x] chokuzeninfo_player
+- [x] resultinfo_common
 - [ ] resultinfo_player
 - [ ] odds_three_rentan
 - [ ] odds_three_renfuku
