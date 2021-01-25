@@ -5,17 +5,14 @@ master2sqlモジュール用単体テスト
 """
 import pytest
 
-from domain.model.info import (
-    ChokuzenPlayerInfo, ProgramCommonInfo,
-    ProgramPlayerInfo, ResultCommonInfo, ResultPlayerInfo, WeatherInfo
-)
+from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
+                               ProgramPlayerInfo, ResultCommonInfo,
+                               ResultPlayerInfo, Tansho, ThreeRenfuku,
+                               ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
+from domain.tablecreator import (ChokuzenTableCreator, JyoDataTableCreator,
+                                 JyoMasterTableCreator, OddsTableCreator,
+                                 RaceInfoTableCreator, ResultTableCreator)
 from infrastructure.mysql import MysqlExecuter
-from domain.tablecreator import (
-    ChokuzenTableCreator,
-    JyoDataTableCreator,
-    JyoMasterTableCreator,
-    RaceInfoTableCreator, ResultTableCreator
-)
 
 from .common import CommonMethod
 
@@ -128,6 +125,38 @@ class TestResultInfoTableCreator(CommonMethod):
         ('p_result_tb', rp_col_set)
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
+        # カラム名の一致でテスト
+        get_set = super().get_columns(tb_name)
+        assert get_set == col_set
+
+
+@pytest.mark.run(ordre=6)
+class TestOdds2sql(CommonMethod):
+
+    @pytest.fixture(scope='class', autouse=True)
+    def insertdata(self):
+        oddsct = OddsTableCreator(MysqlExecuter)
+        oddsct.create_threerentan_table()
+        oddsct.create_threefuku_table()
+        oddsct.create_tworentan_table()
+        oddsct.create_twofuku_table()
+        oddsct.create_tansho_table()
+
+    key_set = {'race_id'}
+    three_rentan_key = key_set.union(set(ThreeRentan.__annotations__.keys()))
+    three_renfuku_key = key_set.union(set(ThreeRenfuku.__annotations__.keys()))
+    two_rentan_key = key_set.union(set(TwoRentan.__annotations__.keys()))
+    two_renfuku_key = key_set.union(set(TwoRenfuku.__annotations__.keys()))
+    one_rentan_key = key_set.union(set(Tansho.__annotations__.keys()))
+
+    @pytest.mark.parametrize("tb_name, col_set", [
+        ('odds_3tan_tb', three_rentan_key),
+        ('odds_3fuku_tb', three_renfuku_key),
+        ('odds_2tan_tb', two_rentan_key),
+        ('odds_2fuku_tb', two_renfuku_key),
+        ('odds_1tan_tb', one_rentan_key)
+    ])
+    def test_exist_odds_table(self, tb_name, col_set):
         # カラム名の一致でテスト
         get_set = super().get_columns(tb_name)
         assert get_set == col_set

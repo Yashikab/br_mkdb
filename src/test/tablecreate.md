@@ -7,7 +7,7 @@
 - [x] chokuzeninfo_common
 - [x] chokuzeninfo_player
 - [x] resultinfo_common
-- [ ] resultinfo_player
+- [x] resultinfo_player
 - [ ] odds_three_rentan
 - [ ] odds_three_renfuku
 - [ ] odds_two_rentan

@@ -1,8 +1,9 @@
 # テーブル作成用ドメイン
-from domain.model.info import (
-    ChokuzenPlayerInfo, ProgramCommonInfo,
-    ProgramPlayerInfo, ResultCommonInfo, ResultPlayerInfo, WeatherInfo,
-)
+from typing import List, Tuple
+import copy
+from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
+                               ProgramPlayerInfo, ResultCommonInfo,
+                               ResultPlayerInfo, Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
 from domain.sql import SqlCreator, SqlExecuter
 
 # TODO クラスごと外部キーで依存してていいのか？
@@ -203,24 +204,85 @@ class ResultTableCreator(TableCreator):
         )
 
 
-class OddsTableCreator:
+class OddsTableCreator(TableCreator):
+    __ids: Tuple[str]
+    __foreign_keys: List[str]
+    __refs: List[str]
+
+    def __init__(self, sql_executer: SqlExecuter):
+        super().__init__(sql_executer)
+        self.__ids = [("race_id", "BIGINT", "PRIMARY KEY")]
+        self.__foreign_keys = ["race_id"]
+        self.__refs = ["raceinfo_tb"]
 
     def create_threerentan_table(self):
         """3連単情報"""
-        pass
+        tb_name = "odds_3tan_tb"
+        schema = copy.deepcopy(self.__ids)
+        for var_name, var_type in ThreeRentan.__annotations__.items():
+            schema.append(
+                (var_name, self.sql_creator.get_sqltype_from_pytype(var_type)))
+
+        super().run_create_table(
+            tb_name,
+            schema,
+            self.__foreign_keys,
+            self.__refs
+        )
 
     def create_threefuku_table(self):
         """3連複情報"""
-        pass
+        tb_name = "odds_3fuku_tb"
+        schema = copy.deepcopy(self.__ids)
+        for var_name, var_type in ThreeRenfuku.__annotations__.items():
+            schema.append(
+                (var_name, self.sql_creator.get_sqltype_from_pytype(var_type)))
+        print(schema)
+        super().run_create_table(
+            tb_name,
+            schema,
+            self.__foreign_keys,
+            self.__refs
+        )
 
     def create_tworentan_table(self):
         """2連単情報"""
-        pass
+        tb_name = "odds_2tan_tb"
+        schema = copy.deepcopy(self.__ids)
+        for var_name, var_type in TwoRentan.__annotations__.items():
+            schema.append(
+                (var_name, self.sql_creator.get_sqltype_from_pytype(var_type)))
+        super().run_create_table(
+            tb_name,
+            schema,
+            self.__foreign_keys,
+            self.__refs
+        )
 
     def create_twofuku_table(self):
         """2連複情報"""
-        pass
+        tb_name = "odds_2fuku_tb"
+        schema = copy.deepcopy(self.__ids)
+        for var_name, var_type in TwoRenfuku.__annotations__.items():
+            schema.append(
+                (var_name, self.sql_creator.get_sqltype_from_pytype(var_type)))
+        super().run_create_table(
+            tb_name,
+            schema,
+            self.__foreign_keys,
+            self.__refs
+        )
 
     def create_tansho_table(self):
         """単勝情報"""
-        pass
+        tb_name = "odds_1tan_tb"
+        schema = copy.deepcopy(self.__ids)
+        for var_name, var_type in Tansho.__annotations__.items():
+            schema.append(
+                (var_name, self.sql_creator.get_sqltype_from_pytype(var_type)))
+        super().run_create_table(
+            tb_name,
+            schema,
+            self.__foreign_keys,
+            self.__refs
+        )
