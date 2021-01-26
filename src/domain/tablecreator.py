@@ -1,12 +1,12 @@
 # テーブル作成用ドメイン
-from typing import List, Tuple
 import copy
+from typing import List, Tuple
+
 from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ProgramPlayerInfo, ResultCommonInfo,
-                               ResultPlayerInfo, Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
+                               ResultPlayerInfo, Tansho, ThreeRenfuku,
+                               ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
 from domain.sql import SqlCreator, SqlExecuter
-
-# TODO クラスごと外部キーで依存してていいのか？
 
 
 class TableCreator:
