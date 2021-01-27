@@ -1,9 +1,12 @@
 import time
 from logging import getLogger
+from typing import List
 
 from application.argument import DBType, Options
 from domain.const import MAIN_LOGNAME
 from domain.dbcontroller import DatabaseController
+from domain.sql.executer import SqlExecuter
+from domain.tablecreator import create_table
 from module.dt2sql import (ChokuzenData2sql, JyoData2sql, Odds2sql,
                            RaceData2sql, ResultData2sql)
 from module.getdata import DateRange as dr
@@ -15,9 +18,13 @@ logger = getLogger(MAIN_LOGNAME)
 
 class BoatRaceUsecase:
     __dbctl: DatabaseController
+    __sql_executer: SqlExecuter
 
-    def __init__(self, dbctl: DatabaseController):
+    def __init__(self,
+                 dbctl: DatabaseController,
+                 sql_executer: SqlExecuter):
         self.__dbctl = dbctl
+        self.__sql_executer
 
     def run(self, op: Options):
         logger.info('Connect MySQL server.')
@@ -36,12 +43,7 @@ class BoatRaceUsecase:
 
         if op.create_table:
             logger.debug('Create table if it does not exist.')
-            jm2sql.create_table_if_not_exists()
-            jd2sql.create_table_if_not_exists()
-            rd2sql.create_table_if_not_exists()
-            cd2sql.create_table_if_not_exists()
-            res2sql.create_table_if_not_exists()
-            odds2sql.create_table_if_not_exists()
+            create_table(self.__sql_executer)
             logger.debug('Completed creating table.')
 
         for date in dr.daterange(op.start_date, op.end_date):

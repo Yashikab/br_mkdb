@@ -1,6 +1,7 @@
 # テーブル作成用ドメイン
 import copy
-from typing import List, Tuple
+from abc import ABCMeta, abstractmethod
+from typing import List, Optional, Tuple
 
 from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ProgramPlayerInfo, ResultCommonInfo,
@@ -9,13 +10,32 @@ from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
 from domain.sql import SqlCreator, SqlExecuter
 
 
-class TableCreator:
+def create_table(sql_executer) -> Optional[Exception]:
+    try:
+        table_creators = []
+        table_creators.append(JyoMasterTableCreator(sql_executer))
+        table_creators.append(JyoDataTableCreator(sql_executer))
+        table_creators.append(RaceInfoTableCreator(sql_executer))
+        table_creators.append(ChokuzenTableCreator(sql_executer))
+        table_creators.append(ResultTableCreator(sql_executer))
+        table_creators.append(OddsTableCreator(sql_executer))
+        for tc in table_creators:
+            tc.create_table()
+    except Exception as e:
+        return e
+
+
+class TableCreator(metaclass=ABCMeta):
     sql_executer: SqlExecuter
     sql_creator: SqlCreator
 
     def __init__(self, sql_executer: SqlExecuter):
         self.sql_executer = sql_executer
         self.sql_creator = SqlCreator()
+
+    @abstractmethod
+    def create_table(self) -> None:
+        raise NotImplementedError()
 
     def run_create_table(self,
                          tb_name,
@@ -29,6 +49,7 @@ class TableCreator:
 
 
 class JyoMasterTableCreator(TableCreator):
+    # TODO データ挿入までやる(fixされてるから)
 
     def create_table(self) -> None:
         tb_name = "jyo_master"
@@ -65,7 +86,12 @@ class JyoDataTableCreator(TableCreator):
 
 class RaceInfoTableCreator(TableCreator):
 
-    def create_commoninfo_table(self):
+    def create_table(self) -> None:
+        self._create_commoninfo_table()
+        self._create_playerinfo_table()
+        return None
+
+    def _create_commoninfo_table(self):
         """レース共通情報"""
         tb_name = "raceinfo_tb"
         schema = [
@@ -87,7 +113,7 @@ class RaceInfoTableCreator(TableCreator):
             refs
         )
 
-    def create_playerinfo_table(self):
+    def _create_playerinfo_table(self):
         """番組表情報"""
         tb_name = "program_tb"
         schema = [
@@ -112,7 +138,12 @@ class RaceInfoTableCreator(TableCreator):
 
 class ChokuzenTableCreator(TableCreator):
 
-    def create_commoninfo_table(self):
+    def create_table(self) -> None:
+        self._create_commoninfo_table()
+        self._create_playerinfo_table()
+        return None
+
+    def _create_commoninfo_table(self):
         """直前共通情報"""
         tb_name = "chokuzen_cond_tb"
         schema = [
@@ -134,7 +165,7 @@ class ChokuzenTableCreator(TableCreator):
             refs
         )
 
-    def create_playerinfo_table(self):
+    def _create_playerinfo_table(self):
         """直前選手情報"""
         tb_name = "chokuzen_player_tb"
         schema = [
@@ -159,7 +190,12 @@ class ChokuzenTableCreator(TableCreator):
 
 class ResultTableCreator(TableCreator):
 
-    def create_commoninfo_table(self):
+    def create_table(self) -> None:
+        self._create_commoninfo_table()
+        self._create_playerinfo_table()
+        return None
+
+    def _create_commoninfo_table(self):
         """結果共通情報"""
         tb_name = "race_result_tb"
         schema = [
@@ -181,7 +217,7 @@ class ResultTableCreator(TableCreator):
             refs
         )
 
-    def create_playerinfo_table(self):
+    def _create_playerinfo_table(self):
         """結果選手情報"""
         tb_name = "p_result_tb"
         schema = [
@@ -215,7 +251,16 @@ class OddsTableCreator(TableCreator):
         self.__foreign_keys = ["race_id"]
         self.__refs = ["raceinfo_tb"]
 
-    def create_threerentan_table(self):
+    def create_table(self) -> None:
+        self._create_threerentan_table()
+        self._create_threefuku_table()
+        self._create_tworentan_table()
+        self._create_twofuku_table()
+        self._create_tansho_table()
+
+        return None
+
+    def _create_threerentan_table(self):
         """3連単情報"""
         tb_name = "odds_3tan_tb"
         schema = copy.deepcopy(self.__ids)
@@ -230,7 +275,7 @@ class OddsTableCreator(TableCreator):
             self.__refs
         )
 
-    def create_threefuku_table(self):
+    def _create_threefuku_table(self):
         """3連複情報"""
         tb_name = "odds_3fuku_tb"
         schema = copy.deepcopy(self.__ids)
@@ -245,7 +290,7 @@ class OddsTableCreator(TableCreator):
             self.__refs
         )
 
-    def create_tworentan_table(self):
+    def _create_tworentan_table(self):
         """2連単情報"""
         tb_name = "odds_2tan_tb"
         schema = copy.deepcopy(self.__ids)
@@ -259,7 +304,7 @@ class OddsTableCreator(TableCreator):
             self.__refs
         )
 
-    def create_twofuku_table(self):
+    def _create_twofuku_table(self):
         """2連複情報"""
         tb_name = "odds_2fuku_tb"
         schema = copy.deepcopy(self.__ids)
@@ -273,7 +318,7 @@ class OddsTableCreator(TableCreator):
             self.__refs
         )
 
-    def create_tansho_table(self):
+    def _create_tansho_table(self):
         """単勝情報"""
         tb_name = "odds_1tan_tb"
         schema = copy.deepcopy(self.__ids)

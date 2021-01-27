@@ -57,8 +57,7 @@ class TestRaceInfoTableCreator(CommonMethod):
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
         rdtc = RaceInfoTableCreator(MysqlExecuter)
-        rdtc.create_commoninfo_table()
-        rdtc.create_playerinfo_table()
+        rdtc.create_table()
 
     ri_col_set = {'race_id', 'datejyo_id'}.union(
         set(ProgramCommonInfo.__annotations__.keys())
@@ -84,8 +83,7 @@ class TestChokuzenInfo2sql(CommonMethod):
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
         chokutc = ChokuzenTableCreator(MysqlExecuter)
-        chokutc.create_commoninfo_table()
-        chokutc.create_playerinfo_table()
+        chokutc.create_table()
 
     cc_col_set = {'race_id', 'datejyo_id'}.union(
         set(WeatherInfo.__annotations__.keys())
@@ -110,8 +108,7 @@ class TestResultInfoTableCreator(CommonMethod):
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
         restc = ResultTableCreator(MysqlExecuter)
-        restc.create_commoninfo_table()
-        restc.create_playerinfo_table()
+        restc.create_table()
 
     rr_col_set = {'race_id', 'datejyo_id'}.union(
         set(ResultCommonInfo.__annotations__.keys())
@@ -136,11 +133,7 @@ class TestOdds2sql(CommonMethod):
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
         oddsct = OddsTableCreator(MysqlExecuter)
-        oddsct.create_threerentan_table()
-        oddsct.create_threefuku_table()
-        oddsct.create_tworentan_table()
-        oddsct.create_twofuku_table()
-        oddsct.create_tansho_table()
+        oddsct.create_table()
 
     key_set = {'race_id'}
     three_rentan_key = key_set.union(set(ThreeRentan.__annotations__.keys()))
