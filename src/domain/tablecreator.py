@@ -1,8 +1,10 @@
 # テーブル作成用ドメイン
 import copy
 from abc import ABCMeta, abstractmethod
+from pathlib import Path
 from typing import List, Optional, Tuple
 
+import pandas as pd
 from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ProgramPlayerInfo, ResultCommonInfo,
                                ResultPlayerInfo, Tansho, ThreeRenfuku,
@@ -49,7 +51,6 @@ class TableCreator(metaclass=ABCMeta):
 
 
 class JyoMasterTableCreator(TableCreator):
-    # TODO データ挿入までやる(fixされてるから)
 
     def create_table(self) -> None:
         tb_name = "jyo_master"
@@ -58,6 +59,19 @@ class JyoMasterTableCreator(TableCreator):
             ("jyo_cd", "INT", "PRIMARY KEY")
         ]
         super().run_create_table(tb_name, schema)
+        sql = f"INSERT IGNORE INTO {tb_name} VALUES"
+        insert_value = ', '.join([
+            val for val in self._csv2rows_generator()])
+        query = ' '.join([sql, insert_value])
+        self.sql_executer.run_query(query)
+
+    def _csv2rows_generator(self):
+        csv_filepath = Path(__file__).parent\
+                                     .joinpath("jyo_master.csv")\
+                                     .resolve()
+        jyomaster_df = pd.read_csv(csv_filepath, header=0)
+        for name, cd in zip(jyomaster_df.jyo_name, jyomaster_df.jyo_cd):
+            yield f"(\"{name}\", {cd})"
 
 
 class JyoDataTableCreator(TableCreator):

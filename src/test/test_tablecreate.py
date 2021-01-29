@@ -33,6 +33,16 @@ class TestJyoMasterTableCreator(CommonMethod):
         # カラム名確認
         assert get_set == expected_set
 
+    def test_inserteddata(self):
+        res_tpl = super().get_targetdata(
+            tb_name=self.__table_name,
+            id_name='jyo_cd',
+            target_id=1,
+            col_list=['jyo_name', 'jyo_cd']
+        )
+        expected_tpl = ('桐生', 1)
+        assert res_tpl == expected_tpl
+
 
 @pytest.mark.run(order=2)
 class TestJyoDataTableCreator(CommonMethod):
