@@ -1,16 +1,18 @@
+import logging
 import os
 import sys
 
-sys.path.append('/home/contuser1/project/module')
-
-import logging
-
-import const
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from IPython.display import HTML, display
 from tqdm import tqdm
+
+import const
+
+sys.path.append('/home/contuser1/project/module')
+
+
 
 plt.style.use(['fivethirtyeight'])
 

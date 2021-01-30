@@ -5,7 +5,6 @@ HTMLから情報をスクレイピングするためのモジュール
 """
 import re
 import sys
-from dataclasses import asdict
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
@@ -15,6 +14,7 @@ import bs4
 import numpy as np
 import pandas as pd
 
+from dataclasses import asdict
 from domain import const
 from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ProgramPlayerInfo, ResultCommonInfo,

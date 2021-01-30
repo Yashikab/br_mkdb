@@ -6,7 +6,6 @@ HTMLから情報をスクレイピングするためのモジュール
 import re
 import sys
 import time
-from dataclasses import asdict
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
@@ -17,6 +16,7 @@ import lxml.html as lxml
 import numpy as np
 import pandas as pd
 
+from dataclasses import asdict
 from domain import const
 from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
                                TwoRentan)

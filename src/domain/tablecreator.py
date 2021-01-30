@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 import pandas as pd
+
 from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ProgramPlayerInfo, ResultCommonInfo,
                                ResultPlayerInfo, Tansho, ThreeRenfuku,

@@ -10,7 +10,6 @@ from domain.tablecreator import create_table
 from module.dt2sql import (ChokuzenData2sql, JyoData2sql, Odds2sql,
                            RaceData2sql, ResultData2sql)
 from module.getdata import DateRange as dr
-from module.master2sql import JyoMaster2sql
 
 # logger
 logger = getLogger(MAIN_LOGNAME)
@@ -24,7 +23,7 @@ class BoatRaceUsecase:
                  dbctl: DatabaseController,
                  sql_executer: SqlExecuter):
         self.__dbctl = dbctl
-        self.__sql_executer
+        self.__sql_executer = sql_executer
 
     def run(self, op: Options):
         logger.info('Connect MySQL server.')
@@ -33,7 +32,6 @@ class BoatRaceUsecase:
 
         logger.info(f'Table Creating: {op.create_table}')
         logger.debug('load classes from dt2sql')
-        jm2sql = JyoMaster2sql()
         jd2sql = JyoData2sql()
         rd2sql = RaceData2sql()
         cd2sql = ChokuzenData2sql()
@@ -81,9 +79,13 @@ class BoatRaceUsecase:
     @classmethod
     def localmysql(cls):
         from infrastructure.dbcontroller import LocalSqlController
-        return BoatRaceUsecase(LocalSqlController())
+        from infrastructure.mysql import MysqlExecuter
+        return BoatRaceUsecase(LocalSqlController(),
+                               MysqlExecuter())
 
     @classmethod
     def gcpmysql(cls):
         from infrastructure.dbcontroller import CloudSqlController
-        return BoatRaceUsecase(CloudSqlController())
+        from infrastructure.mysql import MysqlExecuter
+        return BoatRaceUsecase(CloudSqlController(),
+                               MysqlExecuter())
