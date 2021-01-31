@@ -8,6 +8,7 @@ import pytest
 from module.dt2sql import ResultData2sql
 
 from ..common import CommonMethod
+from domain.model.info import ResultCommonInfo, ResultPlayerInfo
 
 
 @pytest.mark.run(order=5)
@@ -26,15 +27,11 @@ class TestResult2sql(CommonMethod):
                 self.__jyo_cd: range(self.__race_no, self.__race_no+1)},
         )
 
-    rr_col_set = {'race_id', 'datejyo_id', 'temp', 'weather', 'wind_v',
-                  'w_temp', 'wave', 'wind_dr',
-                  'henkantei_list', 'is_henkan', 'kimarite',
-                  'biko', 'payout_3tan', 'popular_3tan',
-                  'payout_3fuku', 'popular_3fuku',
-                  'payout_2tan', 'popular_2tan',
-                  'payout_2fuku', 'popular_2fuku', 'payout_1tan'}
-    rp_col_set = {'waku_id', 'race_id', 'rank', 'p_name',
-                  'p_id', 'p_racetime', 'p_course', 'p_st_time'}
+    rr_col_set = {'race_id', 'datejyo_id'}.union(
+        set(ResultCommonInfo.__annotations__.keys())
+    )
+    rp_col_set = {'waku_id', 'race_id'}.union(
+        set(ResultPlayerInfo.__annotations__.keys()))
 
     race_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}"
     race_col_list = ["race_id", "temp", "kimarite", "biko",
@@ -49,7 +46,7 @@ class TestResult2sql(CommonMethod):
     )
     # 5号艇を見る
     waku_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}5"
-    waku_col_list = ["waku_id", "p_rank", "p_racetime", "p_st_time"]
+    waku_col_list = ["waku_id", "rank", "racetime", "st_time"]
     waku_ex = (
         int(waku_id),
         -1,
@@ -57,9 +54,9 @@ class TestResult2sql(CommonMethod):
         0.11
     )
 
-    @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
+    @ pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
         ("race_result_tb", "race_id", race_id, race_col_list, race_expected),
-        ("p_result_tb", "waku_id", waku_id, waku_col_list, waku_ex)
+        ("player_result_tb", "waku_id", waku_id, waku_col_list, waku_ex)
     ])
     def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
         res_tpl = super().get_targetdata(

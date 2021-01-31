@@ -8,6 +8,7 @@ import pytest
 from module.dt2sql import ChokuzenData2sql
 
 from ..common import CommonMethod
+from domain.model.info import WeatherInfo, ChokuzenPlayerInfo
 
 WAIT = 0.5
 
@@ -28,13 +29,12 @@ class TestChokuzenInfo2sql(CommonMethod):
                 self.__jyo_cd: range(self.__race_no, self.__race_no+1)},
         )
 
-    cc_col_set = {'race_id', 'datejyo_id',
-                  'temp', 'weather', 'wind_v',
-                  'w_temp', 'wave', 'wind_dr'}
-    cp_col_set = {'waku_id', 'race_id', 'p_name',
-                  'p_weight', 'p_chosei_weight',
-                  'p_tenji_time', 'p_tilt',
-                  'p_tenji_course', 'p_tenji_st'}
+    cc_col_set = {'race_id', 'datejyo_id'}.union(
+        set(WeatherInfo.__annotations__.keys())
+    )
+    cp_col_set = {'waku_id', 'race_id'}.union(
+        set(ChokuzenPlayerInfo.__annotations__.keys())
+    )
 
     race_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}"
     cond_col_list = ["race_id", "temp", "weather", "wave"]
@@ -45,8 +45,8 @@ class TestChokuzenInfo2sql(CommonMethod):
         5
     )
     waku_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}1"
-    waku_col_list = ["waku_id", "p_chosei_weight", "p_tenji_time",
-                     "p_tilt", "p_tenji_course", "p_tenji_st"]
+    waku_col_list = ["waku_id", "chosei_weight", "tenji_time",
+                     "tilt", "tenji_course", "tenji_st"]
     waku_ex = (
         int(waku_id),
         0.0,

@@ -234,7 +234,7 @@ class ResultTableCreator(TableCreator):
 
     def _create_playerinfo_table(self):
         """結果選手情報"""
-        tb_name = "p_result_tb"
+        tb_name = "player_result_tb"
         schema = [
             ("waku_id", "BIGINT", "PRIMARY KEY"),
             ("race_id", "BIGINT"),

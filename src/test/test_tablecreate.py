@@ -129,7 +129,7 @@ class TestResultInfoTableCreator(CommonMethod):
 
     @ pytest.mark.parametrize("tb_name, col_set", [
         ('race_result_tb', rr_col_set),
-        ('p_result_tb', rp_col_set)
+        ('player_result_tb', rp_col_set)
     ])
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト

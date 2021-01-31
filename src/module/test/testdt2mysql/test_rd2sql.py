@@ -8,6 +8,7 @@ import pytest
 from module.dt2sql import RaceData2sql
 
 from ..common import CommonMethod
+from domain.model.info import ProgramCommonInfo, ProgramPlayerInfo
 
 
 @pytest.mark.run(order=3)
@@ -27,17 +28,12 @@ class TestRaceInfo2sql(CommonMethod):
                 self.__jyo_cd: range(self.__race_no, self.__race_no+1)},
         )
 
-    ri_col_set = {'race_id', 'datejyo_id', 'taikai_name',
-                  'grade', 'race_type', 'race_kyori',
-                  'is_antei', 'is_shinnyukotei'}
-    pr_col_set = {'waku_id', 'race_id',
-                  'p_name', 'p_id', 'p_level', 'p_home',
-                  'p_birthplace', 'p_age', 'p_weight',
-                  'p_num_f', 'p_num_l', 'p_avg_st',
-                  'p_all_1rate', 'p_all_2rate', 'p_all_3rate',
-                  'p_local_1rate', 'p_local_2rate', 'p_local_3rate',
-                  'motor_no', 'motor_2rate', 'motor_3rate',
-                  'boat_no', 'boat_2rate', 'boat_3rate'}
+    ri_col_set = {'race_id', 'datejyo_id'}.union(
+        set(ProgramCommonInfo.__annotations__.keys()))
+
+    pr_col_set = {'waku_id', 'race_id'}.union(
+        set(ProgramPlayerInfo.__annotations__.keys())
+    )
 
     race_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}"
     race_col_list = ["race_id", "grade", "race_kyori"]
@@ -47,7 +43,7 @@ class TestRaceInfo2sql(CommonMethod):
         1800
     )
     waku_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}1"
-    waku_col_list = ["waku_id", "p_id", "p_all_1rate", "boat_2rate"]
+    waku_col_list = ["waku_id", "id", "all_1rate", "boat_2rate"]
     waku_expected = (
         int(waku_id),
         4713,
@@ -55,7 +51,7 @@ class TestRaceInfo2sql(CommonMethod):
         18.18
     )
 
-    @pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
+    @ pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
         ("raceinfo_tb", "race_id", race_id, race_col_list, race_expected),
         ("program_tb", "waku_id", waku_id, waku_col_list, waku_expected)
     ])

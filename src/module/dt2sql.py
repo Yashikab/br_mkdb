@@ -8,7 +8,6 @@
 import sys
 from abc import ABCMeta, abstractmethod
 from logging import getLogger
-# from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List
 
@@ -331,7 +330,7 @@ class ResultData2sql(Data2MysqlTemplate):
         super().__init__(
             filename_list=['create_raceresult_tb.sql',
                            'create_playerresult_tb.sql'],
-            table_name_list=['race_result_tb', 'p_result_tb'],
+            table_name_list=['race_result_tb', 'player_result_tb'],
             target_cls=OfficialResults)
 
 
@@ -344,11 +343,6 @@ class Odds2sql(Data2MysqlTemplate):
                                'odds_2tan_tb',
                                "odds_2fuku_tb",
                                "odds_1tan_tb"]
-        self.__key_value_list = [ThreeRentan.__annotations__.keys(),
-                                 ThreeRenfuku.__annotations__.keys(),
-                                 TwoRentan.__annotations__.keys(),
-                                 TwoRenfuku.__annotations__.keys(),
-                                 Tansho.__annotations__.keys()]
 
     def insert2table(self,
                      date: int,
