@@ -19,16 +19,7 @@ class TestJyoData2sql(CommonMethod):
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
-        self.__jd2sql.create_table_if_not_exists()
         self.__jd2sql.insert2table(date=self.__target_date)
-
-    def test_exist_table(self):
-        # カラム名の一致でテスト
-        get_set = super().get_columns('holdjyo_tb')
-
-        expected_set = {'datejyo_id', 'holddate', 'jyo_cd',
-                        'jyo_name', 'shinko', 'ed_race_no'}
-        assert get_set == expected_set
 
     def test_insert2table(self):
         # idの情報を一つ取ってきて調べる

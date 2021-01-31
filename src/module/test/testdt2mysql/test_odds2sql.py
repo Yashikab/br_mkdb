@@ -25,7 +25,6 @@ class TestOdds2sql(CommonMethod):
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
         __od2sql = Odds2sql()
-        __od2sql.create_table_if_not_exists()
         __od2sql.insert2table(
             self.__target_date,
             [self.__jyo_cd],
@@ -37,18 +36,6 @@ class TestOdds2sql(CommonMethod):
     two_rentan_key = key_set.union(set(TwoRentan.__annotations__.keys()))
     two_renfuku_key = key_set.union(set(TwoRenfuku.__annotations__.keys()))
     one_rentan_key = key_set.union(set(Tansho.__annotations__.keys()))
-
-    @pytest.mark.parametrize("tb_name, col_set", [
-        ('odds_3tan_tb', three_rentan_key),
-        ('odds_3fuku_tb', three_renfuku_key),
-        ('odds_2tan_tb', two_rentan_key),
-        ('odds_2fuku_tb', two_renfuku_key),
-        ('odds_1tan_tb', one_rentan_key)
-    ])
-    def test_exist_table_raceinfo(self, tb_name, col_set):
-        # カラム名の一致でテスト
-        get_set = super().get_columns(tb_name)
-        assert get_set == col_set
 
     race_id = int(f"{__target_date}{__jyo_cd:02}{__race_no:02}")
     three_tan_col_list = ["race_id", "`comb_123`", "`comb_456`", "`comb_654`"]

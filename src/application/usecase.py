@@ -1,6 +1,5 @@
 import time
 from logging import getLogger
-from typing import List
 
 from application.argument import DBType, Options
 from domain.const import MAIN_LOGNAME

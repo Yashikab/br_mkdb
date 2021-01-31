@@ -24,12 +24,6 @@ from module.getdata_lxml import (GetHoldPlacePast, OfficialChokuzen,
 
 
 class Data2sqlAbstract(metaclass=ABCMeta):
-    @abstractmethod
-    def create_table_if_not_exists(self):
-        '''
-        テーブルがなければ作成する
-        '''
-        pass
 
     @abstractmethod
     def insert2table(self):
@@ -50,10 +44,6 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         self.__filename_list = filename_list
         self.__tb_name_list = table_name_list
         self.target_cls = target_cls
-
-    def create_table_if_not_exists(self) -> None:
-        self._run_query_from_paths(self.__filename_list)
-        return None
 
     def insert2table(self,
                      date: int,
@@ -177,37 +167,6 @@ class Data2MysqlTemplate(Data2sqlAbstract):
     def create_insert_prefix(self, tb_name: str) -> str:
         """挿入句用のテーブル指定部までを作成する"""
         return f"INSERT IGNORE INTO {tb_name} VALUES"
-
-    def _run_query_from_paths(self, filename_list: list) -> None:
-        """
-        queryフォルダ内のファイル名を指定してクエリを実行する
-        ファイル名はリストで受取，複数のテーブルを一気に作る
-
-        Parameters
-        ----------
-            filename_list : list
-                クエリのファイル名のリスト
-
-        Returns
-        -------
-            status : int
-                成功したら0，失敗したら1
-        """
-        query_list = []
-        for filename in filename_list:
-            # パスの指定
-            query_filepath = \
-                Path(__file__).parent\
-                              .joinpath('query', filename)\
-                              .resolve()
-            self.logger.debug(f'run query from {query_filepath}')
-            with open(query_filepath, 'r') as f:
-                query_list.append(f.read())
-        query = '\n'.join(query_list)
-        self.logger.debug(f'{query}')
-        self.run_query(query)
-
-        return None
 
     def _info2query_col(self,
                         id_list: list,
@@ -391,24 +350,6 @@ class Odds2sql(Data2MysqlTemplate):
                                  TwoRenfuku.__annotations__.keys(),
                                  Tansho.__annotations__.keys()]
 
-    # オーバーライド
-    def create_table_if_not_exists(self):
-        zip_list = zip(self.__tb_name_list, self.__key_value_list)
-        query_list = []
-        for tb_name, keylist in zip_list:
-            insert_cols_list = ["race_id BIGINT PRIMARY KEY"]
-            for key_name in keylist:
-                col_name = f"`{key_name}` FLOAT"
-                insert_cols_list.append(col_name)
-            insert_cols_list.append(
-                "FOREIGN KEY (race_id) REFERENCES raceinfo_tb (race_id)")
-            insert_cols = ", ".join(insert_cols_list)
-            query = f"CREATE TABLE {tb_name} ({insert_cols})"\
-                    f"CHARACTER SET utf8;"
-            query_list.append(query)
-        all_query = "\n".join(query_list)
-        super().run_query(all_query)
-
     def insert2table(self,
                      date: int,
                      jyo_cd_list: List[int],
@@ -439,8 +380,8 @@ class Odds2sql(Data2MysqlTemplate):
                             super()._info2query_col(
                                 [race_id],
                                 content
-                                )
                             )
+                        )
                     except Exception as e:
                         self.logger.error(
                             f'args: {date}, {jyo_cd}, {race_no} error: {e}')

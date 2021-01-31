@@ -20,7 +20,6 @@ class TestRaceInfo2sql(CommonMethod):
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
-        self.__rd2sql.create_table_if_not_exists()
         self.__rd2sql.insert2table(
             date=self.__target_date,
             jyo_cd_list=[self.__jyo_cd],
@@ -39,15 +38,6 @@ class TestRaceInfo2sql(CommonMethod):
                   'p_local_1rate', 'p_local_2rate', 'p_local_3rate',
                   'motor_no', 'motor_2rate', 'motor_3rate',
                   'boat_no', 'boat_2rate', 'boat_3rate'}
-
-    @pytest.mark.parametrize("tb_name, col_set", [
-        ('raceinfo_tb', ri_col_set),
-        ('program_tb', pr_col_set)
-    ])
-    def test_exist_table_raceinfo(self, tb_name, col_set):
-        # カラム名の一致でテスト
-        get_set = super().get_columns(tb_name)
-        assert get_set == col_set
 
     race_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}"
     race_col_list = ["race_id", "grade", "race_kyori"]

@@ -21,7 +21,6 @@ class TestChokuzenInfo2sql(CommonMethod):
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
-        self.__ci2sql.create_table_if_not_exists()
         self.__ci2sql.insert2table(
             date=self.__target_date,
             jyo_cd_list=[self.__jyo_cd],
@@ -36,15 +35,6 @@ class TestChokuzenInfo2sql(CommonMethod):
                   'p_weight', 'p_chosei_weight',
                   'p_tenji_time', 'p_tilt',
                   'p_tenji_course', 'p_tenji_st'}
-
-    @pytest.mark.parametrize("tb_name, col_set", [
-        ('chokuzen_cond_tb', cc_col_set),
-        ('chokuzen_player_tb', cp_col_set)
-    ])
-    def test_exist_table_raceinfo(self, tb_name, col_set):
-        # カラム名の一致でテスト
-        get_set = super().get_columns(tb_name)
-        assert get_set == col_set
 
     race_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}"
     cond_col_list = ["race_id", "temp", "weather", "wave"]

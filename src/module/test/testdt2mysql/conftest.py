@@ -8,9 +8,12 @@ import os
 import pytest
 
 from infrastructure.dbcontroller import LocalSqlController
-
+from domain.tablecreator import create_table
+from infrastructure.mysql import MysqlExecuter
 
 # 場コードマスタだけ最初に入れておく
+
+
 @pytest.fixture(scope="session", autouse=True)
 def prepare():
     # 環境変数でmysqlの接続先を入れ替える
@@ -24,3 +27,5 @@ def prepare():
         sql_ctl = LocalSqlController()
         sql_ctl.build()
         # データが消えるので落とさない
+
+    create_table(MysqlExecuter())
