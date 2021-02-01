@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Any, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 logger = getLogger(__name__)
 

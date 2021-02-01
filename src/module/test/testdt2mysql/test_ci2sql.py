@@ -5,10 +5,10 @@ chokuseninfoo2sqlテスト
 """
 import pytest
 
+from domain.model.info import ChokuzenPlayerInfo, WeatherInfo
 from module.dt2sql import ChokuzenData2sql
 
 from ..common import CommonMethod
-from domain.model.info import WeatherInfo, ChokuzenPlayerInfo
 
 WAIT = 0.5
 

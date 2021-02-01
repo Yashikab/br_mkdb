@@ -5,9 +5,7 @@ class DatabaseController(metaclass=ABCMeta):
     @abstractmethod
     def build(self):
         """build DB"""
-        pass
 
     @abstractmethod
     def clean(self):
         """del DB"""
-        pass

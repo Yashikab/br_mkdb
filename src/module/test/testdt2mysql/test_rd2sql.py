@@ -5,10 +5,10 @@ raceinfo2sqlテスト
 """
 import pytest
 
+from domain.model.info import ProgramCommonInfo, ProgramPlayerInfo
 from module.dt2sql import RaceData2sql
 
 from ..common import CommonMethod
-from domain.model.info import ProgramCommonInfo, ProgramPlayerInfo
 
 
 @pytest.mark.run(order=3)

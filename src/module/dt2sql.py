@@ -8,14 +8,11 @@
 import sys
 from abc import ABCMeta, abstractmethod
 from logging import getLogger
-from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 from tqdm import tqdm
 
 from domain import const
-from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
-                               TwoRentan)
 from module.connect import MysqlConnector
 from module.getdata_lxml import (GetHoldPlacePast, OfficialChokuzen,
                                  OfficialOdds, OfficialProgram,
@@ -29,7 +26,6 @@ class Data2sqlAbstract(metaclass=ABCMeta):
         '''
         データを挿入する
         '''
-        pass
 
 
 class Data2MysqlTemplate(Data2sqlAbstract):

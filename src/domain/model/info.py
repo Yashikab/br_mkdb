@@ -1,6 +1,6 @@
-from pydantic.dataclasses import dataclass
-
 from dataclasses import make_dataclass
+
+from pydantic.dataclasses import dataclass
 
 
 @dataclass

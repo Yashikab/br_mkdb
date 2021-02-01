@@ -7,8 +7,6 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any
 
-from bs4 import BeautifulSoup as bs
-
 from domain import const
 from module.connect import MysqlConnector
 

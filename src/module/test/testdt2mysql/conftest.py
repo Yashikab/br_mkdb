@@ -7,8 +7,8 @@ import os
 
 import pytest
 
-from infrastructure.dbcontroller import LocalSqlController
 from domain.tablecreator import create_table
+from infrastructure.dbcontroller import LocalSqlController
 from infrastructure.mysql import MysqlExecuter
 
 # 場コードマスタだけ最初に入れておく

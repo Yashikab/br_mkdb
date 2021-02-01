@@ -5,10 +5,10 @@ chokuseninfoo2sqlテスト
 """
 import pytest
 
+from domain.model.info import ResultCommonInfo, ResultPlayerInfo
 from module.dt2sql import ResultData2sql
 
 from ..common import CommonMethod
-from domain.model.info import ResultCommonInfo, ResultPlayerInfo
 
 
 @pytest.mark.run(order=5)
