@@ -4,9 +4,11 @@
 getdataモジュール用単体テスト
 """
 
-import pytest
-from module import getdata
 from datetime import datetime
+
+import pytest
+
+from module import getdata
 
 
 class TestDateList:

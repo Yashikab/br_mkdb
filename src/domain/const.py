@@ -2,6 +2,7 @@
 # coding: utf-8
 import os
 
+# TODO お前はインフラだ
 
 if os.getenv('MYSQL_ENV') == "TEST":
     MYSQL_CONFIG = {

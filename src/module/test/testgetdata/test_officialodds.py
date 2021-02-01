@@ -4,8 +4,10 @@
 getdataモジュール用単体テスト
 """
 import pytest
+
 from module.getdata import OfficialOdds
 from module.getter import GetParserContent
+
 from ..common import CommonMethod
 
 

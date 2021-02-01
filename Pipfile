@@ -8,6 +8,7 @@ flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
 pycodestyle = "*"
+autoflake = "*"
 
 [packages]
 beautifulsoup4 = "*"
@@ -22,6 +23,7 @@ cssselect = "*"
 tqdm = "*"
 pydantic = "*"
 autopep8 = "*"
+isort = "*"
 
 [requires]
 python_version = "3.7"

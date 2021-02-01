@@ -3,26 +3,21 @@
 """
 HTMLから情報をスクレイピングするためのモジュール
 """
+import re
+import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from logging import getLogger
 from pathlib import Path
-import re
-import sys
-import time
 from typing import Iterator
-from urllib.request import urlopen
 
 import lxml.html as lxml
 import numpy as np
 import pandas as pd
 
 from domain import const
-from domain.model.info import (
-    Tansho, ThreeRenfuku,
-    ThreeRentan, TwoRenfuku,
-    TwoRentan
-)
+from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
+                               TwoRentan)
 from module.getter import GetParserContent
 
 

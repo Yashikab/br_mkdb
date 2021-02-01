@@ -1,18 +1,14 @@
-from logging import getLogger
 import time
+from logging import getLogger
 
-from application.argument import Options, DBType
-from domain.dbctl import DatabaseController
+from application.argument import DBType, Options
 from domain.const import MAIN_LOGNAME
-from module.dt2sql import (
-    JyoData2sql,
-    RaceData2sql,
-    ChokuzenData2sql,
-    ResultData2sql,
-    Odds2sql
-)
+from domain.dbcontroller import DatabaseController
+from domain.sql.executer import SqlExecuter
+from domain.tablecreator import create_table
+from module.dt2sql import (ChokuzenData2sql, JyoData2sql, Odds2sql,
+                           RaceData2sql, ResultData2sql)
 from module.getdata import DateRange as dr
-from module.master2sql import JyoMaster2sql
 
 # logger
 logger = getLogger(MAIN_LOGNAME)
@@ -20,9 +16,13 @@ logger = getLogger(MAIN_LOGNAME)
 
 class BoatRaceUsecase:
     __dbctl: DatabaseController
+    __sql_executer: SqlExecuter
 
-    def __init__(self, dbctl: DatabaseController):
+    def __init__(self,
+                 dbctl: DatabaseController,
+                 sql_executer: SqlExecuter):
         self.__dbctl = dbctl
+        self.__sql_executer = sql_executer
 
     def run(self, op: Options):
         logger.info('Connect MySQL server.')
@@ -31,7 +31,6 @@ class BoatRaceUsecase:
 
         logger.info(f'Table Creating: {op.create_table}')
         logger.debug('load classes from dt2sql')
-        jm2sql = JyoMaster2sql()
         jd2sql = JyoData2sql()
         rd2sql = RaceData2sql()
         cd2sql = ChokuzenData2sql()
@@ -41,12 +40,7 @@ class BoatRaceUsecase:
 
         if op.create_table:
             logger.debug('Create table if it does not exist.')
-            jm2sql.create_table_if_not_exists()
-            jd2sql.create_table_if_not_exists()
-            rd2sql.create_table_if_not_exists()
-            cd2sql.create_table_if_not_exists()
-            res2sql.create_table_if_not_exists()
-            odds2sql.create_table_if_not_exists()
+            create_table(self.__sql_executer)
             logger.debug('Completed creating table.')
 
         for date in dr.daterange(op.start_date, op.end_date):
@@ -83,10 +77,14 @@ class BoatRaceUsecase:
 
     @classmethod
     def localmysql(cls):
-        from module.dbcontroller import LocalSqlController
-        return BoatRaceUsecase(LocalSqlController())
+        from infrastructure.dbcontroller import LocalSqlController
+        from infrastructure.mysql import MysqlExecuter
+        return BoatRaceUsecase(LocalSqlController(),
+                               MysqlExecuter())
 
     @classmethod
     def gcpmysql(cls):
-        from module.dbcontroller import CloudSqlController
-        return BoatRaceUsecase(CloudSqlController())
+        from infrastructure.dbcontroller import CloudSqlController
+        from infrastructure.mysql import MysqlExecuter
+        return BoatRaceUsecase(CloudSqlController(),
+                               MysqlExecuter())

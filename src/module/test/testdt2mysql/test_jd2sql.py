@@ -6,6 +6,7 @@ jyodata2sqlテスト
 import pytest
 
 from module.dt2sql import JyoData2sql
+
 from ..common import CommonMethod
 
 
@@ -18,16 +19,7 @@ class TestJyoData2sql(CommonMethod):
 
     @pytest.fixture(scope='class', autouse=True)
     def insertdata(self):
-        self.__jd2sql.create_table_if_not_exists()
         self.__jd2sql.insert2table(date=self.__target_date)
-
-    def test_exist_table(self):
-        # カラム名の一致でテスト
-        get_set = super().get_columns2set('holdjyo_tb')
-
-        expected_set = {'datejyo_id', 'holddate', 'jyo_cd',
-                        'jyo_name', 'shinko', 'ed_race_no'}
-        assert get_set == expected_set
 
     def test_insert2table(self):
         # idの情報を一つ取ってきて調べる
@@ -35,7 +27,7 @@ class TestJyoData2sql(CommonMethod):
         id_name = "datejyo_id"
         target_id = f"{self.__target_date}{self.__jyo_cd:02}"
         col_list = ["datejyo_id", "jyo_cd", "shinko", "ed_race_no"]
-        res_tpl = super().getdata2tuple(
+        res_tpl = super().get_targetdata(
             tb_name,
             id_name,
             target_id,

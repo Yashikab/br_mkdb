@@ -1,14 +1,18 @@
+import logging
 import os
 import sys
-sys.path.append('/home/contuser1/project/module')
 
-import logging
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
 import const
 import matplotlib.pyplot as plt
-from IPython.display import display, HTML
+import numpy as np
+import pandas as pd
+from IPython.display import HTML, display
+from tqdm import tqdm
+
+sys.path.append('/home/contuser1/project/module')
+
+
+
 plt.style.use(['fivethirtyeight'])
 
 # not use gpu
