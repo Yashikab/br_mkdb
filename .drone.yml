@@ -34,9 +34,10 @@ steps:
     # - gcloud config set project $PROJECT_ID
     # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
     # - make start_gdb
-    - pipenv install --system
-    - rp_pytest src/module/test/testdt2mysql
-    - rp_reviewdog src/
+#    - pipenv install --system
+    - poetry install
+    - poetry run rp_pytest src/
+    - poetry run rp_reviewdog src/
     # あとで外す
     - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
     - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "select * from odds_1tan_tb;"
