@@ -35,6 +35,7 @@ steps:
     # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
     # - make start_gdb
 #    - pipenv install --system
+    - pip install poetry
     - poetry install
     - poetry run rp_pytest src/
     - poetry run rp_reviewdog src/
