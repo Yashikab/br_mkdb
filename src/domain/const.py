@@ -1,7 +1,7 @@
 # python 3.7.5
 # coding: utf-8
-from logging import getLogger
 import os
+from logging import getLogger
 from pathlib import Path
 
 from dotenv import load_dotenv
