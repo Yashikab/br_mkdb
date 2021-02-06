@@ -1,11 +1,11 @@
-kind: pipeline
+ind: pipeline
 type: docker
 name: default
 
 steps:
 - name: reviewdog
   pull: always
-  image: yashikab/mydog:python
+  image: yashikab/mydog:python:w
   environment:
     PRIVATE_KEY:
       from_secret: github_pri_key
@@ -29,19 +29,11 @@ steps:
     MYSQL_ENV: TEST
   commands:
     - sleep 30
-    # - bash -c 'echo -E $${CREDENTIAL_KEY} > /tmp/credential.json'
-    # - gcloud auth activate-service-account --key-file /tmp/credential.json
-    # - gcloud config set project $PROJECT_ID
-    # - export MYSQL_PASSWORD=$(gcloud secrets versions access latest --secret="mysql-usr-pw")
-    # - make start_gdb
-#    - pipenv install --system
     - pip install poetry
     - poetry install
     - poetry run rp_pytest src/
     - poetry run rp_reviewdog src/
-    # あとで外す
     - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "show tables;"
-    - mysql -u test_boat_user -h testmysql --password=test_pw -D test_boat_db -e "select * from odds_1tan_tb;"
   when:
     event:
     - pull_request
@@ -54,7 +46,6 @@ services:
     MYSQL_DATABASE: test_boat_db
     MYSQL_USER: 'test_boat_user'
     MYSQL_PASSWORD: 'test_pw'
-    # command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --explicit_defaults_for_timestamp=true --skip-character-set-client-handshake --character-set-filesystem=utf8
 
 image_pull_secrets:
   - dockerconfig
