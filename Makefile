@@ -21,9 +21,3 @@ start_db: $(dbdocker)
 
 down_db: $(dbdocker)
 	docker-compose -f $(dbdocker) down
-
-start_gdb:
-	cd ./proxy && pipenv run bash start_gsql.sh
-
-down_gdb:
-	cd ./proxy && pipenv run bash down_gsql.sh
