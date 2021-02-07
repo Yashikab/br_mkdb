@@ -1,11 +1,11 @@
-ind: pipeline
+kind: pipeline
 type: docker
 name: default
 
 steps:
 - name: reviewdog
   pull: always
-  image: yashikab/mydog:python:w
+  image: yashikab/mydog:python
   environment:
     PRIVATE_KEY:
       from_secret: github_pri_key
