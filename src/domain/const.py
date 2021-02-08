@@ -1,6 +1,19 @@
 # python 3.7.5
 # coding: utf-8
 import os
+from logging import getLogger
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+logger = getLogger(__name__)
+
+env_filepath = Path(__file__).parents[2].absolute() / ".env"
+logger.debug(env_filepath)
+if env_filepath.exists:
+    logger.info("use dotenv to load")
+    load_dotenv(dotenv_path=env_filepath)
+
 
 # TODO お前はインフラだ
 

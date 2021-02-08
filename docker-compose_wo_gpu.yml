@@ -7,11 +7,11 @@ services:
       dockerfile: Dockerfile
     user: 1000:1000
     volumes:
-      # - sourse:/home/contuser1/src
-      # - /mnt/dataset/My Documents/Project/datasets/BoatRace/:/home/contuser1/data
+      - ./src:/home/contuser1/src
       - ./.jupyter:/home/contuser1/.jupyter  # import jupyter setting
-      - ./Pipfile:/home/contuser1/Pipfile
-      - ./Pipfile.lock:/home/contuser1/Pipfile.lock
+      - ./pyproject.toml:/home/contuser1/pyproject.toml
+      # - ./Pipfile:/home/contuser1/Pipfile
+      # - ./Pipfile.lock:/home/contuser1/Pipfile.lock
 
     working_dir: /home/contuser1
     env_file: .env
@@ -23,11 +23,8 @@ services:
     ports:
       - "8840:8840"
     command: bash -c "
-      pipenv install --system &&
+      pip install poetry &&
+      poetry install &&
+      poetry add ipykernel --dev &&
+      poetry run ipython kernel install --user --name=br-mkdb-kernel &&
       jupyter-lab --no-browser --port=8840 --ip=0.0.0.0 --allow-root --NotebookApp.password='sha1:408161a8c9a2:c3bc403dfe03f329997889dd5e8e06519f95b408'"
-volumes:
-  sourse:
-    driver_opts: 
-      type: none
-      device: /mnt/dataset/My Documents/Project/program/BoatRace/br_mkdb/src
-      o: bind

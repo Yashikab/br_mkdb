@@ -30,12 +30,12 @@ make stop
 make start_db
 ```
 
-## pipenvによる実行
+## poetryによる実行
 
 ```sh
-pipenv install
+poetry install
 # pythonの実行
-pipenv run python src/**/hogehoge.py
+poetry run python src/**/hogehoge.py
 # testの実行
-pipenv run pytest src/**/test/
+poetry run pytest src/**/test/
 ```
