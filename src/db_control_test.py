@@ -7,7 +7,7 @@ import argparse
 import time
 from logging import DEBUG, basicConfig, getLogger
 
-from domain.const import MODULE_LOG_NAME
+from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.dbcontroller import CloudSqlController, LocalSqlController
 
 # logger

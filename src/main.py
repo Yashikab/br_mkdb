@@ -10,8 +10,8 @@ import coloredlogs
 
 from application.argument import Options
 from application.usecase import BoatRaceUsecase
-from domain.const import (CL_FIELD_STYLES, CL_LEVEL_STYLES, DATE_FMT, FMT,
-                          MAIN_LOGNAME, MODULE_LOG_NAME)
+from infrastructure.const import (CL_FIELD_STYLES, CL_LEVEL_STYLES, DATE_FMT, FMT,
+                                  MAIN_LOGNAME, MODULE_LOG_NAME)
 from module.log import TqdmLoggingHandler
 
 if __name__ == '__main__':

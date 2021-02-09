@@ -12,7 +12,7 @@ from typing import Any, Callable, Dict, List
 
 from tqdm import tqdm
 
-from domain import const
+from infrastructure import const
 from module.connect import MysqlConnector
 from module.getdata_lxml import (GetHoldPlacePast, OfficialChokuzen,
                                  OfficialOdds, OfficialProgram,

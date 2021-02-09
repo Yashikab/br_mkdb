@@ -7,7 +7,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any
 
-from domain import const
+from infrastructure import const
 from module.connect import MysqlConnector
 
 

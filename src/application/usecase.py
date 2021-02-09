@@ -2,7 +2,7 @@ import time
 from logging import getLogger
 
 from application.argument import DBType, Options
-from domain.const import MAIN_LOGNAME
+from infrastructure.const import MAIN_LOGNAME
 from domain.dbcontroller import DatabaseController
 from domain.sql.executer import SqlExecuter
 from domain.tablecreator import create_table

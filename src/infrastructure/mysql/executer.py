@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from domain import const
+from infrastructure import const
 from domain.sql import SqlExecuter
 from infrastructure.connector import MysqlConnector
 

@@ -15,7 +15,7 @@ import lxml.html as lxml
 import numpy as np
 import pandas as pd
 
-from domain import const
+from infrastructure import const
 from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
                                TwoRentan)
 from module.getter import GetParserContent

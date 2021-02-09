@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from domain import const
+from infrastructure import const
 from module.dt2sql import Data2MysqlTemplate
 
 
