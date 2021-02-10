@@ -297,7 +297,6 @@ class OddsTableCreator(TableCreator):
         for var_name, var_type in ThreeRenfuku.__annotations__.items():
             schema.append(
                 (var_name, self.sql_creator.get_sqltype_from_pytype(var_type)))
-        print(schema)
         super().run_create_table(
             tb_name,
             schema,
