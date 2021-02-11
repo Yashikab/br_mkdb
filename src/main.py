@@ -12,7 +12,7 @@ from application.argument import Options
 from application.usecase import BoatRaceUsecase
 from infrastructure.const import (CL_FIELD_STYLES, CL_LEVEL_STYLES, DATE_FMT, FMT,
                                   MAIN_LOGNAME, MODULE_LOG_NAME)
-from module.log import TqdmLoggingHandler
+from infrastructure.log import TqdmLoggingHandler
 
 if __name__ == '__main__':
     # logging設定
