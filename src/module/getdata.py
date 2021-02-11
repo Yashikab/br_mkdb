@@ -20,7 +20,7 @@ from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ProgramPlayerInfo, ResultCommonInfo,
                                ResultPlayerInfo, Tansho, ThreeRenfuku,
                                ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
-from module.getter import GetParserContent
+from infrastructure.getter import GetParserContent
 
 
 class CommonMethods4Official:

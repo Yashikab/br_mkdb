@@ -18,7 +18,7 @@ import pandas as pd
 from infrastructure import const
 from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
                                TwoRentan)
-from module.getter import GetParserContent
+from infrastructure.getter import GetParserContent
 
 
 class CommonMethods4Official:
