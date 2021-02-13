@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from infrastructure import const
-from module.connect import MysqlConnector
+from infrastructure.connector import MysqlConnector
 
 
 class CommonMethod:
