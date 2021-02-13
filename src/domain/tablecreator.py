@@ -12,6 +12,8 @@ from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
 from domain.sql import SqlCreator, SqlExecuter
 
+# TODO : Run Create Tableはinfraに追いやる
+
 
 def create_table(sql_executer) -> Optional[Exception]:
     try:
