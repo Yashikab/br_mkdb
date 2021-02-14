@@ -5,8 +5,8 @@ getdataモジュール用単体テスト
 """
 import pytest
 
-from module.getdata import OfficialChokuzen
-from module.getter import GetParserContent
+from infrastructure.getter import GetParserContent
+from infrastructure.getdata import OfficialChokuzen
 
 from ..common import CommonMethod
 

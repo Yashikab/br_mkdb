@@ -12,6 +12,8 @@ from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
 from domain.sql import SqlCreator, SqlExecuter
 
+# TODO : Run Create Tableはinfraに追いやる
+
 
 def create_table(sql_executer) -> Optional[Exception]:
     try:
@@ -297,7 +299,6 @@ class OddsTableCreator(TableCreator):
         for var_name, var_type in ThreeRenfuku.__annotations__.items():
             schema.append(
                 (var_name, self.sql_creator.get_sqltype_from_pytype(var_type)))
-        print(schema)
         super().run_create_table(
             tb_name,
             schema,

@@ -6,7 +6,7 @@ raceinfo2sqlテスト
 import pytest
 
 from domain.model.info import ProgramCommonInfo, ProgramPlayerInfo
-from module.dt2sql import RaceData2sql
+from infrastructure.dt2sql import RaceData2sql
 
 from ..common import CommonMethod
 

@@ -8,7 +8,7 @@ from datetime import datetime
 
 import pytest
 
-from module import getdata
+from infrastructure import getdata
 
 
 class TestDateList:

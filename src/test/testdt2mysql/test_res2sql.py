@@ -6,7 +6,7 @@ chokuseninfoo2sqlテスト
 import pytest
 
 from domain.model.info import ResultCommonInfo, ResultPlayerInfo
-from module.dt2sql import ResultData2sql
+from infrastructure.dt2sql import ResultData2sql
 
 from ..common import CommonMethod
 

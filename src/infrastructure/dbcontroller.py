@@ -13,8 +13,8 @@ from stat import S_IXGRP, S_IXOTH, S_IXUSR
 
 import mysql.connector
 
-from domain.const import MODULE_LOG_NAME, MYSQL_CONFIG
 from domain.dbcontroller import DatabaseController
+from infrastructure.const import MODULE_LOG_NAME, MYSQL_CONFIG
 
 
 class Common:

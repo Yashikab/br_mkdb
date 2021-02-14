@@ -5,7 +5,7 @@ jyodata2sqlテスト
 """
 import pytest
 
-from module.dt2sql import JyoData2sql
+from infrastructure.dt2sql import JyoData2sql
 
 from ..common import CommonMethod
 

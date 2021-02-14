@@ -12,11 +12,11 @@ from typing import Any, Callable, Dict, List
 
 from tqdm import tqdm
 
-from domain import const
-from module.connect import MysqlConnector
-from module.getdata_lxml import (GetHoldPlacePast, OfficialChokuzen,
-                                 OfficialOdds, OfficialProgram,
-                                 OfficialResults)
+from infrastructure import const
+from infrastructure.connector import MysqlConnector
+from infrastructure.getdata_lxml import (GetHoldPlacePast, OfficialChokuzen,
+                                         OfficialOdds, OfficialProgram,
+                                         OfficialResults)
 
 
 class Data2sqlAbstract(metaclass=ABCMeta):

@@ -15,12 +15,12 @@ import bs4
 import numpy as np
 import pandas as pd
 
-from domain import const
 from domain.model.info import (ChokuzenPlayerInfo, ProgramCommonInfo,
                                ProgramPlayerInfo, ResultCommonInfo,
                                ResultPlayerInfo, Tansho, ThreeRenfuku,
                                ThreeRentan, TwoRenfuku, TwoRentan, WeatherInfo)
-from module.getter import GetParserContent
+from infrastructure import const
+from infrastructure.getter import GetParserContent
 
 
 class CommonMethods4Official:

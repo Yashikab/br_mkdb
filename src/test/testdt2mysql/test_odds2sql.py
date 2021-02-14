@@ -7,8 +7,8 @@ import pytest
 
 from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
                                TwoRentan)
-from module.dt2sql import Odds2sql
-from module.getdata_lxml import OfficialOdds
+from infrastructure.dt2sql import Odds2sql
+from infrastructure.getdata_lxml import OfficialOdds
 
 from ..common import CommonMethod
 
