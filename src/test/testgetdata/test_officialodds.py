@@ -6,7 +6,7 @@ getdataモジュール用単体テスト
 import pytest
 
 from infrastructure.getter import GetParserContent
-from module.getdata import OfficialOdds
+from infrastructure.getdata import OfficialOdds
 
 from ..common import CommonMethod
 

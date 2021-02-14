@@ -7,7 +7,7 @@ getdataモジュール用単体テスト
 import pytest
 
 from infrastructure.getter import GetParserContent
-from module.getdata import OfficialProgram
+from infrastructure.getdata import OfficialProgram
 
 from ..common import CommonMethod
 
