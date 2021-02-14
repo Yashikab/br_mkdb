@@ -1,7 +1,7 @@
 from logging import getLogger
 
-from infrastructure import const
 from domain.sql import SqlExecuter
+from infrastructure import const
 from infrastructure.connector import MysqlConnector
 
 logger = getLogger(__name__)
