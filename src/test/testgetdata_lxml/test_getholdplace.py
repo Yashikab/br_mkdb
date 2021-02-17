@@ -5,8 +5,8 @@ getdataモジュール用単体テスト
 """
 import pytest
 
-from infrastructure.getter import GetParserContent
 from infrastructure.getdata_lxml import GetHoldPlacePast
+from infrastructure.getter import GetParserContent
 
 from ..common import CommonMethod
 

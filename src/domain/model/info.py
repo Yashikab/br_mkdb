@@ -4,6 +4,14 @@ from pydantic.dataclasses import dataclass
 
 
 @dataclass
+class HoldRaceInfo:
+    jyo_name: str
+    jyo_cd: str
+    shinko: str  # 進行状況
+    ed_race_no: str  # 最終レース番号(中止とかに対応するため)
+
+
+@dataclass
 class ProgramPlayerInfo:
     """番組表記載の選手情報"""
 
