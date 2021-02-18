@@ -9,5 +9,5 @@ class RaceInfoFactory(metaclass=ABCMeta):
     """当日の開催情報を取得する"""
 
     @abstractmethod
-    def getdata(self, target_date: date) -> Iterator[HoldRaceInfo]:
+    def getinfo(self, target_date: date) -> Iterator[HoldRaceInfo]:
         raise NotImplementedError()

@@ -1,4 +1,5 @@
 from dataclasses import make_dataclass
+from typing import List
 
 from pydantic.dataclasses import dataclass
 
@@ -47,6 +48,12 @@ class ProgramCommonInfo:
     race_kyori: int
     is_antei: bool
     is_shinnyukotei: bool
+
+
+@dataclass
+class ProgramInfo:
+    common: ProgramCommonInfo
+    players: List[ProgramPlayerInfo]
 
 
 @dataclass
