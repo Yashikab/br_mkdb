@@ -78,6 +78,12 @@ class WeatherInfo:
 
 
 @dataclass
+class ChokuzenInfo:
+    common: WeatherInfo
+    players: List[ChokuzenPlayerInfo]
+
+
+@dataclass
 class ResultPlayerInfo:
     rank: int
     name: str
