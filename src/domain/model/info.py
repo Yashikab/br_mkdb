@@ -116,6 +116,12 @@ class ResultCommonInfo:
     payout_1tan: int
 
 
+@dataclass
+class ResultInfo:
+    common: ResultCommonInfo
+    players: ResultPlayerInfo
+
+
 # 連単キー生成
 def rentan_keylist(rank: int) -> list:
     """連単用キーのリストを返す.
