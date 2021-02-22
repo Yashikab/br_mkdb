@@ -16,6 +16,7 @@ cssselect = "^1.1.0"
 tqdm = "^4.56.0"
 pydantic = "^1.7.3"
 python-dotenv = "^0.15.0"
+docker-compose = "^1.28.4"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.4"
