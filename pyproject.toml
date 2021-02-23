@@ -16,6 +16,7 @@ cssselect = "^1.1.0"
 tqdm = "^4.56.0"
 pydantic = "^1.7.3"
 python-dotenv = "^0.15.0"
+docker-compose = "^1.28.4"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.4"
@@ -27,6 +28,7 @@ autopep8 = "^1.5.4"
 isort = "^5.7.0"
 pytest-mock = "^3.5.1"
 pytest-ordering = "^0.6"
+ipykernel = "^5.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
