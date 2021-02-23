@@ -197,3 +197,11 @@ TwoRenfuku = make_dataclass(
 )
 # pydanticに装着
 TwoRenfuku = dataclass(TwoRenfuku)
+
+
+class OddsInfo:
+    three_rentan: ThreeRentan
+    three_renfuku: ThreeRenfuku
+    two_rentan: TwoRentan
+    two_renfuku: TwoRenfuku
+    tansho: Tansho
