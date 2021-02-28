@@ -13,5 +13,5 @@ class ProgramInfoFactory(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def _get_raceinfo(self, target_date: date, race_no: int) -> ProgramInfo:
+    def _raceinfo(self, target_date: date, race_no: int) -> ProgramInfo:
         raise NotImplementedError()

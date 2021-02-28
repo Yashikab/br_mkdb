@@ -10,5 +10,5 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
     def getinfo(self, target_date: date) -> Iterator[ProgramInfo]:
         pass
 
-    def _get_raceinfo(self, target_date: date, race_no: int) -> ProgramInfo:
+    def _raceinfo(self, target_date: date, race_no: int) -> ProgramInfo:
         pass
