@@ -1,6 +1,15 @@
 from dataclasses import make_dataclass
+from typing import List
 
 from pydantic.dataclasses import dataclass
+
+
+@dataclass
+class HoldRaceInfo:
+    jyo_name: str
+    jyo_cd: str
+    shinko: str  # 進行状況
+    ed_race_no: str  # 最終レース番号(中止とかに対応するため)
 
 
 @dataclass
@@ -42,6 +51,12 @@ class ProgramCommonInfo:
 
 
 @dataclass
+class ProgramInfo:
+    common: ProgramCommonInfo
+    players: List[ProgramPlayerInfo]
+
+
+@dataclass
 class ChokuzenPlayerInfo:
     name: str
     weight: float
@@ -60,6 +75,12 @@ class WeatherInfo:
     w_temp: float
     wave: int
     wind_dr: int
+
+
+@dataclass
+class ChokuzenInfo:
+    common: WeatherInfo
+    players: List[ChokuzenPlayerInfo]
 
 
 @dataclass
@@ -93,6 +114,12 @@ class ResultCommonInfo:
     payout_2fuku: int
     popular_2fuku: int
     payout_1tan: int
+
+
+@dataclass
+class ResultInfo:
+    common: ResultCommonInfo
+    players: ResultPlayerInfo
 
 
 # 連単キー生成
@@ -170,3 +197,11 @@ TwoRenfuku = make_dataclass(
 )
 # pydanticに装着
 TwoRenfuku = dataclass(TwoRenfuku)
+
+
+class OddsInfo:
+    three_rentan: ThreeRentan
+    three_renfuku: ThreeRenfuku
+    two_rentan: TwoRentan
+    two_renfuku: TwoRenfuku
+    tansho: Tansho

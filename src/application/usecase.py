@@ -2,9 +2,9 @@ import time
 from logging import getLogger
 
 from application.argument import DBType, Options
-from domain.dbcontroller import DatabaseController
-from domain.sql.executer import SqlExecuter
-from domain.tablecreator import create_table
+from domain.dbcontroller import DatabaseController  # sqlとはかぎらない
+from domain.sql.executer import SqlExecuter  # sqlとはかぎらない
+from domain.tablecreator import create_table  # 多分domainじゃない
 from infrastructure.const import MAIN_LOGNAME
 from infrastructure.dt2sql import (ChokuzenData2sql, JyoData2sql, Odds2sql,
                                    RaceData2sql, ResultData2sql)
