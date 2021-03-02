@@ -1,7 +1,7 @@
 from typing import Iterator
 
-from domain.repository import OddsInfoRepository
 from domain.model.info import OddsInfo
+from domain.repository import OddsInfoRepository
 
 
 class ProtramInfoRepositoryImpl(OddsInfoRepository):

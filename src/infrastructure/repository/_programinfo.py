@@ -1,7 +1,7 @@
 from typing import Iterator
 
-from domain.repository import ProgramInfoRepository
 from domain.model.info import ProgramInfo
+from domain.repository import ProgramInfoRepository
 
 
 class ProgramInfoRepositoryImpl(ProgramInfoRepository):

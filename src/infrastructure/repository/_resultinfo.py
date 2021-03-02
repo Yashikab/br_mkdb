@@ -1,7 +1,7 @@
 from typing import Iterator
 
-from domain.repository import ResultInfoRepository
 from domain.model.info import ResultInfo
+from domain.repository import ResultInfoRepository
 
 
 class ProtramInfoRepositoryImpl(ResultInfoRepository):
