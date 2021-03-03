@@ -6,7 +6,7 @@ import pytest
 from infrastructure.factory import RaceInfoFactoryImpl
 from infrastructure.getter import GetParserContent
 
-FILEPATH = Path(__file__).resolve().parents[2] / "test_html"
+FILEPATH = Path(__file__).resolve().parents[1] / "test_html"
 
 
 class TestRaceInfoFactoryImpl:
@@ -17,11 +17,20 @@ class TestRaceInfoFactoryImpl:
     codes1 = [3, 6, 8, 9, 10, 13, 18, 19, 20, 22, 24]
     shinkos1 = ["-" for i in range(len(names1))]
     ed_races1 = [12 for i in range(len(names1))]
+    names2 = ['多摩川', '浜名湖', '蒲郡', '常滑', '津',
+              '三国', '住之江', '丸亀', '児島',
+              '宮島', '芦屋', '福岡']
+    codes2 = [5, 6, 7, 8, 9, 10, 12, 15, 16, 17, 21, 22]
+    shinkos2 = ["-" for i in range(len(names2))]
+    shinkos2[0] = "9R以降中止"
+    ed_races2 = [12 for i in range(len(names2))]
+    ed_races2[0] = 8
 
     @pytest.mark.parametrize(
         "target_date, ex_names, ex_codes, ex_shinkos, ex_ed_races",
         [
             (date(2020, 4, 8), names1, codes1, shinkos1, ed_races1),
+            (date(2011, 3, 11), names2, codes2, shinkos2, ed_races2)
         ]
     )
     def test_getinfo(self,
@@ -31,7 +40,7 @@ class TestRaceInfoFactoryImpl:
                      ex_shinkos: list,
                      ex_ed_races: list,
                      mocker):
-        filename = FILEPATH / f"ghp_{target_date.strftime('%Y%d%m')}.html"
+        filename = FILEPATH / f"ghp_{target_date.strftime('%Y%m%d')}.html"
         lx_content = GetParserContent.file_to_content(filename, "lxml")
         mocker.patch.object(GetParserContent, "url_to_content",
                             return_value=lx_content)

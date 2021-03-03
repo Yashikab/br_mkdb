@@ -7,9 +7,9 @@ from pydantic.dataclasses import dataclass
 @dataclass
 class HoldRaceInfo:
     jyo_name: str
-    jyo_cd: str
+    jyo_cd: int
     shinko: str  # 進行状況
-    ed_race_no: str  # 最終レース番号(中止とかに対応するため)
+    ed_race_no: int  # 最終レース番号(中止とかに対応するため)
 
 
 @dataclass
