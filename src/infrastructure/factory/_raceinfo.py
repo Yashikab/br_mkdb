@@ -11,6 +11,7 @@ from domain.factory import RaceInfoFactory
 from domain.model.info import HoldRaceInfo
 from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.getter import GetParserContent
+
 from ._common import CommonMethods
 
 

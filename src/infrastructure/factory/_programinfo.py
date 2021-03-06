@@ -7,8 +7,12 @@ from domain.model.info import ProgramInfo
 
 class ProgramInfoFactoryImpl(ProgramInfoFactory):
 
-    def getinfo(self, target_date: date) -> Iterator[ProgramInfo]:
+    def each_jyoinfo(self,
+                     target_date: date,
+                     jyo_cd: int) -> Iterator[ProgramInfo]:
         pass
 
-    def _raceinfo(self, target_date: date, race_no: int) -> ProgramInfo:
+    def _raceinfo(self, target_date: date,
+                  target_jyo: int,
+                  race_no: int) -> ProgramInfo:
         pass
