@@ -1,4 +1,5 @@
 from datetime import date
+import json
 from pathlib import Path
 from typing import Tuple
 
@@ -9,20 +10,21 @@ from infrastructure.factory import ProgramInfoFactoryImpl
 from infrastructure.getter import GetParserContent
 
 FILEPATH = Path(__file__).resolve().parents[1] / "test_html"
+SAMPLEPATH = Path(__file__).resolve().parent / "sample" / "program"
 
 
 class TestProgramFactoryImpl:
 
-    common1 = ProgramCommonInfo(
-        "スポーツ報知　ビクトリーカップ",
-        "is_ippan",
-        "予選",
-        1800,
-        False,
-        False
-    )
-    player1_1 = (None, 0)
-    player1_2 = (None, 1)
+    with open(SAMPLEPATH / "common1.json", 'r') as f:
+        common1 = ProgramCommonInfo(**json.load(f))
+
+    # 選手情報と枠番のインデックス(0~5)
+    with open(SAMPLEPATH / "p1_1.json", "r") as f:
+        p1_1 = ProgramPlayerInfo(**json.load(f))
+    with open(SAMPLEPATH / "p1_2.json", "r") as f:
+        p1_2 = ProgramPlayerInfo(**json.load(f))
+    player1_1 = (p1_1, 0)
+    player1_2 = (p1_2, 1)
 
     @pytest.mark.parametrize(
         ("target_date, target_jyo, race_no, ex_common, ex_p1, ex_p2"), [
