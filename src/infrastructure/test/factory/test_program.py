@@ -1,11 +1,11 @@
-from datetime import date
 import json
+from datetime import date
 from pathlib import Path
 from typing import Tuple
 
 import pytest
-from domain.model.info import ProgramCommonInfo, ProgramPlayerInfo
 
+from domain.model.info import ProgramCommonInfo, ProgramPlayerInfo
 from infrastructure.factory import ProgramInfoFactoryImpl
 from infrastructure.getter import GetParserContent
 
