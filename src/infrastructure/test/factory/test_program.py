@@ -51,5 +51,15 @@ class TestProgramFactoryImpl:
         programinfo = pif._raceinfo(target_date, target_jyo, race_no)
 
         assert programinfo.common == ex_common
-        assert programinfo.player[ex_p1[1]] == ex_p1[0]
-        assert programinfo.player[ex_p2[1]] == ex_p2[0]
+        assert programinfo.players[ex_p1[1]] == ex_p1[0]
+        assert programinfo.players[ex_p2[1]] == ex_p2[0]
+
+    @pytest.mark.parametrize("ed_race_no", [
+        (12), (0), (8)
+    ])
+    def test_each_jyoinfo(self, ed_race_no, mocker):
+        raceinfo_func = mocker.patch.object(
+            ProgramInfoFactoryImpl, "_raceinfo")
+        pif = ProgramInfoFactoryImpl()
+        list(pif.each_jyoinfo(date(2020, 4, 8), 6, ed_race_no))
+        assert raceinfo_func.call_count == ed_race_no

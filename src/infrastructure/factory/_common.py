@@ -1,13 +1,17 @@
 import re
 import sys
+from logging import getLogger
 from typing import Optional
+
+from infrastructure.const import MODULE_LOG_NAME
 
 
 class CommonMethods:
     """Factoryで使う共通メソッド"""
 
     def __init__(self):
-        pass
+        self.logger = \
+            getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
     def getonlyzenkaku2str(self, in_str: str) -> Optional[str]:
         try:

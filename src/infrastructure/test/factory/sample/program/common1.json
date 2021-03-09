@@ -1,6 +1,6 @@
 {
     "taikai_name": "スポーツ報知　ビクトリーカップ",
-    "grade": "is_ippan",
+    "grade": "is-ippan",
     "race_type": "予選",
     "race_kyori": 1800,
     "is_antei": false,
