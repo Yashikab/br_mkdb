@@ -29,13 +29,13 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             yield self._raceinfo(target_date, jyo_cd, race_no)
 
     def _raceinfo(self, target_date: date,
-                  target_jyo: int,
+                  jyo_cd: int,
                   race_no: int) -> ProgramInfo:
         # htmlをload
         target_url = (
             f"https://boatrace.jp/owpc/pc/race/racelist"
             f"?rno={race_no}"
-            f"&jcd={target_jyo:02}"
+            f"&jcd={jyo_cd:02}"
             f"&hd={target_date.strftime('%Y%m%d')}")
         self.logger.debug(f'get html: {target_url}')
         lx_content = GetParserContent.url_to_content(
