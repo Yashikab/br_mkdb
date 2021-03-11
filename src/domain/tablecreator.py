@@ -221,10 +221,16 @@ class ResultTableCreator(TableCreator):
         ]
         # annotationを使う
         for var_name, var_type in ResultCommonInfo.__annotations__.items():
-            schema.append(
-                (var_name,
-                 self.sql_creator.get_sqltype_from_pytype(var_type))
-            )
+            if var_type == WeatherInfo:
+                for weather_name, weather_type in WeatherInfo.__annotations__.items():
+                    schema.append(
+                        (weather_name,
+                         self.sql_creator.get_sqltype_from_pytype(weather_type)))
+            else:
+                schema.append(
+                    (var_name,
+                     self.sql_creator.get_sqltype_from_pytype(var_type))
+                )
         foreign_keys = ["race_id"]
         refs = ["raceinfo_tb"]
         super().run_create_table(

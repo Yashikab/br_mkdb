@@ -95,12 +95,7 @@ class ResultPlayerInfo:
 
 @dataclass
 class ResultCommonInfo:
-    temp: float
-    weather: str
-    wind_v: int
-    w_temp: float
-    wave: int
-    wind_dr: int
+    weather_info: WeatherInfo
     henkantei_list: str  # カンマ区切り
     is_henkan: bool
     kimarite: str

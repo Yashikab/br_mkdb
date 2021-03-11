@@ -120,8 +120,16 @@ class TestResultInfoTableCreator(CommonMethod):
         restc = ResultTableCreator(MysqlExecuter)
         restc.create_table()
 
+    cols = []
+    for var_name, var_type in ResultCommonInfo.__annotations__.items():
+        if var_type == WeatherInfo:
+            for weather_name, weather_type in WeatherInfo.__annotations__.items():
+                cols.append(weather_name)
+        else:
+            cols.append(var_name)
+
     rr_col_set = {'race_id', 'datejyo_id'}.union(
-        set(ResultCommonInfo.__annotations__.keys())
+        set(cols)
     )
     rp_col_set = {'waku_id', 'race_id'}.union(
         set(ResultPlayerInfo.__annotations__.keys())

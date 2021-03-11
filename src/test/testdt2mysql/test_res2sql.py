@@ -5,7 +5,7 @@ chokuseninfoo2sqlテスト
 """
 import pytest
 
-from domain.model.info import ResultCommonInfo, ResultPlayerInfo
+from domain.model.info import ResultCommonInfo, ResultPlayerInfo, WeatherInfo
 from infrastructure.dt2sql import ResultData2sql
 
 from ..common import CommonMethod
@@ -26,9 +26,15 @@ class TestResult2sql(CommonMethod):
             raceno_dict={
                 self.__jyo_cd: range(self.__race_no, self.__race_no+1)},
         )
-
+    cols = []
+    for var_name, var_type in ResultCommonInfo.__annotations__.items():
+        if var_type == WeatherInfo:
+            for weather_name, weather_type in WeatherInfo.__annotations__.items():
+                cols.append(weather_name)
+        else:
+            cols.append(var_name)
     rr_col_set = {'race_id', 'datejyo_id'}.union(
-        set(ResultCommonInfo.__annotations__.keys())
+        set(cols)
     )
     rp_col_set = {'waku_id', 'race_id'}.union(
         set(ResultPlayerInfo.__annotations__.keys()))
