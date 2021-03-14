@@ -53,6 +53,7 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
 
     def _commoninfo(self,
                     lx_content: lxml.HtmlElement) -> ProgramCommonInfo:
+        self.logger.debug("get Common info.")
         target_table_xpath = "/html/body/main/div/div/div/div[1]/div/div[2]"
 
         # SG, G1, G2, G3 一般
@@ -87,6 +88,7 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             is_shinnyukotei = True
         else:
             is_shinnyukotei = False
+        self.logger.debug("done.")
         return ProgramCommonInfo(
             taikai_name,
             grade,

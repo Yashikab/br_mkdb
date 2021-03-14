@@ -1,13 +1,13 @@
 import json
 from datetime import date
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 import pytest
 
 from infrastructure.factory import ChokuzenInfoFactoryImpl
-from src.domain.model.info import ChokuzenPlayerInfo, WeatherInfo
-from src.infrastructure.getter import GetParserContent
+from domain.model.info import ChokuzenPlayerInfo, WeatherInfo
+from infrastructure.getter import GetParserContent
 
 FILEPATH = Path(__file__).resolve().parents[1] / "test_html"
 SAMPLEPATH = Path(__file__).resolve().parent / "sample" / "chokuzen"
@@ -21,11 +21,13 @@ class TestChokuzenFactoryImpl:
     with open(SAMPLEPATH / "p1_1.json", "r") as f:
         p1_1 = (ChokuzenPlayerInfo(**json.load(f)), 0)
     with open(SAMPLEPATH / "p1_5.json", "r") as f:
-        p1_5 = (ChokuzenPlayerInfo(**json.load(f)), 4)
+        p1_5 = (ChokuzenPlayerInfo(**json.load(f)), 5)
+
+    players = [p1_1, p1_5]
 
     @pytest.mark.parametrize(
-        ("target_date, target_jyo, race_no, ex_common, ex_p1, ex_p2"), [
-            (date(20200, 4, 8), 6, 9, common, p1_1, p1_5)
+        ("target_date, target_jyo, race_no, ex_common, ex_players"), [
+            (date(2020, 4, 8), 6, 9, common, players)
         ]
     )
     def test_raceinfo(self,
@@ -33,8 +35,7 @@ class TestChokuzenFactoryImpl:
                       target_jyo: int,
                       race_no: int,
                       ex_common: WeatherInfo,
-                      ex_p1: Tuple[ChokuzenPlayerInfo, int],
-                      ex_p2: Tuple[ChokuzenPlayerInfo, int],
+                      ex_players: List[Tuple[ChokuzenPlayerInfo, int]],
                       mocker
                       ):
         filepath = FILEPATH / \
@@ -47,5 +48,5 @@ class TestChokuzenFactoryImpl:
         chokuinfo = chif._raceinfo(target_date, target_jyo, race_no)
 
         assert chokuinfo.common == ex_common
-        assert chokuinfo.players[ex_p1[1]] == ex_p1[0]
-        assert chokuinfo.players[ex_p2[1]] == ex_p2[0]
+        for ex_p, idx in ex_players:
+            assert chokuinfo.players[idx] == ex_p
