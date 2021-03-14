@@ -4,8 +4,8 @@ from logging import getLogger
 from typing import Optional
 
 import lxml.html as lxml
-from domain.model.info import WeatherInfo
 
+from domain.model.info import WeatherInfo
 from infrastructure.const import MODULE_LOG_NAME
 
 

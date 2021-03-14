@@ -18,7 +18,14 @@
 
 ## chokuzeninfo
 
+- [x] 指定した開催場でレースぶんのイテレータが回る
+- ピックアップした開催上のあるレースについて
+  - [x] レース共通部分のデータが取れている（ChokuzenCommonInfoに従う)
+  - [x] 選手個人の部分のデータが取れている(ChokuzenPlayerInfoに従う)
+
+## resultinfo
+
 - [ ] 指定した開催場でレースぶんのイテレータが回る
 - ピックアップした開催上のあるレースについて
-  - [ ] レース共通部分のデータが取れている（ChokuzenCommonInfoに従う)
-  - [ ] 選手個人の部分のデータが取れている(ChokuzenPlayerInfoに従う)
+  - [ ] レース共通部分のデータが取れている(ResultCommonInfoに従う)
+  - [ ] 選手個人の部分のデータが取れている(ResultPlayerInfoに従う)

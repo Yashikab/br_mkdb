@@ -5,7 +5,7 @@ from typing import Iterator
 import lxml.html as lxml
 
 from domain.factory import ChokuzenInfoFactory
-from domain.model.info import ChokuzenInfo, WeatherInfo, ChokuzenPlayerInfo
+from domain.model.info import ChokuzenInfo, ChokuzenPlayerInfo, WeatherInfo
 from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.getter import GetParserContent
 
