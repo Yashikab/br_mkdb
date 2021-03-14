@@ -23,7 +23,8 @@ class ChokuzenInfoFactoryImpl(ChokuzenInfoFactory):
                      target_date: date,
                      jyo_cd: int,
                      ed_race_no: int) -> Iterator[ChokuzenInfo]:
-        pass
+        for race_no in range(1, ed_race_no+1):
+            yield self._raceinfo(target_date, jyo_cd, race_no)
 
     def _raceinfo(self,
                   target_date: date,

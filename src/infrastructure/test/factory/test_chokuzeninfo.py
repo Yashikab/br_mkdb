@@ -50,3 +50,13 @@ class TestChokuzenFactoryImpl:
         assert chokuinfo.common == ex_common
         for ex_p, idx in ex_players:
             assert chokuinfo.players[idx] == ex_p
+
+    @pytest.mark.parametrize("ed_race_no", [
+        (12), (0), (8)
+    ])
+    def test_each_jyoinfo(self, ed_race_no, mocker):
+        raceinfo_func = mocker.patch.object(
+            ChokuzenInfoFactoryImpl, "_raceinfo")
+        chif = ChokuzenInfoFactoryImpl()
+        list(chif.each_jyoinfo(date(2020, 4, 8), 6, ed_race_no))
+        assert raceinfo_func.call_count == ed_race_no
