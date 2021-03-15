@@ -114,7 +114,7 @@ class ResultCommonInfo:
 @dataclass
 class ResultInfo:
     common: ResultCommonInfo
-    players: ResultPlayerInfo
+    players: List[ResultPlayerInfo]
 
 
 # 連単キー生成
