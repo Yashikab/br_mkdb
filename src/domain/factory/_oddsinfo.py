@@ -8,9 +8,9 @@ from domain.model.info import OddsInfo
 class OddsInfoFactory(metaclass=ABCMeta):
 
     @abstractmethod
-    def getinfo(self, target_date: date) -> Iterator[OddsInfo]:
+    def each_jyo(self, target_date: date, jyo_cd: int) -> Iterator[OddsInfo]:
         raise NotImplementedError()
 
     @abstractmethod
-    def _raceinfo(self, target_date: date, race_no: int) -> OddsInfo:
+    def _raceinfo(self, target_date: date, jyo_cd: int, race_no: int) -> OddsInfo:
         raise NotImplementedError()
