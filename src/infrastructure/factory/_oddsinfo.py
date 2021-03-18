@@ -2,7 +2,7 @@ from datetime import date
 from typing import Iterator
 
 from domain.factory import OddsInfoFactory
-from domain.model.info import OddsInfo, ThreeRentan, ThreeRenfuku
+from domain.model.info import OddsInfo, ThreeRenfuku, ThreeRentan
 
 
 class OddsInfoFactoryImpl(OddsInfoFactory):

@@ -1,7 +1,6 @@
+import re
 from datetime import date, datetime, timedelta
 from logging import getLogger
-import re
-from infrastructure.getter import GetParserContent
 from typing import Iterator
 
 import lxml.html as lxml
@@ -9,6 +8,7 @@ import lxml.html as lxml
 from domain.factory import ResultInfoFactory
 from domain.model.info import ResultCommonInfo, ResultInfo, ResultPlayerInfo
 from infrastructure.const import MODULE_LOG_NAME
+from infrastructure.getter import GetParserContent
 
 from ._common import CommonMethods
 
