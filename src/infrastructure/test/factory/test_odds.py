@@ -50,6 +50,16 @@ class TestOddsInfoFactoryImpl:
             expected = ex_three_rentan[3]
             assert three_rentans[f"comb_{fst}{snd}{trd}"] == expected
 
+    ex_three_renfukus1 = [
+        (1, 2, 3, 2.9),
+        (2, 3, 4, 160.2),
+        (3, 4, 5, 200.3),
+        (4, 5, 6, 228.9)
+    ]
+
+    @pytest.mark.parametrize("target_date, target_jyo, race_no, ex_three_renfukus", [
+        (date(2020, 4, 8), 6, 9, ex_three_renfukus1)
+    ])
     def test_three_renfuku(self,
                            target_date: date,
                            target_jyo: int,
@@ -72,6 +82,16 @@ class TestOddsInfoFactoryImpl:
             expected = ex_three_renfuku[3]
             assert three_renfukus[f"comb_{fst}{snd}{trd}"] == expected
 
+    ex_two_rentans1 = [
+        (1, 2, 2.7),
+        (2, 3, 101.3),
+        (3, 4, 238.5),
+        (6, 5, 135.1),
+    ]
+
+    @pytest.mark.parametrize("target_date, target_jyo, race_no, ex_two_rentans", [
+        (date(2020, 4, 8), 6, 9, ex_two_rentans1)
+    ])
     def test_two_rentan(self,
                         target_date: date,
                         target_jyo: int,
@@ -93,6 +113,15 @@ class TestOddsInfoFactoryImpl:
             expected = ex_two_rentan[2]
             assert two_rentans[f"comb_{fst}{snd}"] == expected
 
+    ex_two_renfukus1 = [
+        (1, 2, 2.0),
+        (2, 3, 25.7),
+        (3, 4, 47.1),
+    ]
+
+    @pytest.mark.parametrize("target_date, target_jyo, race_no, ex_two_renfukus", [
+        (date(2020, 4, 8), 6, 9, ex_two_renfukus1)
+    ])
     def test_two_renfuku(self,
                          target_date: date,
                          target_jyo: int,
@@ -114,6 +143,16 @@ class TestOddsInfoFactoryImpl:
             expected = ex_two_renfuku[2]
             assert two_renfukus[f"comb_{fst}{snd}"] == expected
 
+    ex_tanshos1 = [
+        (1, 1.0),
+        (2, 6.1),
+        (3, 12.2),
+        (6, 9.1)
+    ]
+
+    @pytest.mark.parametrize("target_date, target_jyo, race_no, ex_tanshos", [
+        (date(2020, 4, 8), 6, 9, ex_tanshos1)
+    ])
     def test_tansho(self,
                     target_date: date,
                     target_jyo: int,
