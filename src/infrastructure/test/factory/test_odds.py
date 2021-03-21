@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 from typing import List, Tuple
@@ -43,6 +44,7 @@ class TestOddsInfoFactoryImpl:
         )
         oif = OddsInfoFactoryImpl()
         three_rentans = oif._three_rentan(target_date, target_jyo, race_no)
+        three_rentans = asdict(three_rentans)
         for ex_three_rentan in ex_three_rentans:
             fst = ex_three_rentan[0]
             snd = ex_three_rentan[1]
@@ -107,6 +109,7 @@ class TestOddsInfoFactoryImpl:
         )
         oif = OddsInfoFactoryImpl()
         two_rentans = oif._two_rentan(target_date, target_jyo, race_no)
+        two_rentans = asdict(two_rentans)
         for ex_two_rentan in ex_two_rentans:
             fst = ex_two_rentan[0]
             snd = ex_two_rentan[1]
@@ -168,6 +171,7 @@ class TestOddsInfoFactoryImpl:
         )
         oif = OddsInfoFactoryImpl()
         tanshos = oif._tansho(target_date, target_jyo, race_no)
+        tanshos = asdict(tanshos)
         for ex_tansho in ex_tanshos:
             fst = ex_tansho[0]
             expected = ex_tansho[1]
