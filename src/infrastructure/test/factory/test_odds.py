@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 import pytest
+from domain.model.info import OddsInfo
 
 from infrastructure.factory import OddsInfoFactoryImpl
 from infrastructure.getter import GetParserContent
@@ -185,3 +186,16 @@ class TestOddsInfoFactoryImpl:
             fst = ex_tansho[0]
             expected = ex_tansho[1]
             assert tanshos[f"comb_{fst}"] == expected
+
+    def test_call_raceinfo(self, mocker):
+
+        oif = OddsInfoFactoryImpl()
+        oddsinfo = oif._raceinfo(date(2020, 4, 8), 6, 9)
+        assert type(oddsinfo) == OddsInfo
+
+    @pytest.mark.parametrize("ed_race_no", [(12), (0), (8)])
+    def test_each_jyoinfo(self, ed_race_no, mocker):
+        raceinfo_func = mocker.patch.object(OddsInfoFactoryImpl, "_raceinfo")
+        oif = OddsInfoFactoryImpl()
+        list(oif.each_jyoinfo(date(2020, 4, 8), 6, ed_race_no))
+        assert raceinfo_func.call_count == ed_race_no

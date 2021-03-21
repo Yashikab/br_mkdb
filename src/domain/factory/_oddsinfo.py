@@ -7,7 +7,7 @@ from domain.model.info import OddsInfo
 
 class OddsInfoFactory(metaclass=ABCMeta):
     @abstractmethod
-    def each_jyo(self, target_date: date, jyo_cd: int) -> Iterator[OddsInfo]:
+    def each_jyoinfo(self, target_date: date, jyo_cd: int) -> Iterator[OddsInfo]:
         raise NotImplementedError()
 
     @abstractmethod

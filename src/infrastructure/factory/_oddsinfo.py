@@ -16,11 +16,20 @@ from infrastructure.getter import GetParserContent
 
 
 class OddsInfoFactoryImpl(OddsInfoFactory):
-    def each_jyo(self, target_date: date, jyo_cd: int) -> Iterator[OddsInfo]:
-        pass
+    def each_jyoinfo(
+        self, target_date: date, jyo_cd: int, ed_race_no: int
+    ) -> Iterator[OddsInfo]:
+        for race_no in range(1, ed_race_no + 1):
+            yield self._raceinfo(target_date, jyo_cd, race_no)
 
     def _raceinfo(self, target_date: date, jyo_cd: int, race_no: int) -> OddsInfo:
-        pass
+        return OddsInfo(
+            self._three_rentan(target_date, jyo_cd, race_no),
+            self._three_renfuku(target_date, jyo_cd, race_no),
+            self._two_rentan(target_date, jyo_cd, race_no),
+            self._two_renfuku(target_date, jyo_cd, race_no),
+            self._tansho(target_date, jyo_cd, race_no),
+        )
 
     def _three_rentan(
         self, target_date: date, jyo_cd: int, race_no: int
@@ -32,15 +41,13 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
     ) -> ThreeRenfuku:
         return self._renfuku_common(target_date, jyo_cd, race_no, 3)
 
-    def _two_renfuku(
-        self, target_date: date, jyo_cd: int, race_no: int
-    ) -> ThreeRenfuku:
+    def _two_renfuku(self, target_date: date, jyo_cd: int, race_no: int) -> TwoRenfuku:
         return self._renfuku_common(target_date, jyo_cd, race_no, 2)
 
     def _two_rentan(self, target_date: date, jyo_cd: int, race_no: int) -> TwoRentan:
         return self._rentan_common(target_date, jyo_cd, race_no, 2)
 
-    def _tansho(self, target_date: date, jyo_cd: int, race_no: int) -> TwoRentan:
+    def _tansho(self, target_date: date, jyo_cd: int, race_no: int) -> Tansho:
         # htmlをload
         target_url = (
             f"https://boatrace.jp/owpc/pc/race/oddstf?"

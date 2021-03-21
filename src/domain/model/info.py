@@ -187,6 +187,7 @@ TwoRenfuku = make_dataclass(
 TwoRenfuku = dataclass(TwoRenfuku)
 
 
+@dataclass
 class OddsInfo:
     three_rentan: ThreeRentan
     three_renfuku: ThreeRenfuku
