@@ -9,5 +9,5 @@ __all__ = [
     "ProgramInfoRepository",
     "ChokuzenInfoRepository",
     "ResultInfoRepository",
-    "OddsInfoRepository"
+    "OddsInfoRepository",
 ]

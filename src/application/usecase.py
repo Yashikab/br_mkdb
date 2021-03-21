@@ -6,8 +6,13 @@ from domain.dbcontroller import DatabaseController  # sqlとはかぎらない
 from domain.sql.executer import SqlExecuter  # sqlとはかぎらない
 from domain.tablecreator import create_table  # 多分domainじゃない
 from infrastructure.const import MAIN_LOGNAME
-from infrastructure.dt2sql import (ChokuzenData2sql, JyoData2sql, Odds2sql,
-                                   RaceData2sql, ResultData2sql)
+from infrastructure.dt2sql import (
+    ChokuzenData2sql,
+    JyoData2sql,
+    Odds2sql,
+    RaceData2sql,
+    ResultData2sql,
+)
 from infrastructure.getdata import DateRange as dr
 
 # logger
@@ -18,73 +23,69 @@ class BoatRaceUsecase:
     __dbctl: DatabaseController
     __sql_executer: SqlExecuter
 
-    def __init__(self,
-                 dbctl: DatabaseController,
-                 sql_executer: SqlExecuter):
+    def __init__(self, dbctl: DatabaseController, sql_executer: SqlExecuter):
         self.__dbctl = dbctl
         self.__sql_executer = sql_executer
 
     def run(self, op: Options):
-        logger.info('Connect MySQL server.')
+        logger.info("Connect MySQL server.")
         self.__dbctl.build()
-        logger.info('Done')
+        logger.info("Done")
 
-        logger.info(f'Table Creating: {op.create_table}')
-        logger.debug('load classes from dt2sql')
+        logger.info(f"Table Creating: {op.create_table}")
+        logger.debug("load classes from dt2sql")
         jd2sql = JyoData2sql()
         rd2sql = RaceData2sql()
         cd2sql = ChokuzenData2sql()
         res2sql = ResultData2sql()
         odds2sql = Odds2sql()
-        logger.debug('Completed loading classes.')
+        logger.debug("Completed loading classes.")
 
         if op.create_table:
-            logger.debug('Create table if it does not exist.')
+            logger.debug("Create table if it does not exist.")
             create_table(self.__sql_executer)
-            logger.debug('Completed creating table.')
+            logger.debug("Completed creating table.")
 
         for date in dr.daterange(op.start_date, op.end_date):
             try:
-                logger.debug(f'target date: {date}')
+                logger.debug(f"target date: {date}")
                 jd2sql.insert2table(date)
                 # jd2sqlで開催場と最終レース番を取得する
-                logger.debug('insert race data: race chokuzen result odds')
+                logger.debug("insert race data: race chokuzen result odds")
                 jyo_cd_list = jd2sql.map_raceno_dict.keys()
                 start_time = time.time()
-                logger.debug('Start to insert race data')
+                logger.debug("Start to insert race data")
                 rd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                logger.debug('Start to insert chokuzen data')
+                logger.debug("Start to insert chokuzen data")
                 cd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                logger.debug('Start to insert result data')
-                res2sql.insert2table(date, jyo_cd_list,
-                                     jd2sql.map_raceno_dict)
-                logger.debug('Start to insert odds data')
-                odds2sql.insert2table(
-                    date, jyo_cd_list, jd2sql.map_raceno_dict)
+                logger.debug("Start to insert result data")
+                res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                logger.debug("Start to insert odds data")
+                odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
 
                 elapsed_time = time.time() - start_time
-                logger.debug(f'completed in {elapsed_time}sec')
-                logger.debug('insert race data completed.')
+                logger.debug(f"completed in {elapsed_time}sec")
+                logger.debug("insert race data completed.")
             except Exception as e:
-                logger.error(f'{e}')
+                logger.error(f"{e}")
 
         # localは実験で落とすと消えてしまうので落とさない
         if op.db_type == DBType.gcs:
-            logger.info('Down Server.')
+            logger.info("Down Server.")
             self.__dbctl.clean()
 
-        logger.info('All completed.')
+        logger.info("All completed.")
 
     @classmethod
     def localmysql(cls):
         from infrastructure.dbcontroller import LocalSqlController
         from infrastructure.mysql import MysqlExecuter
-        return BoatRaceUsecase(LocalSqlController(),
-                               MysqlExecuter())
+
+        return BoatRaceUsecase(LocalSqlController(), MysqlExecuter())
 
     @classmethod
     def gcpmysql(cls):
         from infrastructure.dbcontroller import CloudSqlController
         from infrastructure.mysql import MysqlExecuter
-        return BoatRaceUsecase(CloudSqlController(),
-                               MysqlExecuter())
+
+        return BoatRaceUsecase(CloudSqlController(), MysqlExecuter())

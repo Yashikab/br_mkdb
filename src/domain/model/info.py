@@ -129,36 +129,31 @@ def rentan_keylist(rank: int) -> list:
     rentan_key_list = []
     for fst in range(1, 7):
         if rank == 1:
-            rentan_key_list.append(f'comb_{fst}')
+            rentan_key_list.append(f"comb_{fst}")
         else:
             for snd in range(1, 7):
                 if snd != fst and rank == 2:
-                    rentan_key_list.append(f'comb_{fst}{snd}')
+                    rentan_key_list.append(f"comb_{fst}{snd}")
                 else:
                     for trd in range(1, 7):
                         if fst != snd and fst != trd and snd != trd:
-                            rentan_key_list.append(f'comb_{fst}{snd}{trd}')
+                            rentan_key_list.append(f"comb_{fst}{snd}{trd}")
     return rentan_key_list
 
 
 ThreeRentan = make_dataclass(
-    "ThreeRentan",
-    [(key_name, float) for key_name in rentan_keylist(3)]
+    "ThreeRentan", [(key_name, float) for key_name in rentan_keylist(3)]
 )
 # pydanticに装着
 ThreeRentan = dataclass(ThreeRentan)
 
 TwoRentan = make_dataclass(
-    "TwoRentan",
-    [(key_name, float) for key_name in rentan_keylist(2)]
+    "TwoRentan", [(key_name, float) for key_name in rentan_keylist(2)]
 )
 # pydanticに装着
 TwoRentan = dataclass(TwoRentan)
 
-Tansho = make_dataclass(
-    "Tansho",
-    [(key_name, float) for key_name in rentan_keylist(1)]
-)
+Tansho = make_dataclass("Tansho", [(key_name, float) for key_name in rentan_keylist(1)])
 # pydanticに装着
 Tansho = dataclass(Tansho)
 
@@ -168,27 +163,25 @@ def renfuku_keylist(rank: int) -> list:
     renfuku_key_list = []
     if rank == 2:
         for fst in range(1, 6):
-            for snd in range(fst+1, 7):
-                renfuku_key_list.append(f'comb_{fst}{snd}')
+            for snd in range(fst + 1, 7):
+                renfuku_key_list.append(f"comb_{fst}{snd}")
         return renfuku_key_list
     elif rank == 3:
         for fst in range(1, 5):
-            for snd in range(fst+1, 6):
-                for trd in range(snd+1, 7):
-                    renfuku_key_list.append(f'comb_{fst}{snd}{trd}')
+            for snd in range(fst + 1, 6):
+                for trd in range(snd + 1, 7):
+                    renfuku_key_list.append(f"comb_{fst}{snd}{trd}")
         return renfuku_key_list
 
 
 ThreeRenfuku = make_dataclass(
-    "ThreeRenfuku",
-    [(key_name, float) for key_name in renfuku_keylist(3)]
+    "ThreeRenfuku", [(key_name, float) for key_name in renfuku_keylist(3)]
 )
 # pydanticに装着
 ThreeRenfuku = dataclass(ThreeRenfuku)
 
 TwoRenfuku = make_dataclass(
-    "TwoRenfuku",
-    [(key_name, float) for key_name in renfuku_keylist(2)]
+    "TwoRenfuku", [(key_name, float) for key_name in renfuku_keylist(2)]
 )
 # pydanticに装着
 TwoRenfuku = dataclass(TwoRenfuku)

@@ -14,36 +14,38 @@ from tqdm import tqdm
 
 from infrastructure import const
 from infrastructure.connector import MysqlConnector
-from infrastructure.getdata_lxml import (GetHoldPlacePast, OfficialChokuzen,
-                                         OfficialOdds, OfficialProgram,
-                                         OfficialResults)
+from infrastructure.getdata_lxml import (
+    GetHoldPlacePast,
+    OfficialChokuzen,
+    OfficialOdds,
+    OfficialProgram,
+    OfficialResults,
+)
 
 
 class Data2sqlAbstract(metaclass=ABCMeta):
-
     @abstractmethod
     def insert2table(self):
-        '''
+        """
         データを挿入する
-        '''
+        """
 
 
 class Data2MysqlTemplate(Data2sqlAbstract):
-
-    def __init__(self,
-                 filename_list: list = [],
-                 table_name_list: list = [],
-                 target_cls: Any = None):
-        self.logger = \
-            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+    def __init__(
+        self,
+        filename_list: list = [],
+        table_name_list: list = [],
+        target_cls: Any = None,
+    ):
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         self.__filename_list = filename_list
         self.__tb_name_list = table_name_list
         self.target_cls = target_cls
 
-    def insert2table(self,
-                     date: int,
-                     jyo_cd_list: List[int],
-                     raceno_dict: Dict[int, List[int]]) -> None:
+    def insert2table(
+        self, date: int, jyo_cd_list: List[int], raceno_dict: Dict[int, List[int]]
+    ) -> None:
         """直前情報をSQLへ
 
         日付，会場コード，レース番号を受取る \n
@@ -71,25 +73,25 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         pbar = tqdm(total=total_race)
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
-                self.logger.debug(f'args: {self.date}, {jyo_cd}, {race_no}')
-                pbar.set_description(
-                    f"Processing jyo:{jyo_cd}, race: {race_no}")
+                self.logger.debug(f"args: {self.date}, {jyo_cd}, {race_no}")
+                pbar.set_description(f"Processing jyo:{jyo_cd}, race: {race_no}")
                 try:
                     common, waku = self._create_queries(jyo_cd, race_no)
                     common_row_list.append(common)
                     waku_row_list.append(waku)
                 except Exception as e:
                     self.logger.error(
-                        f'args: {self.date}, {jyo_cd}, {race_no} error: {e}')
+                        f"args: {self.date}, {jyo_cd}, {race_no} error: {e}"
+                    )
                 pbar.update(1)
         pbar.close()
 
         common_sql = self.create_insert_prefix(self.__tb_name_list[0])
         common_row = ", ".join(common_row_list)
-        query = ' '.join([common_sql, common_row])
+        query = " ".join([common_sql, common_row])
         waku_sql = self.create_insert_prefix(self.__tb_name_list[1])
         waku_row = ", ".join(waku_row_list)
-        waku_query = ' '.join([waku_sql, waku_row])
+        waku_query = " ".join([waku_sql, waku_row])
         all_query = ";\n".join([query, waku_query])
         all_query += ";"
         self.run_query(all_query)
@@ -97,10 +99,8 @@ class Data2MysqlTemplate(Data2sqlAbstract):
 
     def _create_queries(self, jyo_cd: int, race_no: int) -> str:
         """クエリを作る"""
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        tcls = self.target_cls(race_no=race_no,
-                               jyo_code=jyo_cd,
-                               date=self.date)
+        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
+        tcls = self.target_cls(race_no=race_no, jyo_code=jyo_cd, date=self.date)
 
         # 各種id
         race_id = int(f"{self.date}{jyo_cd:02}{race_no:02}")
@@ -108,15 +108,14 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         insert_col = self._info2query_col(
             # tb_name=self.__tb_name_list[0],
             id_list=[race_id, datejyo_id],
-            info_dict=tcls.getcommoninfo2dict()
+            info_dict=tcls.getcommoninfo2dict(),
         )
 
         # sql = self.create_insert_prefix(self.__tb_name_list[0])
         # query = ' '.join([sql, insert_col])
 
         waku_insert_col = self._waku_all2query_col(
-            base_id=race_id,
-            callback_func=tcls.getplayerinfo2dict
+            base_id=race_id, callback_func=tcls.getplayerinfo2dict
         )
         # waku_sql = self.create_insert_prefix(self.__tb_name_list[1])
         # waku_query = ' '.join([waku_sql, waku_insert_col])
@@ -147,15 +146,15 @@ class Data2MysqlTemplate(Data2sqlAbstract):
                 クエリ文
         """
         try:
-            self.logger.debug('connecteng Mysql.')
+            self.logger.debug("connecteng Mysql.")
             with MysqlConnector(const.MYSQL_CONFIG) as conn:
                 cursor = conn.cursor()
-                self.logger.debug('run query.')
+                self.logger.debug("run query.")
                 cursor.execute(query)
                 # cursor.close()
-            self.logger.debug('query run successfully!')
+            self.logger.debug("query run successfully!")
         except Exception as e:
-            self.logger.error(f'{e}')
+            self.logger.error(f"{e}")
 
         return None
 
@@ -163,10 +162,9 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         """挿入句用のテーブル指定部までを作成する"""
         return f"INSERT IGNORE INTO {tb_name} VALUES"
 
-    def _info2query_col(self,
-                        id_list: list,
-                        info_dict: dict,
-                        ommit_list: list = []) -> str:
+    def _info2query_col(
+        self, id_list: list, info_dict: dict, ommit_list: list = []
+    ) -> str:
         """
         選手の情報の辞書からsqlへインサートするsqlを作成し，挿入する
         注意：テーブルのカラムの順番とinfo_dict.keys()の順番が一致していること
@@ -192,15 +190,14 @@ class Data2MysqlTemplate(Data2sqlAbstract):
             if i_value not in ommit_list:
                 insert_value_list.append(i_value)
 
-        insert_value_content = ', '.join(insert_value_list)
+        insert_value_content = ", ".join(insert_value_list)
         insert_value = "(" + insert_value_content + ")"
 
         return insert_value
 
-    def _waku_all2query_col(self,
-                            base_id: int,
-                            callback_func: Callable[[int], dict],
-                            ommit_list: list = []) -> str:
+    def _waku_all2query_col(
+        self, base_id: int, callback_func: Callable[[int], dict], ommit_list: list = []
+    ) -> str:
         """1~6枠の情報をクエリカラムにするメソッド
 
         Parameters
@@ -218,24 +215,20 @@ class Data2MysqlTemplate(Data2sqlAbstract):
         for waku in range(1, 7):
             waku_id = int(f"{base_id}{waku}")
             single_query_col = self._info2query_col(
-                id_list=[waku_id, base_id],
-                info_dict=callback_func(waku)
+                id_list=[waku_id, base_id], info_dict=callback_func(waku)
             )
             query_col_list.append(single_query_col)
-        query_col = ', '.join(query_col_list)
+        query_col = ", ".join(query_col_list)
         return query_col
 
 
 class JyoData2sql(Data2MysqlTemplate):
 
-    __tb_name = 'holdjyo_tb'
+    __tb_name = "holdjyo_tb"
 
     def __init__(self):
-        self.logger = \
-            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-        super().__init__(
-            ['create_jyodata_tb.sql']
-        )
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        super().__init__(["create_jyodata_tb.sql"])
 
     # オーバーライド
     def insert2table(self, date: int) -> None:
@@ -247,11 +240,11 @@ class JyoData2sql(Data2MysqlTemplate):
             date: int
             日付，yyyymmdd型
         """
-        self.logger.info(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.info(f"called {sys._getframe().f_code.co_name}.")
         self.logger.info(f"Date: {date}")
         query = self._create_query(date)
         super().run_query(query)
-        self.logger.debug(f'{sys._getframe().f_code.co_name} completed.')
+        self.logger.debug(f"{sys._getframe().f_code.co_name} completed.")
 
         return None
 
@@ -264,7 +257,7 @@ class JyoData2sql(Data2MysqlTemplate):
             date: int
             日付，yyyymmdd型
         """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
         # 他のテーブルデータのinsertに使う辞書
         self.map_raceno_dict = {}
         ghp = GetHoldPlacePast(target_date=date)
@@ -273,34 +266,33 @@ class JyoData2sql(Data2MysqlTemplate):
 
         rows = []
         for hp_s, hp_c in zip(hp_str_list, hp_cd_list):
-            datejyo_id: str = f'{date}{hp_c:02}'
+            datejyo_id: str = f"{date}{hp_c:02}"
             hi_dict = ghp.holdinfo2dict(hp_s)
-            self.map_raceno_dict[hp_c] = range(1, hi_dict['ed_race_no'] + 1)
+            self.map_raceno_dict[hp_c] = range(1, hi_dict["ed_race_no"] + 1)
             insert_value_list = [datejyo_id, str(date), str(hp_c), f"'{hp_s}'"]
             ommit_list = []
             for i_key, i_value in hi_dict.items():
                 i_value = super().value2query_str(i_value)
                 if i_value not in ommit_list:
                     insert_value_list.append(i_value)
-            insert_value_content = ', '.join(insert_value_list)
+            insert_value_content = ", ".join(insert_value_list)
             rows.append("(" + insert_value_content + ")")
-        insert_rows = ', '.join(rows)
+        insert_rows = ", ".join(rows)
         sql = f"INSERT IGNORE INTO {self.__tb_name} VALUES"
-        query = ' '.join([sql, insert_rows])
-        self.logger.debug(f'{sys._getframe().f_code.co_name} completed.')
+        query = " ".join([sql, insert_rows])
+        self.logger.debug(f"{sys._getframe().f_code.co_name} completed.")
 
         return query
 
 
 class RaceData2sql(Data2MysqlTemplate):
-
     def __init__(self):
-        self.logger = \
-            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
-            filename_list=['create_raceinfo_tb.sql', 'create_program_tb.sql'],
-            table_name_list=['raceinfo_tb', 'program_tb'],
-            target_cls=OfficialProgram)
+            filename_list=["create_raceinfo_tb.sql", "create_program_tb.sql"],
+            table_name_list=["raceinfo_tb", "program_tb"],
+            target_cls=OfficialProgram,
+        )
 
 
 class ChokuzenData2sql(Data2MysqlTemplate):
@@ -308,43 +300,41 @@ class ChokuzenData2sql(Data2MysqlTemplate):
     リアルタムデータ取得時のため別クラスにする"""
 
     def __init__(self):
-        self.logger = \
-            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
-            filename_list=[
-                'create_chokuzen_cond_tb.sql', 'create_chokuzen_p_tb.sql'],
-            table_name_list=['chokuzen_cond_tb', 'chokuzen_player_tb'],
-            target_cls=OfficialChokuzen)
+            filename_list=["create_chokuzen_cond_tb.sql", "create_chokuzen_p_tb.sql"],
+            table_name_list=["chokuzen_cond_tb", "chokuzen_player_tb"],
+            target_cls=OfficialChokuzen,
+        )
 
 
 class ResultData2sql(Data2MysqlTemplate):
     """結果情報テーブル作成"""
 
     def __init__(self):
-        self.logger = \
-            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
         super().__init__(
-            filename_list=['create_raceresult_tb.sql',
-                           'create_playerresult_tb.sql'],
-            table_name_list=['race_result_tb', 'player_result_tb'],
-            target_cls=OfficialResults)
+            filename_list=["create_raceresult_tb.sql", "create_playerresult_tb.sql"],
+            table_name_list=["race_result_tb", "player_result_tb"],
+            target_cls=OfficialResults,
+        )
 
 
 class Odds2sql(Data2MysqlTemplate):
     def __init__(self):
-        self.logger = \
-            getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
-        self.__tb_name_list = ['odds_3tan_tb',
-                               "odds_3fuku_tb",
-                               'odds_2tan_tb',
-                               "odds_2fuku_tb",
-                               "odds_1tan_tb"]
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.__tb_name_list = [
+            "odds_3tan_tb",
+            "odds_3fuku_tb",
+            "odds_2tan_tb",
+            "odds_2fuku_tb",
+            "odds_1tan_tb",
+        ]
 
-    def insert2table(self,
-                     date: int,
-                     jyo_cd_list: List[int],
-                     raceno_dict: Dict[int, List[int]]) -> None:
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+    def insert2table(
+        self, date: int, jyo_cd_list: List[int], raceno_dict: Dict[int, List[int]]
+    ) -> None:
+        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
         insert_rows_dict: Dict[str, List[Any]] = {}
         # tqdm用
         total_race = 0
@@ -354,34 +344,29 @@ class Odds2sql(Data2MysqlTemplate):
         pbar = tqdm(total=total_race)
         for jyo_cd in jyo_cd_list:
             for race_no in raceno_dict[jyo_cd]:
-                self.logger.debug(f'args: {date}, {jyo_cd}, {race_no}')
+                self.logger.debug(f"args: {date}, {jyo_cd}, {race_no}")
                 race_id = f"{date}{jyo_cd:02}{race_no:02}"
-                pbar.set_description(
-                    f"Processing jyo:{jyo_cd}, race: {race_no}")
-                for tb_name, content in zip(self.__tb_name_list,
-                                            self._call_oddsfunc(
-                                                date,
-                                                jyo_cd,
-                                                race_no)):
+                pbar.set_description(f"Processing jyo:{jyo_cd}, race: {race_no}")
+                for tb_name, content in zip(
+                    self.__tb_name_list, self._call_oddsfunc(date, jyo_cd, race_no)
+                ):
                     try:
                         if tb_name not in insert_rows_dict.keys():
                             insert_rows_dict[tb_name] = []
                         insert_rows_dict[tb_name].append(
-                            super()._info2query_col(
-                                [race_id],
-                                content
-                            )
+                            super()._info2query_col([race_id], content)
                         )
                     except Exception as e:
                         self.logger.error(
-                            f'args: {date}, {jyo_cd}, {race_no} error: {e}')
+                            f"args: {date}, {jyo_cd}, {race_no} error: {e}"
+                        )
                 pbar.update(1)
         pbar.close()
         # まとめる
         for tb_name, insert_rows_list in insert_rows_dict.items():
             sql = super().create_insert_prefix(tb_name)
-            insert_rows = ', '.join(insert_rows_list)
-            query = ' '.join([sql, insert_rows])
+            insert_rows = ", ".join(insert_rows_list)
+            query = " ".join([sql, insert_rows])
             super().run_query(query)
 
     def _call_oddsfunc(self, date, jyo_cd, race_no):

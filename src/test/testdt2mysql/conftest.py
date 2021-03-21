@@ -17,10 +17,10 @@ from infrastructure.mysql import MysqlExecuter
 @pytest.fixture(scope="session", autouse=True)
 def prepare():
     # 環境変数でmysqlの接続先を入れ替える
-    os.environ['MYSQL_HOST'] = "testmysql"
-    os.environ['MYSQL_USER'] = "test_boat_user"
-    os.environ['MYSQL_PASSWORD'] = "test_pw"
-    os.environ['MYSQL_DATABASE'] = "test_boat_db"
+    os.environ["MYSQL_HOST"] = "testmysql"
+    os.environ["MYSQL_USER"] = "test_boat_user"
+    os.environ["MYSQL_PASSWORD"] = "test_pw"
+    os.environ["MYSQL_DATABASE"] = "test_boat_db"
 
     # local実行の場合はdb立てる
     if not os.getenv("DRONE_COMMIT"):

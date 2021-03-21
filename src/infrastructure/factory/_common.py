@@ -13,13 +13,12 @@ class CommonMethods:
     """Factoryで使う共通メソッド"""
 
     def __init__(self):
-        self.logger = \
-            getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
 
     def getonlyzenkaku2str(self, in_str: str) -> Optional[str]:
         try:
             # 全角の抽出
-            return re.search(r'[^\x01-\x7E]+', in_str).group(0)
+            return re.search(r"[^\x01-\x7E]+", in_str).group(0)
         except ValueError:
             return None
 
@@ -28,8 +27,8 @@ class CommonMethods:
         文字列から文字を取り除き少数で返す
         マイナス表記は残す
         """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
-        in_str = re.search(r'-{0,1}[0-9]*\.[0-9]+', in_str)
+        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
+        in_str = re.search(r"-{0,1}[0-9]*\.[0-9]+", in_str)
         if in_str is not None:
             out_float = float(in_str.group(0))
         else:
@@ -41,18 +40,18 @@ class CommonMethods:
         文字列から文字を取り除き整数で返す
         マイナス表記は残す
         """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
         try:
-            in_str = re.search(r'-{0,1}[0-9]+', in_str)
+            in_str = re.search(r"-{0,1}[0-9]+", in_str)
             out_int = int(in_str.group(0))
         except AttributeError as e:
             self.logger.error(f"in_str: {in_str}, error: {e}")
             out_int = None
         return out_int
 
-    def getweatherinfo(self,
-                       lx_content: lxml.HtmlElement,
-                       table_xpath: str) -> WeatherInfo:
+    def getweatherinfo(
+        self, lx_content: lxml.HtmlElement, table_xpath: str
+    ) -> WeatherInfo:
         """
         水面気象情報テーブルのスクレイパー
 
@@ -65,7 +64,7 @@ class CommonMethods:
         -------
             content_dict : dict
         """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
 
         # 気温
         temp_xpath = "/".join([table_xpath, "div[1]/div/span[2]"])
@@ -100,20 +99,15 @@ class CommonMethods:
         wind_dr = wind_dr_class.split()[1].strip()
         wind_dr = self.rmletter2int(wind_dr)
 
-        return WeatherInfo(
-            temp,
-            weather,
-            wind_v,
-            w_temp,
-            wave,
-            wind_dr
-        )
+        return WeatherInfo(temp, weather, wind_v, w_temp, wave, wind_dr)
 
-    def getSTtable(self,
-                   lx_content: lxml.HtmlComment,
-                   tbody_xpath: str,
-                   waku: int,
-                   table_type: str = "default") -> tuple:
+    def getSTtable(
+        self,
+        lx_content: lxml.HtmlComment,
+        tbody_xpath: str,
+        waku: int,
+        table_type: str = "default",
+    ) -> tuple:
         """
         スタート情報のテーブルを抜き取り対象枠のコースとSTタイムを
         タプルにして返す.
@@ -133,7 +127,7 @@ class CommonMethods:
             course st_time : tuple
                 対象枠のコースとSTタイムをタプルで返す
         """
-        self.logger.debug(f'called {sys._getframe().f_code.co_name}.')
+        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
 
         tr_xpath = "/".join([tbody_xpath, "tr"])
         len_course = len(lx_content.xpath(tr_xpath))
@@ -146,22 +140,20 @@ class CommonMethods:
         st_time_list = []
         for i in range(1, len_course + 1):
             try:
-                waku_no_xpath = "/".join([
-                    tbody_xpath, f"tr[{i}]/td/div/span[1]"])
+                waku_no_xpath = "/".join([tbody_xpath, f"tr[{i}]/td/div/span[1]"])
                 waku_no = lx_content.xpath(waku_no_xpath)[0].text
                 waku_list.append(self.rmletter2int(waku_no))
 
                 if table_type == "result":
-                    st_time_xpath = "/".join([
-                        tbody_xpath,
-                        f"tr[{i}]/td/div/span[3]/span/text()"])
+                    st_time_xpath = "/".join(
+                        [tbody_xpath, f"tr[{i}]/td/div/span[3]/span/text()"]
+                    )
                     st_time = lx_content.xpath(st_time_xpath)[0].strip()
                 else:
-                    st_time_xpath = "/".join([
-                        tbody_xpath, f"tr[{i}]/td/div/span[3]"])
+                    st_time_xpath = "/".join([tbody_xpath, f"tr[{i}]/td/div/span[3]"])
                     st_time = lx_content.xpath(st_time_xpath)[0].text
                 # Fをマイナスに変換し，少数化
-                st_time = self.rmletter2float(st_time.replace('F', '-'))
+                st_time = self.rmletter2float(st_time.replace("F", "-"))
                 st_time_list.append(st_time)
             except IndexError as e:
                 self.logger.error(e)

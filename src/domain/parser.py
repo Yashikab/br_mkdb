@@ -8,7 +8,6 @@ from typing import Any, Dict, List
 
 
 class HoldPlaceParser(metaclass=ABCMeta):
-
     @abstractmethod
     def holdplace2list(self) -> List[str]:
         pass
@@ -23,7 +22,6 @@ class HoldPlaceParser(metaclass=ABCMeta):
 
 
 class ProgramParser(metaclass=ABCMeta):
-
     @abstractmethod
     def getplayerinfo2dict(self, waku) -> Dict[str, Any]:
         pass
@@ -34,7 +32,6 @@ class ProgramParser(metaclass=ABCMeta):
 
 
 class ChokuzenParser(metaclass=ABCMeta):
-
     @abstractmethod
     def getplayerinfo2dict(self, waku: int) -> Dict[str, Any]:
         pass
@@ -45,7 +42,6 @@ class ChokuzenParser(metaclass=ABCMeta):
 
 
 class ResultsParser(metaclass=ABCMeta):
-
     @abstractmethod
     def getplayerinfo2dict(self, waku: int) -> Dict[str, Any]:
         pass
@@ -56,7 +52,6 @@ class ResultsParser(metaclass=ABCMeta):
 
 
 class OddsParser(metaclass=ABCMeta):
-
     @abstractmethod
     def three_rentan(self) -> Dict[str, float]:
         pass

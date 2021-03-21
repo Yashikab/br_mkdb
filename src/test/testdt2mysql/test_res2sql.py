@@ -18,14 +18,14 @@ class TestResult2sql(CommonMethod):
     __race_no = 1
     __res2sql = ResultData2sql()
 
-    @pytest.fixture(scope='class', autouse=True)
+    @pytest.fixture(scope="class", autouse=True)
     def insertdata(self):
         self.__res2sql.insert2table(
             date=self.__target_date,
             jyo_cd_list=[self.__jyo_cd],
-            raceno_dict={
-                self.__jyo_cd: range(self.__race_no, self.__race_no+1)},
+            raceno_dict={self.__jyo_cd: range(self.__race_no, self.__race_no + 1)},
         )
+
     cols = []
     for var_name, var_type in ResultCommonInfo.__annotations__.items():
         if var_type == WeatherInfo:
@@ -33,42 +33,33 @@ class TestResult2sql(CommonMethod):
                 cols.append(weather_name)
         else:
             cols.append(var_name)
-    rr_col_set = {'race_id', 'datejyo_id'}.union(
-        set(cols)
+    rr_col_set = {"race_id", "datejyo_id"}.union(set(cols))
+    rp_col_set = {"waku_id", "race_id"}.union(
+        set(ResultPlayerInfo.__annotations__.keys())
     )
-    rp_col_set = {'waku_id', 'race_id'}.union(
-        set(ResultPlayerInfo.__annotations__.keys()))
 
     race_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}"
-    race_col_list = ["race_id", "temp", "kimarite", "biko",
-                     "payout_3tan", "popular_3tan"]
-    race_expected = (
-        int(race_id),
-        21.0,
-        '逃げ',
-        '',
-        4000,
-        14
-    )
+    race_col_list = [
+        "race_id",
+        "temp",
+        "kimarite",
+        "biko",
+        "payout_3tan",
+        "popular_3tan",
+    ]
+    race_expected = (int(race_id), 21.0, "逃げ", "", 4000, 14)
     # 5号艇を見る
     waku_id = f"{__target_date}{__jyo_cd:02}{__race_no:02}5"
     waku_col_list = ["waku_id", "rank", "racetime", "st_time"]
-    waku_ex = (
-        int(waku_id),
-        -1,
-        -1,
-        0.11
-    )
+    waku_ex = (int(waku_id), -1, -1, 0.11)
 
-    @ pytest.mark.parametrize("tb_nm, id_nm, t_id, col_list, expected", [
-        ("race_result_tb", "race_id", race_id, race_col_list, race_expected),
-        ("player_result_tb", "waku_id", waku_id, waku_col_list, waku_ex)
-    ])
+    @pytest.mark.parametrize(
+        "tb_nm, id_nm, t_id, col_list, expected",
+        [
+            ("race_result_tb", "race_id", race_id, race_col_list, race_expected),
+            ("player_result_tb", "waku_id", waku_id, waku_col_list, waku_ex),
+        ],
+    )
     def test_insert2table(self, tb_nm, id_nm, t_id, col_list, expected):
-        res_tpl = super().get_targetdata(
-            tb_nm,
-            id_nm,
-            t_id,
-            col_list
-        )
+        res_tpl = super().get_targetdata(tb_nm, id_nm, t_id, col_list)
         assert res_tpl == expected

@@ -5,6 +5,5 @@ from domain.repository import OddsInfoRepository
 
 
 class ProtramInfoRepositoryImpl(OddsInfoRepository):
-
     def save_info(self, data_itr: Iterator[OddsInfo]) -> None:
         pass

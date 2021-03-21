@@ -4,3 +4,4 @@ set -o xtrace
 
 autoflake -ir --remove-all-unused-imports --remove-unused-variables --remove-duplicate-keys .
 isort .
+black .
