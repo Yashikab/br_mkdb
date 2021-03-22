@@ -13,6 +13,7 @@ class DBType(str, Enum):
 
 class Options(BaseModel):
     """ユーザーが指定するoption引数"""
+
     start_date: date
     end_date: date
     wait_time: float

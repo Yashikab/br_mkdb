@@ -17,7 +17,7 @@ class TestJyoData2sql(CommonMethod):
     __jyo_cd = 20
     __jd2sql = JyoData2sql()
 
-    @pytest.fixture(scope='class', autouse=True)
+    @pytest.fixture(scope="class", autouse=True)
     def insertdata(self):
         self.__jd2sql.insert2table(date=self.__target_date)
 
@@ -27,18 +27,8 @@ class TestJyoData2sql(CommonMethod):
         id_name = "datejyo_id"
         target_id = f"{self.__target_date}{self.__jyo_cd:02}"
         col_list = ["datejyo_id", "jyo_cd", "shinko", "ed_race_no"]
-        res_tpl = super().get_targetdata(
-            tb_name,
-            id_name,
-            target_id,
-            col_list
-        )
-        expected_tpl = (
-            int(target_id),
-            self.__jyo_cd,
-            '中止順延',
-            0
-        )
+        res_tpl = super().get_targetdata(tb_name, id_name, target_id, col_list)
+        expected_tpl = (int(target_id), self.__jyo_cd, "中止順延", 0)
         assert res_tpl == expected_tpl
 
     def test_map_raceno_dict(self):

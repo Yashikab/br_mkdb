@@ -24,10 +24,9 @@ class ContentTypes(str, Enum):
 class GetParserContent:
     # report先はlxmlを使った各種parser
     @classmethod
-    def url_to_content(cls,
-                       url: str,
-                       content_type: ContentTypes
-                       ) -> ContentTypes.get_content():
+    def url_to_content(
+        cls, url: str, content_type: ContentTypes
+    ) -> ContentTypes.get_content():
         """urlを読み込んで指定した種類のparser contentを返す
 
         Parameters
@@ -52,10 +51,9 @@ class GetParserContent:
         return content
 
     @classmethod
-    def file_to_content(cls,
-                        filepath: Path,
-                        content_type: ContentTypes
-                        ) -> ContentTypes.get_content():
+    def file_to_content(
+        cls, filepath: Path, content_type: ContentTypes
+    ) -> ContentTypes.get_content():
         """HTMLファイルを読み込んで指定した種類のparser contentを返す
 
         Parameters
@@ -85,7 +83,7 @@ class GetParserContent:
         success_flg = False
         html_content = None
         for i in range(num_retry):
-            with urlopen(url, timeout=10.) as f:
+            with urlopen(url, timeout=10.0) as f:
                 if f.status == 200:
                     html_content = f.read()
                     success_flg = True
@@ -98,12 +96,13 @@ class GetParserContent:
             time.sleep(0.5)
         if not success_flg:
             raise self.logger.error(
-                f"Didn't succeed in {num_retry} times retry.")
+                f"Didn't succeed in {num_retry} times retry."
+            )
         return html_content
 
-    def _html_to_content(self, html_content: str,
-                         content_type: ContentTypes
-                         ) -> ContentTypes.get_content():
+    def _html_to_content(
+        self, html_content: str, content_type: ContentTypes
+    ) -> ContentTypes.get_content():
         if content_type == ContentTypes.bs4:
             content = bs(html_content, "lxml")
         elif content_type == ContentTypes.lxml:

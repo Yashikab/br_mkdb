@@ -7,9 +7,9 @@ from pydantic.dataclasses import dataclass
 @dataclass
 class HoldRaceInfo:
     jyo_name: str
-    jyo_cd: str
+    jyo_cd: int
     shinko: str  # 進行状況
-    ed_race_no: str  # 最終レース番号(中止とかに対応するため)
+    ed_race_no: int  # 最終レース番号(中止とかに対応するため)
 
 
 @dataclass
@@ -95,12 +95,7 @@ class ResultPlayerInfo:
 
 @dataclass
 class ResultCommonInfo:
-    temp: float
-    weather: str
-    wind_v: int
-    w_temp: float
-    wave: int
-    wind_dr: int
+    weather_info: WeatherInfo
     henkantei_list: str  # カンマ区切り
     is_henkan: bool
     kimarite: str
@@ -119,7 +114,7 @@ class ResultCommonInfo:
 @dataclass
 class ResultInfo:
     common: ResultCommonInfo
-    players: ResultPlayerInfo
+    players: List[ResultPlayerInfo]
 
 
 # 連単キー生成
@@ -134,35 +129,32 @@ def rentan_keylist(rank: int) -> list:
     rentan_key_list = []
     for fst in range(1, 7):
         if rank == 1:
-            rentan_key_list.append(f'comb_{fst}')
+            rentan_key_list.append(f"comb_{fst}")
         else:
             for snd in range(1, 7):
                 if snd != fst and rank == 2:
-                    rentan_key_list.append(f'comb_{fst}{snd}')
+                    rentan_key_list.append(f"comb_{fst}{snd}")
                 else:
                     for trd in range(1, 7):
                         if fst != snd and fst != trd and snd != trd:
-                            rentan_key_list.append(f'comb_{fst}{snd}{trd}')
+                            rentan_key_list.append(f"comb_{fst}{snd}{trd}")
     return rentan_key_list
 
 
 ThreeRentan = make_dataclass(
-    "ThreeRentan",
-    [(key_name, float) for key_name in rentan_keylist(3)]
+    "ThreeRentan", [(key_name, float) for key_name in rentan_keylist(3)]
 )
 # pydanticに装着
 ThreeRentan = dataclass(ThreeRentan)
 
 TwoRentan = make_dataclass(
-    "TwoRentan",
-    [(key_name, float) for key_name in rentan_keylist(2)]
+    "TwoRentan", [(key_name, float) for key_name in rentan_keylist(2)]
 )
 # pydanticに装着
 TwoRentan = dataclass(TwoRentan)
 
 Tansho = make_dataclass(
-    "Tansho",
-    [(key_name, float) for key_name in rentan_keylist(1)]
+    "Tansho", [(key_name, float) for key_name in rentan_keylist(1)]
 )
 # pydanticに装着
 Tansho = dataclass(Tansho)
@@ -173,32 +165,31 @@ def renfuku_keylist(rank: int) -> list:
     renfuku_key_list = []
     if rank == 2:
         for fst in range(1, 6):
-            for snd in range(fst+1, 7):
-                renfuku_key_list.append(f'comb_{fst}{snd}')
+            for snd in range(fst + 1, 7):
+                renfuku_key_list.append(f"comb_{fst}{snd}")
         return renfuku_key_list
     elif rank == 3:
         for fst in range(1, 5):
-            for snd in range(fst+1, 6):
-                for trd in range(snd+1, 7):
-                    renfuku_key_list.append(f'comb_{fst}{snd}{trd}')
+            for snd in range(fst + 1, 6):
+                for trd in range(snd + 1, 7):
+                    renfuku_key_list.append(f"comb_{fst}{snd}{trd}")
         return renfuku_key_list
 
 
 ThreeRenfuku = make_dataclass(
-    "ThreeRenfuku",
-    [(key_name, float) for key_name in renfuku_keylist(3)]
+    "ThreeRenfuku", [(key_name, float) for key_name in renfuku_keylist(3)]
 )
 # pydanticに装着
 ThreeRenfuku = dataclass(ThreeRenfuku)
 
 TwoRenfuku = make_dataclass(
-    "TwoRenfuku",
-    [(key_name, float) for key_name in renfuku_keylist(2)]
+    "TwoRenfuku", [(key_name, float) for key_name in renfuku_keylist(2)]
 )
 # pydanticに装着
 TwoRenfuku = dataclass(TwoRenfuku)
 
 
+@dataclass
 class OddsInfo:
     three_rentan: ThreeRentan
     three_renfuku: ThreeRenfuku

@@ -9,7 +9,9 @@ class ProgramInfoFactory(metaclass=ABCMeta):
     """番組表情報を取得する"""
 
     @abstractmethod
-    def getinfo(self, target_date: date) -> Iterator[ProgramInfo]:
+    def each_jyoinfo(
+        self, target_date: date, jyo_cd: int
+    ) -> Iterator[ProgramInfo]:
         raise NotImplementedError()
 
     @abstractmethod

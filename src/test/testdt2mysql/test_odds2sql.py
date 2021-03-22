@@ -5,8 +5,13 @@ odds2sqlテスト
 """
 import pytest
 
-from domain.model.info import (Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku,
-                               TwoRentan)
+from domain.model.info import (
+    Tansho,
+    ThreeRenfuku,
+    ThreeRentan,
+    TwoRenfuku,
+    TwoRentan,
+)
 from infrastructure.dt2sql import Odds2sql
 from infrastructure.getdata_lxml import OfficialOdds
 
@@ -22,15 +27,16 @@ class TestOdds2sql(CommonMethod):
     # load Official Odds for get keys
     __ood = OfficialOdds
 
-    @pytest.fixture(scope='class', autouse=True)
+    @pytest.fixture(scope="class", autouse=True)
     def insertdata(self):
         __od2sql = Odds2sql()
         __od2sql.insert2table(
             self.__target_date,
             [self.__jyo_cd],
-            {self.__jyo_cd: [self.__race_no]})
+            {self.__jyo_cd: [self.__race_no]},
+        )
 
-    key_set = {'race_id'}
+    key_set = {"race_id"}
     three_rentan_key = key_set.union(set(ThreeRentan.__annotations__.keys()))
     three_renfuku_key = key_set.union(set(ThreeRenfuku.__annotations__.keys()))
     two_rentan_key = key_set.union(set(TwoRentan.__annotations__.keys()))
@@ -49,18 +55,18 @@ class TestOdds2sql(CommonMethod):
     one_tan_col_list = ["race_id", "`comb_1`", "`comb_5`"]
     one_tan_expected = (race_id, 2.7, 1.8)
 
-    @pytest.mark.parametrize("tb_nm, col_list, expected", [
-        ("odds_3tan_tb", three_tan_col_list, three_tan_expected),
-        ("odds_3fuku_tb", three_fuku_col_list, three_fuku_expected),
-        ("odds_2tan_tb", two_tan_col_list, two_tan_expected),
-        ("odds_2fuku_tb", two_fuku_col_list, two_fuku_expected),
-        ("odds_1tan_tb", one_tan_col_list, one_tan_expected),
-    ])
+    @pytest.mark.parametrize(
+        "tb_nm, col_list, expected",
+        [
+            ("odds_3tan_tb", three_tan_col_list, three_tan_expected),
+            ("odds_3fuku_tb", three_fuku_col_list, three_fuku_expected),
+            ("odds_2tan_tb", two_tan_col_list, two_tan_expected),
+            ("odds_2fuku_tb", two_fuku_col_list, two_fuku_expected),
+            ("odds_1tan_tb", one_tan_col_list, one_tan_expected),
+        ],
+    )
     def test_insert2table(self, tb_nm, col_list, expected):
         res_tpl = super().get_targetdata(
-            tb_nm,
-            "race_id",
-            self.race_id,
-            col_list
+            tb_nm, "race_id", self.race_id, col_list
         )
         assert res_tpl == expected

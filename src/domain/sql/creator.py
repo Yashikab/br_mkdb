@@ -5,14 +5,13 @@ logger = getLogger(__name__)
 
 
 class SqlCreator:
-
     def sql_for_create_table(
         self,
         tb_name: str,
         schema: List[Tuple[str, ...]],
         foreign_keys: Optional[List[str]] = None,
         refs: Optional[List[str]] = None,
-        replace: bool = True
+        replace: bool = True,
     ) -> str:
         """テーブル作成のためのクエリ作成
 
@@ -46,23 +45,28 @@ class SqlCreator:
         foreign_phases = [""]
         if foreign_keys:
             assert refs, "You have to set references, if foreign_keys are set."
-            assert len(foreign_keys) == len(refs), \
-                "Length between foreign_keys and references must be same."
+            assert len(foreign_keys) == len(
+                refs
+            ), "Length between foreign_keys and references must be same."
             schema_names = set(map(lambda s: s[0], schema))
-            assert set(foreign_keys) <= schema_names, \
-                "foregin key must be in the set of columns."
+            assert (
+                set(foreign_keys) <= schema_names
+            ), "foregin key must be in the set of columns."
             for f, r in zip(foreign_keys, refs):
                 foreign_phases.append(
-                    f"FOREIGN KEY ({f}) REFERENCES {r} ({f})")
+                    f"FOREIGN KEY ({f}) REFERENCES {r} ({f})"
+                )
 
         if len(foreign_phases) > 1:
             foreign_phrase = ", ".join(foreign_phases)
         else:
             foreign_phrase = ""
 
-        sql = f"CREATE TABLE {replace_txt} {tb_name}"\
-              f"( {schema_phrase} {foreign_phrase} ) " \
-              f"CHARACTER SET utf8;"
+        sql = (
+            f"CREATE TABLE {replace_txt} {tb_name}"
+            f"( {schema_phrase} {foreign_phrase} ) "
+            f"CHARACTER SET utf8;"
+        )
         logger.debug(sql)
         return sql
 
