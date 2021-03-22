@@ -41,7 +41,7 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
         )
         common = self._commoninfo(lx_content)
         players = list(self._playerinfo(lx_content))
-        self.logger.debug(f"Completed.")
+        self.logger.debug("Completed.")
         return ResultInfo(common, players)
 
     def _commoninfo(self, lx_content: lxml.HtmlElement) -> ResultCommonInfo:
@@ -200,7 +200,10 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
 
         for waku in range(1, 7):
             # # 結果STテーブルの情報を取得
-            tbody_xpath = "/html/body/main/div/div/div/div[2]/div[4]/div[2]/div/table/tbody"
+            tbody_xpath = (
+                "/html/body/main/div/div/div/"
+                "div[2]/div[4]/div[2]/div/table/tbody"
+            )
             course, st_time = self.__common_methods.getSTtable(
                 lx_content=lx_content,
                 tbody_xpath=tbody_xpath,

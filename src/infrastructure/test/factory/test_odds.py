@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import List, Tuple
 
 import pytest
-from domain.model.info import OddsInfo
 
+from domain.model.info import OddsInfo
 from infrastructure.factory import OddsInfoFactoryImpl
 from infrastructure.getter import GetParserContent
 
@@ -41,10 +41,11 @@ class TestOddsInfoFactoryImpl:
         ex_three_rentans: List[Tuple[int, int, int, float]],
         mocker,
     ):
-        filepath = (
-            FILEPATH
-            / f"odds_3tan_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+        filename = (
+            f"odds_3tan_"
+            f"{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
+        filepath = FILEPATH / filename
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
             GetParserContent, "url_to_content", return_value=lx_content
@@ -78,10 +79,11 @@ class TestOddsInfoFactoryImpl:
         ex_three_renfukus: List[Tuple[int, int, int, float]],
         mocker,
     ):
-        filepath = (
-            FILEPATH
-            / f"odds_3fuku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+        filename = (
+            f"odds_3fuku_"
+            f"{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
+        filepath = FILEPATH / filename
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
             GetParserContent, "url_to_content", return_value=lx_content
@@ -115,10 +117,11 @@ class TestOddsInfoFactoryImpl:
         ex_two_rentans: List[Tuple[int, int, float]],
         mocker,
     ):
-        filepath = (
-            FILEPATH
-            / f"odds_2tanfuku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+        filename = (
+            f"odds_2tanfuku_"
+            f"{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
+        filepath = FILEPATH / filename
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
             GetParserContent, "url_to_content", return_value=lx_content
@@ -150,10 +153,11 @@ class TestOddsInfoFactoryImpl:
         ex_two_renfukus: List[Tuple[int, int, float]],
         mocker,
     ):
-        filepath = (
-            FILEPATH
-            / f"odds_2tanfuku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+        filename = (
+            f"odds_2tanfuku_"
+            f"{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
+        filepath = FILEPATH / filename
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
             GetParserContent, "url_to_content", return_value=lx_content
@@ -181,10 +185,11 @@ class TestOddsInfoFactoryImpl:
         ex_tanshos: List[Tuple[int, float]],
         mocker,
     ):
-        filepath = (
-            FILEPATH
-            / f"odds_1tan_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+        filename = (
+            f"odds_1tan_"
+            f"{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
+        filepath = FILEPATH / filename
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
             GetParserContent, "url_to_content", return_value=lx_content

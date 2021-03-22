@@ -38,10 +38,10 @@ class TestChokuzenFactoryImpl:
         ex_players: List[Tuple[ChokuzenPlayerInfo, int]],
         mocker,
     ):
-        filepath = (
-            FILEPATH
-            / f"choku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+        filename = (
+            f"choku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
+        filepath = FILEPATH / filename
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
         mocker.patch.object(
             GetParserContent, "url_to_content", return_value=lx_content

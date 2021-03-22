@@ -57,7 +57,9 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
         # htmlをload
         target_url = (
             f"https://boatrace.jp/owpc/pc/race/oddstf?"
-            f"rno={race_no}&jcd={jyo_cd:02}&hd={target_date.strftime('%Y%m%d')}"
+            f"rno={race_no}&"
+            f"jcd={jyo_cd:02}&"
+            f"hd={target_date.strftime('%Y%m%d')}"
         )
         lx_content = GetParserContent.url_to_content(
             url=target_url, content_type="lxml"
@@ -162,7 +164,8 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
         # htmlをload
         target_url = (
             f"https://boatrace.jp/owpc/pc/race/odds{num}{html_type}?"
-            f"rno={race_no}&jcd={jyo_cd:02}&hd={target_date.strftime('%Y%m%d')}"
+            f"rno={race_no}&"
+            f"jcd={jyo_cd:02}&hd={target_date.strftime('%Y%m%d')}"
         )
         lx_content = GetParserContent.url_to_content(
             url=target_url, content_type="lxml"

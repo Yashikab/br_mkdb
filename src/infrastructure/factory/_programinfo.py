@@ -98,7 +98,10 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
         self, lx_content: lxml.HtmlElement
     ) -> Iterator[ProgramPlayerInfo]:
         for waku in range(1, 7):
-            target_tbody_xpath = f"/html/body/main/div/div/div/div[2]/div[4]/table/tbody[{waku}]"
+            target_tbody_xpath = (
+                f"/html/body/main/div/div/div/"
+                f"div[2]/div[4]/table/tbody[{waku}]"
+            )
 
             self.logger.debug(
                 "Get player's informaiton.(id, level, name, etc)"
@@ -138,7 +141,8 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
                 [target_tbody_xpath, "tr[1]/td[3]/div[3]/text()[1]"]
             )
             # xpathでtextまで指定されている
-            # 出力例: '\n                          愛知/愛知\n                          '
+            # 出力例:
+            # '\n        愛知/愛知\n     '
             home_birth = lx_content.xpath(home_birth_xpath)[0]
             home, birth_place = home_birth.strip().split("/")
 
