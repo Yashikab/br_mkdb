@@ -5,7 +5,13 @@ odds2sqlテスト
 """
 import pytest
 
-from domain.model.info import Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku, TwoRentan
+from domain.model.info import (
+    Tansho,
+    ThreeRenfuku,
+    ThreeRentan,
+    TwoRenfuku,
+    TwoRentan,
+)
 from infrastructure.dt2sql import Odds2sql
 from infrastructure.getdata_lxml import OfficialOdds
 
@@ -25,7 +31,9 @@ class TestOdds2sql(CommonMethod):
     def insertdata(self):
         __od2sql = Odds2sql()
         __od2sql.insert2table(
-            self.__target_date, [self.__jyo_cd], {self.__jyo_cd: [self.__race_no]}
+            self.__target_date,
+            [self.__jyo_cd],
+            {self.__jyo_cd: [self.__race_no]},
         )
 
     key_set = {"race_id"}
@@ -58,5 +66,7 @@ class TestOdds2sql(CommonMethod):
         ],
     )
     def test_insert2table(self, tb_nm, col_list, expected):
-        res_tpl = super().get_targetdata(tb_nm, "race_id", self.race_id, col_list)
+        res_tpl = super().get_targetdata(
+            tb_nm, "race_id", self.race_id, col_list
+        )
         assert res_tpl == expected

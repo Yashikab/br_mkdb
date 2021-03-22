@@ -13,7 +13,9 @@ class CommonMethods:
     """Factoryで使う共通メソッド"""
 
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
 
     def getonlyzenkaku2str(self, in_str: str) -> Optional[str]:
         try:
@@ -140,7 +142,9 @@ class CommonMethods:
         st_time_list = []
         for i in range(1, len_course + 1):
             try:
-                waku_no_xpath = "/".join([tbody_xpath, f"tr[{i}]/td/div/span[1]"])
+                waku_no_xpath = "/".join(
+                    [tbody_xpath, f"tr[{i}]/td/div/span[1]"]
+                )
                 waku_no = lx_content.xpath(waku_no_xpath)[0].text
                 waku_list.append(self.rmletter2int(waku_no))
 
@@ -150,7 +154,9 @@ class CommonMethods:
                     )
                     st_time = lx_content.xpath(st_time_xpath)[0].strip()
                 else:
-                    st_time_xpath = "/".join([tbody_xpath, f"tr[{i}]/td/div/span[3]"])
+                    st_time_xpath = "/".join(
+                        [tbody_xpath, f"tr[{i}]/td/div/span[3]"]
+                    )
                     st_time = lx_content.xpath(st_time_xpath)[0].text
                 # Fをマイナスに変換し，少数化
                 st_time = self.rmletter2float(st_time.replace("F", "-"))

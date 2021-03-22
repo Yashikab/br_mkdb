@@ -30,9 +30,13 @@ class TestOfficialChokuzen(CommonMethod):
         date = 20200408
 
         # mocking
-        filepath = super().get_html_filepath(f"choku_{date}{jyo_code}{race_no}.html")
+        filepath = super().get_html_filepath(
+            f"choku_{date}{jyo_code}{race_no}.html"
+        )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         och = OfficialChokuzen(race_no, jyo_code, date)
         return och
 

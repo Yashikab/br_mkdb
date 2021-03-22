@@ -42,7 +42,9 @@ class CloudSqlController(DatabaseController):
     """use cloud sql mysql"""
 
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         self.logger.info("Set path to proxy.")
         pwd = Path(__file__).resolve()
         self.__proxy_dir = pwd.parents[2].joinpath("proxy")
@@ -65,7 +67,9 @@ class CloudSqlController(DatabaseController):
         os.chdir(self.__proxy_dir)
         if not os.path.exists("cloud_sql_proxy"):
             self.logger.debug("Install cloud_sql_proxy")
-            proxy_dl_url = "https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64"
+            proxy_dl_url = (
+                "https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64"
+            )
             subprocess.run(["wget", proxy_dl_url, "-O", "cloud_sql_proxy"])
         os.chmod("cloud_sql_proxy", S_IXUSR | S_IXGRP | S_IXOTH)
 
@@ -104,8 +108,12 @@ class CloudSqlController(DatabaseController):
         cmd3 = ["awk", "{print $1}"]
         cmd4 = ["xargs", "kill", "-9"]
         pipe = subprocess.Popen(cmd1, stdout=subprocess.PIPE)
-        pipe = subprocess.Popen(cmd2, stdin=pipe.stdout, stdout=subprocess.PIPE)
-        pipe = subprocess.Popen(cmd3, stdin=pipe.stdout, stdout=subprocess.PIPE)
+        pipe = subprocess.Popen(
+            cmd2, stdin=pipe.stdout, stdout=subprocess.PIPE
+        )
+        pipe = subprocess.Popen(
+            cmd3, stdin=pipe.stdout, stdout=subprocess.PIPE
+        )
         subprocess.run(cmd4, stdin=pipe.stdout)
 
         self.logger.debug("delete pri key id from gcp")
@@ -133,7 +141,9 @@ class LocalSqlController(DatabaseController):
     """use local mysql db"""
 
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         pwd = Path(__file__).resolve()
         self.__sql_dir = pwd.parents[2].joinpath("local_mysql")
         self.logger.debug(f"sql dir is {self.__sql_dir}")

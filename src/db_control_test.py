@@ -16,10 +16,16 @@ logger.setLevel(DEBUG)
 
 
 def main():
-    msg = "MySQL DB to start.\n" "default : local \n" 'if use gcs: add opt "--gcs"'
+    msg = (
+        "MySQL DB to start.\n"
+        "default : local \n"
+        'if use gcs: add opt "--gcs"'
+    )
     parser = argparse.ArgumentParser(description=msg)
     parser.add_argument(
-        "--gcs", action="store_true", help="if you want to use gcs as MySQL db."
+        "--gcs",
+        action="store_true",
+        help="if you want to use gcs as MySQL db.",
     )
     args = parser.parse_args()
 

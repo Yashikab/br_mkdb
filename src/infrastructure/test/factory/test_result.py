@@ -37,10 +37,13 @@ class TestResultFactoryImpl:
         mocker,
     ):
         filepath = (
-            FILEPATH / f"res_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+            FILEPATH
+            / f"res_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
 
         rif = ResultInfoFactoryImpl()
         resinfo = rif._raceinfo(target_date, target_jyo, race_no)

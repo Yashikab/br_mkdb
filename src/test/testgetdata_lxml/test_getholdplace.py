@@ -17,7 +17,19 @@ class TestGetHoldPlace(CommonMethod):
     URL: https://www.boatrace.jp/owpc/pc/race/index?hd=20110311
     """
 
-    name_list1 = ["江戸川", "浜名湖", "常滑", "津", "三国", "尼崎", "徳山", "下関", "若松", "福岡", "大村"]
+    name_list1 = [
+        "江戸川",
+        "浜名湖",
+        "常滑",
+        "津",
+        "三国",
+        "尼崎",
+        "徳山",
+        "下関",
+        "若松",
+        "福岡",
+        "大村",
+    ]
     name_list2 = [
         "多摩川",
         "浜名湖",
@@ -61,6 +73,8 @@ class TestGetHoldPlace(CommonMethod):
         """mock用に共通項にする"""
         filepath = super().get_html_filepath(f"ghp_{date}.html")
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         ghp = GetHoldPlacePast(date)
         return ghp

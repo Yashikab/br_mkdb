@@ -14,7 +14,9 @@ from ._common import CommonMethods
 
 class ChokuzenInfoFactoryImpl(ChokuzenInfoFactory):
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         self.__common_methods = CommonMethods()
 
     def each_jyoinfo(
@@ -23,7 +25,9 @@ class ChokuzenInfoFactoryImpl(ChokuzenInfoFactory):
         for race_no in range(1, ed_race_no + 1):
             yield self._raceinfo(target_date, jyo_cd, race_no)
 
-    def _raceinfo(self, target_date: date, jyo_cd: int, race_no: int) -> ChokuzenInfo:
+    def _raceinfo(
+        self, target_date: date, jyo_cd: int, race_no: int
+    ) -> ChokuzenInfo:
         target_url = (
             f"https://boatrace.jp/owpc/pc/race/beforeinfo?"
             f"rno={race_no}&"
@@ -89,7 +93,8 @@ class ChokuzenInfoFactoryImpl(ChokuzenInfoFactory):
 
             # スタート展示テーブルの選択
             target_ST_tbody = (
-                "/html/body/main/div/div/div/div[2]/" "div[4]/div[2]/div[1]/table/tbody"
+                "/html/body/main/div/div/div/div[2]/"
+                "div[4]/div[2]/div[1]/table/tbody"
             )
             tenji_C, tenji_ST = self.__common_methods.getSTtable(
                 lx_content, target_ST_tbody, waku

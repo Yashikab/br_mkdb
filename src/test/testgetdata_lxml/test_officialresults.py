@@ -28,9 +28,13 @@ class TestOfficialResults(CommonMethod):
         # day 2020/04/08
         date = 20200410
 
-        filepath = super().get_html_filepath(f"res_{date}{jyo_code}{race_no}.html")
+        filepath = super().get_html_filepath(
+            f"res_{date}{jyo_code}{race_no}.html"
+        )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         ors = OfficialResults(race_no, jyo_code, date)
         return ors
 

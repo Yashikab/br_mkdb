@@ -17,7 +17,9 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
     __common_methods: CommonMethods
 
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         self.__common_methods = CommonMethods()
 
     def each_jyoinfo(
@@ -26,7 +28,9 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
         for race_no in range(1, ed_race_no + 1):
             yield self._raceinfo(target_date, jyo_cd, race_no)
 
-    def _raceinfo(self, target_date: date, jyo_cd: int, race_no: int) -> ProgramInfo:
+    def _raceinfo(
+        self, target_date: date, jyo_cd: int, race_no: int
+    ) -> ProgramInfo:
         # htmlをload
         target_url = (
             f"https://boatrace.jp/owpc/pc/race/racelist"
@@ -68,7 +72,9 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
         # 安定版or進入固定の有無
         antei_shinyu_xpath = "/".join([target_table_xpath, "/div/span"])
         antei_shinyu_el_list = lx_content.xpath(antei_shinyu_xpath)
-        antei_shinyu_list = list(map(lambda x: x.text.strip(), antei_shinyu_el_list))
+        antei_shinyu_list = list(
+            map(lambda x: x.text.strip(), antei_shinyu_el_list)
+        )
 
         if "安定板使用" in antei_shinyu_list:
             is_antei = True
@@ -80,18 +86,27 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             is_shinnyukotei = False
         self.logger.debug("done.")
         return ProgramCommonInfo(
-            taikai_name, grade, race_type, race_kyori, is_antei, is_shinnyukotei
+            taikai_name,
+            grade,
+            race_type,
+            race_kyori,
+            is_antei,
+            is_shinnyukotei,
         )
 
-    def _playersinfo(self, lx_content: lxml.HtmlElement) -> Iterator[ProgramPlayerInfo]:
+    def _playersinfo(
+        self, lx_content: lxml.HtmlElement
+    ) -> Iterator[ProgramPlayerInfo]:
         for waku in range(1, 7):
-            target_tbody_xpath = (
-                f"/html/body/main/div/div/div/div[2]/div[4]/table/tbody[{waku}]"
-            )
+            target_tbody_xpath = f"/html/body/main/div/div/div/div[2]/div[4]/table/tbody[{waku}]"
 
-            self.logger.debug("Get player's informaiton.(id, level, name, etc)")
+            self.logger.debug(
+                "Get player's informaiton.(id, level, name, etc)"
+            )
             # 登録番号
-            player_id_xpath = "/".join([target_tbody_xpath, "tr[1]/td[3]/div[1]"])
+            player_id_xpath = "/".join(
+                [target_tbody_xpath, "tr[1]/td[3]/div[1]"]
+            )
             raw_player_id = lx_content.xpath(player_id_xpath)[0].text
             player_id = self.__common_methods.rmletter2int(raw_player_id)
 
@@ -100,15 +115,23 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             raw_player_level = lx_content.xpath(player_level_xpath)[0].text
             # 級が取りうる値かチェックする
             try:
-                player_level = re.search(r"[A,B][1,2]", raw_player_level).group(0)
+                player_level = re.search(
+                    r"[A,B][1,2]", raw_player_level
+                ).group(0)
             except AttributeError as e:
-                self.logger.error(f"player_level: {raw_player_level} error: {e}")
+                self.logger.error(
+                    f"player_level: {raw_player_level} error: {e}"
+                )
                 player_level = None
 
             # 名前
-            player_name_xpath = "/".join([target_tbody_xpath, "tr[1]/td[3]/div[2]/a"])
+            player_name_xpath = "/".join(
+                [target_tbody_xpath, "tr[1]/td[3]/div[2]/a"]
+            )
             raw_player_name = lx_content.xpath(player_name_xpath)[0].text
-            player_name = raw_player_name.replace("\n", "").replace("\u3000", "")
+            player_name = raw_player_name.replace("\n", "").replace(
+                "\u3000", ""
+            )
 
             # 所属、出身地
             home_birth_xpath = "/".join(
@@ -129,7 +152,9 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             weight = self.__common_methods.rmletter2float(raw_weight)
 
             # F/L数 平均ST
-            num_F_xpath = "/".join([target_tbody_xpath, "tr[1]/td[4]/text()[1]"])
+            num_F_xpath = "/".join(
+                [target_tbody_xpath, "tr[1]/td[4]/text()[1]"]
+            )
             raw_num_F = lx_content.xpath(num_F_xpath)[0]
             raw_num_F, raw_num_L, raw_avg_ST = self._box_to_three_element(
                 lx_content, target_tbody_xpath, column_no=4
@@ -139,38 +164,72 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             avg_ST = self.__common_methods.rmletter2float(raw_avg_ST.strip())
 
             # 全国勝率
-            raw_all_1rate, raw_all_2rate, raw_all_3rate = self._box_to_three_element(
+            (
+                raw_all_1rate,
+                raw_all_2rate,
+                raw_all_3rate,
+            ) = self._box_to_three_element(
                 lx_content, target_tbody_xpath, column_no=5
             )
-            all_1rate = self.__common_methods.rmletter2float(raw_all_1rate.strip())
-            all_2rate = self.__common_methods.rmletter2float(raw_all_2rate.strip())
-            all_3rate = self.__common_methods.rmletter2float(raw_all_3rate.strip())
+            all_1rate = self.__common_methods.rmletter2float(
+                raw_all_1rate.strip()
+            )
+            all_2rate = self.__common_methods.rmletter2float(
+                raw_all_2rate.strip()
+            )
+            all_3rate = self.__common_methods.rmletter2float(
+                raw_all_3rate.strip()
+            )
 
             # 当地勝率
             (
                 raw_local_1rate,
                 raw_local_2rate,
                 raw_local_3rate,
-            ) = self._box_to_three_element(lx_content, target_tbody_xpath, column_no=6)
-            local_1rate = self.__common_methods.rmletter2float(raw_local_1rate.strip())
-            local_2rate = self.__common_methods.rmletter2float(raw_local_2rate.strip())
-            local_3rate = self.__common_methods.rmletter2float(raw_local_3rate.strip())
+            ) = self._box_to_three_element(
+                lx_content, target_tbody_xpath, column_no=6
+            )
+            local_1rate = self.__common_methods.rmletter2float(
+                raw_local_1rate.strip()
+            )
+            local_2rate = self.__common_methods.rmletter2float(
+                raw_local_2rate.strip()
+            )
+            local_3rate = self.__common_methods.rmletter2float(
+                raw_local_3rate.strip()
+            )
 
             # モーター情報は7番目
-            raw_motor_no, raw_motor_2rate, raw_motor_3rate = self._box_to_three_element(
+            (
+                raw_motor_no,
+                raw_motor_2rate,
+                raw_motor_3rate,
+            ) = self._box_to_three_element(
                 lx_content, target_tbody_xpath, column_no=7
             )
             motor_no = self.__common_methods.rmletter2int(raw_motor_no.strip())
-            motor_2rate = self.__common_methods.rmletter2float(raw_motor_2rate.strip())
-            motor_3rate = self.__common_methods.rmletter2float(raw_motor_3rate.strip())
+            motor_2rate = self.__common_methods.rmletter2float(
+                raw_motor_2rate.strip()
+            )
+            motor_3rate = self.__common_methods.rmletter2float(
+                raw_motor_3rate.strip()
+            )
 
             # ボート情報は8番目
-            raw_boat_no, raw_boat_2rate, raw_boat_3rate = self._box_to_three_element(
+            (
+                raw_boat_no,
+                raw_boat_2rate,
+                raw_boat_3rate,
+            ) = self._box_to_three_element(
                 lx_content, target_tbody_xpath, column_no=8
             )
             boat_no = self.__common_methods.rmletter2int(raw_boat_no.strip())
-            boat_2rate = self.__common_methods.rmletter2float(raw_boat_2rate.strip())
-            boat_3rate = self.__common_methods.rmletter2float(raw_boat_3rate.strip())
+            boat_2rate = self.__common_methods.rmletter2float(
+                raw_boat_2rate.strip()
+            )
+            boat_3rate = self.__common_methods.rmletter2float(
+                raw_boat_3rate.strip()
+            )
 
             self.logger.debug("get target player info completed.")
 
@@ -204,6 +263,8 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
     ) -> list:
         el_list = []
         for i in range(1, 4):
-            target_xpath = "/".join([root_xpath, f"tr[1]/td[{column_no}]/text()[{i}]"])
+            target_xpath = "/".join(
+                [root_xpath, f"tr[1]/td[{column_no}]/text()[{i}]"]
+            )
             el_list.append(lx_content.xpath(target_xpath)[0])
         return el_list

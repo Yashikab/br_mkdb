@@ -24,7 +24,9 @@ class TestRaceInfo2sql(CommonMethod):
         self.__rd2sql.insert2table(
             date=self.__target_date,
             jyo_cd_list=[self.__jyo_cd],
-            raceno_dict={self.__jyo_cd: range(self.__race_no, self.__race_no + 1)},
+            raceno_dict={
+                self.__jyo_cd: range(self.__race_no, self.__race_no + 1)
+            },
         )
 
     ri_col_set = {"race_id", "datejyo_id"}.union(

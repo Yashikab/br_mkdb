@@ -61,7 +61,9 @@ class BoatRaceUsecase:
                 logger.debug("Start to insert result data")
                 res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
                 logger.debug("Start to insert odds data")
-                odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                odds2sql.insert2table(
+                    date, jyo_cd_list, jd2sql.map_raceno_dict
+                )
 
                 elapsed_time = time.time() - start_time
                 logger.debug(f"completed in {elapsed_time}sec")

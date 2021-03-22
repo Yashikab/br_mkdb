@@ -43,7 +43,9 @@ class TestChokuzenFactoryImpl:
             / f"choku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
 
         chif = ChokuzenInfoFactoryImpl()
         chokuinfo = chif._raceinfo(target_date, target_jyo, race_no)
@@ -54,7 +56,9 @@ class TestChokuzenFactoryImpl:
 
     @pytest.mark.parametrize("ed_race_no", [(12), (0), (8)])
     def test_each_jyoinfo(self, ed_race_no, mocker):
-        raceinfo_func = mocker.patch.object(ChokuzenInfoFactoryImpl, "_raceinfo")
+        raceinfo_func = mocker.patch.object(
+            ChokuzenInfoFactoryImpl, "_raceinfo"
+        )
         chif = ChokuzenInfoFactoryImpl()
         list(chif.each_jyoinfo(date(2020, 4, 8), 6, ed_race_no))
         assert raceinfo_func.call_count == ed_race_no

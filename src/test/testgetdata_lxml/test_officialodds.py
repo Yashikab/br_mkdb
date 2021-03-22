@@ -30,14 +30,21 @@ class TestOfficialOdds(CommonMethod):
     # 3連単
     @pytest.mark.parametrize(
         "fst, snd, trd, expected",
-        [(1, 2, 3, 6.5), (3, 4, 5, 1621.0), (4, 5, 6, 2555.0), (6, 5, 4, 810.9)],
+        [
+            (1, 2, 3, 6.5),
+            (3, 4, 5, 1621.0),
+            (4, 5, 6, 2555.0),
+            (6, 5, 4, 810.9),
+        ],
     )
     def test_threerentan(self, fst, snd, trd, expected, odds, mocker):
         filepath = super().get_html_filepath(
             f"odds_3tan_{self.__date}{self.__jyo_code}{self.__race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         assert odds.three_rentan()[f"comb_{fst}{snd}{trd}"] == expected
 
     # 3連単(欠場を試行)
@@ -52,7 +59,9 @@ class TestOfficialOdds(CommonMethod):
     def test_threerentan_ketsujyo(self, fst, snd, trd, expected, odds, mocker):
         filepath = super().get_html_filepath("odds_3tan_20190103222.html")
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         assert odds.three_rentan()[f"comb_{fst}{snd}{trd}"] == expected
 
     # 3連複
@@ -65,20 +74,26 @@ class TestOfficialOdds(CommonMethod):
             f"odds_3fuku_{self.__date}{self.__jyo_code}{self.__race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         assert odds.three_renfuku()[f"comb_{fst}{snd}{trd}"] == expected
 
     # 2連単
     @pytest.mark.parametrize(
-        "fst, snd, expected", [(1, 2, 2.7), (2, 3, 101.3), (3, 4, 238.5), (6, 5, 135.1)]
+        "fst, snd, expected",
+        [(1, 2, 2.7), (2, 3, 101.3), (3, 4, 238.5), (6, 5, 135.1)],
     )
     def test_tworentan(self, fst, snd, expected, odds, mocker):
         filename = (
-            f"odds_2tanfuku_" f"{self.__date}{self.__jyo_code}{self.__race_no}.html"
+            f"odds_2tanfuku_"
+            f"{self.__date}{self.__jyo_code}{self.__race_no}.html"
         )
         filepath = super().get_html_filepath(filename)
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         assert odds.two_rentan()[f"comb_{fst}{snd}"] == expected
 
     # 2連複
@@ -92,18 +107,28 @@ class TestOfficialOdds(CommonMethod):
     )
     def test_tworenfuku(self, fst, snd, expected, odds, mocker):
         filename = (
-            f"odds_2tanfuku_" f"{self.__date}{self.__jyo_code}{self.__race_no}.html"
+            f"odds_2tanfuku_"
+            f"{self.__date}{self.__jyo_code}{self.__race_no}.html"
         )
         filepath = super().get_html_filepath(filename)
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         assert odds.two_renfuku()[f"comb_{fst}{snd}"] == expected
 
     # 単勝
-    @pytest.mark.parametrize("fst, expected", [(1, 1.0), (2, 6.1), (3, 12.2), (6, 9.1)])
+    @pytest.mark.parametrize(
+        "fst, expected", [(1, 1.0), (2, 6.1), (3, 12.2), (6, 9.1)]
+    )
     def test_tansho(self, fst, expected, odds, mocker):
-        filename = f"odds_1tan_" f"{self.__date}{self.__jyo_code}{self.__race_no}.html"
+        filename = (
+            f"odds_1tan_"
+            f"{self.__date}{self.__jyo_code}{self.__race_no}.html"
+        )
         filepath = super().get_html_filepath(filename)
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         assert odds.tansho()[f"comb_{fst}"] == expected

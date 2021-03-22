@@ -25,7 +25,9 @@ class TestChokuzenInfo2sql(CommonMethod):
         self.__ci2sql.insert2table(
             date=self.__target_date,
             jyo_cd_list=[self.__jyo_cd],
-            raceno_dict={self.__jyo_cd: range(self.__race_no, self.__race_no + 1)},
+            raceno_dict={
+                self.__jyo_cd: range(self.__race_no, self.__race_no + 1)
+            },
         )
 
     cc_col_set = {"race_id", "datejyo_id"}.union(
@@ -52,7 +54,13 @@ class TestChokuzenInfo2sql(CommonMethod):
     @pytest.mark.parametrize(
         "tb_nm, id_nm, t_id, col_list, expected",
         [
-            ("chokuzen_cond_tb", "race_id", race_id, cond_col_list, cond_expected),
+            (
+                "chokuzen_cond_tb",
+                "race_id",
+                race_id,
+                cond_col_list,
+                cond_expected,
+            ),
             ("chokuzen_player_tb", "waku_id", waku_id, waku_col_list, waku_ex),
         ],
     )

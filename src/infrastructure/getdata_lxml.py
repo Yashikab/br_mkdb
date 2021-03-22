@@ -15,14 +15,22 @@ import lxml.html as lxml
 import numpy as np
 import pandas as pd
 
-from domain.model.info import Tansho, ThreeRenfuku, ThreeRentan, TwoRenfuku, TwoRentan
+from domain.model.info import (
+    Tansho,
+    ThreeRenfuku,
+    ThreeRentan,
+    TwoRenfuku,
+    TwoRentan,
+)
 from infrastructure import const
 from infrastructure.getter import GetParserContent
 
 
 class CommonMethods4Official:
     def __init__(self):
-        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
 
     def _getSTtable2tuple(
         self,
@@ -63,7 +71,9 @@ class CommonMethods4Official:
         st_time_list = []
         for i in range(1, len_course + 1):
             try:
-                waku_no_xpath = "/".join([tbody_xpath, f"tr[{i}]/td/div/span[1]"])
+                waku_no_xpath = "/".join(
+                    [tbody_xpath, f"tr[{i}]/td/div/span[1]"]
+                )
                 waku_no = lx_content.xpath(waku_no_xpath)[0].text
                 waku_list.append(self._rmletter2int(waku_no))
 
@@ -73,7 +83,9 @@ class CommonMethods4Official:
                     )
                     st_time = lx_content.xpath(st_time_xpath)[0].strip()
                 else:
-                    st_time_xpath = "/".join([tbody_xpath, f"tr[{i}]/td/div/span[3]"])
+                    st_time_xpath = "/".join(
+                        [tbody_xpath, f"tr[{i}]/td/div/span[3]"]
+                    )
                     st_time = lx_content.xpath(st_time_xpath)[0].text
                 # Fをマイナスに変換し，少数化
                 st_time = self._rmletter2float(st_time.replace("F", "-"))
@@ -202,7 +214,9 @@ class GetHoldPlacePast(CommonMethods4Official):
             target_date : int
                 yyyymmdd型
         """
-        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         # htmlをload
         base_url = "https://www.boatrace.jp/owpc/pc/race/index?"
         target_url = f"{base_url}hd={target_date}"
@@ -215,7 +229,9 @@ class GetHoldPlacePast(CommonMethods4Official):
         target_table_xpath = "/html/body/main/div/div/div/div[2]/div[3]/table"
 
         # 会場名のパス
-        place_name_xpath = "/".join([target_table_xpath, "tbody/tr/td[1]/a/img"])
+        place_name_xpath = "/".join(
+            [target_table_xpath, "tbody/tr/td[1]/a/img"]
+        )
         self.place_name_list = list(
             map(self._getplacename, self.__lx_content.xpath(place_name_xpath))
         )
@@ -223,7 +239,9 @@ class GetHoldPlacePast(CommonMethods4Official):
         # 進行状況のパス
         shinko_info_xpath = "/".join([target_table_xpath, "tbody/tr/td[2]"])
         self.shinko_info_list = list(
-            map(self._getshinkoinfo, self.__lx_content.xpath(shinko_info_xpath))
+            map(
+                self._getshinkoinfo, self.__lx_content.xpath(shinko_info_xpath)
+            )
         )
 
     def holdplace2strlist(self) -> list:
@@ -310,7 +328,9 @@ class OfficialProgram(CommonMethods4Official):
 
         """
         # logger設定
-        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
 
         # htmlをload
         base_url = "https://boatrace.jp/owpc/pc/race/racelist?"
@@ -345,7 +365,9 @@ class OfficialProgram(CommonMethods4Official):
             player_level = None
 
         # 名前
-        player_name_xpath = "/".join([target_tbody_xpath, "tr[1]/td[3]/div[2]/a"])
+        player_name_xpath = "/".join(
+            [target_tbody_xpath, "tr[1]/td[3]/div[2]/a"]
+        )
         raw_player_name = self.__lx_content.xpath(player_name_xpath)[0].text
         player_name = raw_player_name.replace("\n", "").replace("\u3000", "")
 
@@ -378,33 +400,41 @@ class OfficialProgram(CommonMethods4Official):
         avg_ST = super()._rmletter2float(raw_avg_ST.strip())
 
         # 全国勝率
-        raw_all_1rate, raw_all_2rate, raw_all_3rate = self._box_to_three_element(
-            target_tbody_xpath, column_no=5
-        )
+        (
+            raw_all_1rate,
+            raw_all_2rate,
+            raw_all_3rate,
+        ) = self._box_to_three_element(target_tbody_xpath, column_no=5)
         all_1rate = super()._rmletter2float(raw_all_1rate.strip())
         all_2rate = super()._rmletter2float(raw_all_2rate.strip())
         all_3rate = super()._rmletter2float(raw_all_3rate.strip())
 
         # 当地勝率
-        raw_local_1rate, raw_local_2rate, raw_local_3rate = self._box_to_three_element(
-            target_tbody_xpath, column_no=6
-        )
+        (
+            raw_local_1rate,
+            raw_local_2rate,
+            raw_local_3rate,
+        ) = self._box_to_three_element(target_tbody_xpath, column_no=6)
         local_1rate = super()._rmletter2float(raw_local_1rate.strip())
         local_2rate = super()._rmletter2float(raw_local_2rate.strip())
         local_3rate = super()._rmletter2float(raw_local_3rate.strip())
 
         # モーター情報は7番目
-        raw_motor_no, raw_motor_2rate, raw_motor_3rate = self._box_to_three_element(
-            target_tbody_xpath, column_no=7
-        )
+        (
+            raw_motor_no,
+            raw_motor_2rate,
+            raw_motor_3rate,
+        ) = self._box_to_three_element(target_tbody_xpath, column_no=7)
         motor_no = super()._rmletter2int(raw_motor_no.strip())
         motor_2rate = super()._rmletter2float(raw_motor_2rate.strip())
         motor_3rate = super()._rmletter2float(raw_motor_3rate.strip())
 
         # ボート情報は8番目
-        raw_boat_no, raw_boat_2rate, raw_boat_3rate = self._box_to_three_element(
-            target_tbody_xpath, column_no=8
-        )
+        (
+            raw_boat_no,
+            raw_boat_2rate,
+            raw_boat_3rate,
+        ) = self._box_to_three_element(target_tbody_xpath, column_no=8)
         boat_no = super()._rmletter2int(raw_boat_no.strip())
         boat_2rate = super()._rmletter2float(raw_boat_2rate.strip())
         boat_3rate = super()._rmletter2float(raw_boat_3rate.strip())
@@ -443,7 +473,9 @@ class OfficialProgram(CommonMethods4Official):
         target_table_xpath = "/html/body/main/div/div/div/div[1]/div/div[2]"
 
         # SG, G1, G2, G3 一般
-        raw_grade = self.__lx_content.xpath(target_table_xpath)[0].attrib["class"]
+        raw_grade = self.__lx_content.xpath(target_table_xpath)[0].attrib[
+            "class"
+        ]
         grade = raw_grade.split()[1].strip()
 
         # 大会名
@@ -462,7 +494,9 @@ class OfficialProgram(CommonMethods4Official):
         # 安定版or進入固定の有無
         antei_shinyu_xpath = "/".join([target_table_xpath, "/div/span"])
         antei_shinyu_el_list = self.__lx_content.xpath(antei_shinyu_xpath)
-        antei_shinyu_list = list(map(lambda x: x.text.strip(), antei_shinyu_el_list))
+        antei_shinyu_list = list(
+            map(lambda x: x.text.strip(), antei_shinyu_el_list)
+        )
 
         if "安定板使用" in antei_shinyu_list:
             is_antei = True
@@ -487,7 +521,9 @@ class OfficialProgram(CommonMethods4Official):
     def _box_to_three_element(self, root_xpath: str, column_no: int) -> list:
         el_list = []
         for i in range(1, 4):
-            target_xpath = "/".join([root_xpath, f"tr[1]/td[{column_no}]/text()[{i}]"])
+            target_xpath = "/".join(
+                [root_xpath, f"tr[1]/td[{column_no}]/text()[{i}]"]
+            )
             el_list.append(self.__lx_content.xpath(target_xpath)[0])
         return el_list
 
@@ -508,7 +544,9 @@ class OfficialChokuzen(CommonMethods4Official):
             yyyymmdd形式で入力
 
         """
-        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         # htmlをload
         base_url = "https://boatrace.jp/owpc/pc/race/beforeinfo?"
         target_url = f"{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}"
@@ -551,7 +589,8 @@ class OfficialChokuzen(CommonMethods4Official):
 
         # スタート展示テーブルの選択
         target_ST_tbody = (
-            "/html/body/main/div/div/div/div[2]/" "div[4]/div[2]/div[1]/table/tbody"
+            "/html/body/main/div/div/div/div[2]/"
+            "div[4]/div[2]/div[1]/table/tbody"
         )
         tenji_C, tenji_ST = super()._getSTtable2tuple(
             self.__lx_content, target_ST_tbody, waku
@@ -599,7 +638,9 @@ class OfficialResults(CommonMethods4Official):
                 yyyymmdd形式で入力
 
         """
-        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         # htmlをload
         base_url = "http://boatrace.jp/owpc/pc/race/raceresult?"
         target_url = f"{base_url}rno={race_no}&jcd={jyo_code:02}&hd={date}"
@@ -628,7 +669,9 @@ class OfficialResults(CommonMethods4Official):
         content_dict = self.waku_dict[waku]
 
         # # 結果STテーブルの情報を取得
-        tbody_xpath = "/html/body/main/div/div/div/div[2]/div[4]/div[2]/div/table/tbody"
+        tbody_xpath = (
+            "/html/body/main/div/div/div/div[2]/div[4]/div[2]/div/table/tbody"
+        )
         course, st_time = super()._getSTtable2tuple(
             lx_content=self.__lx_content,
             tbody_xpath=tbody_xpath,
@@ -672,7 +715,9 @@ class OfficialResults(CommonMethods4Official):
             else:
                 return None
 
-        henkantei_list = list(map(lambda x: teistr2str(x.text), henkantei_list))
+        henkantei_list = list(
+            map(lambda x: teistr2str(x.text), henkantei_list)
+        )
 
         # 返還艇があればリスト長が1以上になる
         if len(henkantei_list) > 0:
@@ -705,7 +750,9 @@ class OfficialResults(CommonMethods4Official):
             "/div[5]/div[1]/div/table/tbody/tr[1]/td[3]/span"
         )
         pay_contents = self.__lx_content.xpath(table_xpath)
-        pay_list = list(map(lambda x: int(re.sub(r"[^\d]", "", x.text)), pay_contents))
+        pay_list = list(
+            map(lambda x: int(re.sub(r"[^\d]", "", x.text)), pay_contents)
+        )
 
         # 人気
         # TODO 順番問題でうまくいってない可能性大
@@ -744,13 +791,19 @@ class OfficialResults(CommonMethods4Official):
         rank_xpath = "/".join([target_table_xpath, "/tr/td[1]"])
         rank_el_list = self.__lx_content.xpath(rank_xpath)
         rank_list = list(
-            map(lambda x: int(x.text) if x.text.isdecimal() else -1, rank_el_list)
+            map(
+                lambda x: int(x.text) if x.text.isdecimal() else -1,
+                rank_el_list,
+            )
         )
 
         waku_xpath = "/".join([target_table_xpath, "/tr/td[2]"])
         waku_el_list = self.__lx_content.xpath(waku_xpath)
         waku_list = list(
-            map(lambda x: int(x.text) if x.text.isdecimal() else -1, waku_el_list)
+            map(
+                lambda x: int(x.text) if x.text.isdecimal() else -1,
+                waku_el_list,
+            )
         )
 
         name_xpath = "/".join([target_table_xpath, "/tr/td[3]/span[2]"])
@@ -762,7 +815,10 @@ class OfficialResults(CommonMethods4Official):
         reg_no_xpath = "/".join([target_table_xpath, "/tr/td[3]/span[1]"])
         reg_el_list = self.__lx_content.xpath(reg_no_xpath)
         reg_no_list = list(
-            map(lambda x: int(x.text) if x.text.isdecimal() else -1, reg_el_list)
+            map(
+                lambda x: int(x.text) if x.text.isdecimal() else -1,
+                reg_el_list,
+            )
         )
 
         racetime_xpath = "/".join([target_table_xpath, "/tr/td[4]"])
@@ -806,7 +862,9 @@ class OfficialOdds(CommonMethods4Official):
         race_no: int,
     ):
 
-        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(const.MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         # 賭け方によりURLが違うので，関数ごとでURLを設定する
         self.race_no = race_no
         self.jyo_code = jyo_code
@@ -844,7 +902,8 @@ class OfficialOdds(CommonMethods4Official):
         # htmlをload
         base_url = "https://boatrace.jp/owpc/pc/race/" "oddstf?"
         target_url = (
-            f"{base_url}rno={self.race_no}&" f"jcd={self.jyo_code:02}&hd={self.date}"
+            f"{base_url}rno={self.race_no}&"
+            f"jcd={self.jyo_code:02}&hd={self.date}"
         )
         lx_content = GetParserContent.url_to_content(
             url=target_url, content_type="lxml"
@@ -964,9 +1023,12 @@ class OfficialOdds(CommonMethods4Official):
             html_type = "tf"
 
         # htmlをload
-        base_url = f"https://boatrace.jp/owpc/pc/race/" f"odds{num}{html_type}?"
+        base_url = (
+            f"https://boatrace.jp/owpc/pc/race/" f"odds{num}{html_type}?"
+        )
         target_url = (
-            f"{base_url}rno={self.race_no}&" f"jcd={self.jyo_code:02}&hd={self.date}"
+            f"{base_url}rno={self.race_no}&"
+            f"jcd={self.jyo_code:02}&hd={self.date}"
         )
         lx_content = GetParserContent.url_to_content(
             url=target_url, content_type="lxml"
@@ -974,15 +1036,21 @@ class OfficialOdds(CommonMethods4Official):
         # 3連単と共通--------------------
         # oddsテーブルの抜き出し
         if num == 2 and kake == "renfuku":
-            table_xpath = "/html/body/main/div/div/div/div[2]/div[8]/table/tbody"
+            table_xpath = (
+                "/html/body/main/div/div/div/div[2]/div[8]/table/tbody"
+            )
         else:
-            table_xpath = "/html/body/main/div/div/div/div[2]/div[6]/table/tbody"
+            table_xpath = (
+                "/html/body/main/div/div/div/div[2]/div[6]/table/tbody"
+            )
 
         # 横優先のoddsリスト
         odds_el = lx_content.xpath(
             "/".join([table_xpath, "tr/td[contains(@class, 'oddsPoint')]"])
         )
-        odds_horizontals = list(map(lambda x: self._check_ketsujyo(x.text), odds_el))
+        odds_horizontals = list(
+            map(lambda x: self._check_ketsujyo(x.text), odds_el)
+        )
 
         return odds_horizontals
 

@@ -15,7 +15,9 @@ from ._common import CommonMethods
 
 class ResultInfoFactoryImpl(ResultInfoFactory):
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         self.__common_methods = CommonMethods()
 
     def each_jyoinfo(
@@ -24,7 +26,9 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
         for race_no in range(1, ed_race_no + 1):
             yield self._raceinfo(target_date, jyo_cd, race_no)
 
-    def _raceinfo(self, target_date: date, jyo_cd: int, race_no: int) -> ResultInfo:
+    def _raceinfo(
+        self, target_date: date, jyo_cd: int, race_no: int
+    ) -> ResultInfo:
         target_url = (
             f"http://boatrace.jp/owpc/pc/race/raceresult?"
             f"rno={race_no}&"
@@ -73,7 +77,9 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
             else:
                 return None
 
-        henkantei_list = list(map(lambda x: teistr2str(x.text), henkantei_list))
+        henkantei_list = list(
+            map(lambda x: teistr2str(x.text), henkantei_list)
+        )
 
         # 返還艇があればリスト長が1以上になる
         if len(henkantei_list) > 0:
@@ -106,7 +112,9 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
             "/div[5]/div[1]/div/table/tbody/tr[1]/td[3]/span"
         )
         pay_contents = lx_content.xpath(table_xpath)
-        pay_list = list(map(lambda x: int(re.sub(r"[^\d]", "", x.text)), pay_contents))
+        pay_list = list(
+            map(lambda x: int(re.sub(r"[^\d]", "", x.text)), pay_contents)
+        )
 
         # 人気
         # TODO 順番問題でうまくいってない可能性大
@@ -136,20 +144,28 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
 
         return ResultCommonInfo(**content_dict)
 
-    def _playerinfo(self, lx_content: lxml.HtmlElement) -> Iterator[ResultPlayerInfo]:
+    def _playerinfo(
+        self, lx_content: lxml.HtmlElement
+    ) -> Iterator[ResultPlayerInfo]:
         target_table_xpath = (
             "/html/body/main/div/div/div/div[2]/div[4]/div[1]/div/table/tbody"
         )
         rank_xpath = "/".join([target_table_xpath, "/tr/td[1]"])
         rank_el_list = lx_content.xpath(rank_xpath)
         rank_list = list(
-            map(lambda x: int(x.text) if x.text.isdecimal() else -1, rank_el_list)
+            map(
+                lambda x: int(x.text) if x.text.isdecimal() else -1,
+                rank_el_list,
+            )
         )
 
         waku_xpath = "/".join([target_table_xpath, "/tr/td[2]"])
         waku_el_list = lx_content.xpath(waku_xpath)
         waku_list = list(
-            map(lambda x: int(x.text) if x.text.isdecimal() else -1, waku_el_list)
+            map(
+                lambda x: int(x.text) if x.text.isdecimal() else -1,
+                waku_el_list,
+            )
         )
 
         name_xpath = "/".join([target_table_xpath, "/tr/td[3]/span[2]"])
@@ -161,7 +177,10 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
         reg_no_xpath = "/".join([target_table_xpath, "/tr/td[3]/span[1]"])
         reg_el_list = lx_content.xpath(reg_no_xpath)
         reg_no_list = list(
-            map(lambda x: int(x.text) if x.text.isdecimal() else -1, reg_el_list)
+            map(
+                lambda x: int(x.text) if x.text.isdecimal() else -1,
+                reg_el_list,
+            )
         )
 
         racetime_xpath = "/".join([target_table_xpath, "/tr/td[4]"])
@@ -181,9 +200,7 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
 
         for waku in range(1, 7):
             # # 結果STテーブルの情報を取得
-            tbody_xpath = (
-                "/html/body/main/div/div/div/div[2]/div[4]/div[2]/div/table/tbody"
-            )
+            tbody_xpath = "/html/body/main/div/div/div/div[2]/div[4]/div[2]/div/table/tbody"
             course, st_time = self.__common_methods.getSTtable(
                 lx_content=lx_content,
                 tbody_xpath=tbody_xpath,

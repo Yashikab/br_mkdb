@@ -22,7 +22,9 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
         for race_no in range(1, ed_race_no + 1):
             yield self._raceinfo(target_date, jyo_cd, race_no)
 
-    def _raceinfo(self, target_date: date, jyo_cd: int, race_no: int) -> OddsInfo:
+    def _raceinfo(
+        self, target_date: date, jyo_cd: int, race_no: int
+    ) -> OddsInfo:
         return OddsInfo(
             self._three_rentan(target_date, jyo_cd, race_no),
             self._three_renfuku(target_date, jyo_cd, race_no),
@@ -41,10 +43,14 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
     ) -> ThreeRenfuku:
         return self._renfuku_common(target_date, jyo_cd, race_no, 3)
 
-    def _two_renfuku(self, target_date: date, jyo_cd: int, race_no: int) -> TwoRenfuku:
+    def _two_renfuku(
+        self, target_date: date, jyo_cd: int, race_no: int
+    ) -> TwoRenfuku:
         return self._renfuku_common(target_date, jyo_cd, race_no, 2)
 
-    def _two_rentan(self, target_date: date, jyo_cd: int, race_no: int) -> TwoRentan:
+    def _two_rentan(
+        self, target_date: date, jyo_cd: int, race_no: int
+    ) -> TwoRentan:
         return self._rentan_common(target_date, jyo_cd, race_no, 2)
 
     def _tansho(self, target_date: date, jyo_cd: int, race_no: int) -> Tansho:
@@ -103,7 +109,9 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
         """
         assert rank in [2, 3], "rank must be 2 or 3 as integer."
         # 連単・連複の共通メソッドを使ってoddsテーブルを抜く
-        odds_rv = self._tanfuku_common(target_date, jyo_cd, race_no, rank, "renfuku")
+        odds_rv = self._tanfuku_common(
+            target_date, jyo_cd, race_no, rank, "renfuku"
+        )
         odds_rv.reverse()
         # 辞書で格納する
         content_rv_dict = {}
@@ -162,15 +170,21 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
         # 3連単と共通--------------------
         # oddsテーブルの抜き出し
         if num == 2 and kake == "renfuku":
-            table_xpath = "/html/body/main/div/div/div/div[2]/div[8]/table/tbody"
+            table_xpath = (
+                "/html/body/main/div/div/div/div[2]/div[8]/table/tbody"
+            )
         else:
-            table_xpath = "/html/body/main/div/div/div/div[2]/div[6]/table/tbody"
+            table_xpath = (
+                "/html/body/main/div/div/div/div[2]/div[6]/table/tbody"
+            )
 
         # 横優先のoddsリスト
         odds_el = lx_content.xpath(
             "/".join([table_xpath, "tr/td[contains(@class, 'oddsPoint')]"])
         )
-        odds_horizontals = list(map(lambda x: self._check_ketsujyo(x.text), odds_el))
+        odds_horizontals = list(
+            map(lambda x: self._check_ketsujyo(x.text), odds_el)
+        )
 
         return odds_horizontals
 

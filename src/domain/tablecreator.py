@@ -51,7 +51,9 @@ class TableCreator(metaclass=ABCMeta):
     def create_table(self) -> None:
         raise NotImplementedError()
 
-    def run_create_table(self, tb_name, schema, foreign_keys=None, refs=None) -> None:
+    def run_create_table(
+        self, tb_name, schema, foreign_keys=None, refs=None
+    ) -> None:
         query = self.sql_creator.sql_for_create_table(
             tb_name, schema, foreign_keys, refs
         )
@@ -61,7 +63,10 @@ class TableCreator(metaclass=ABCMeta):
 class JyoMasterTableCreator(TableCreator):
     def create_table(self) -> None:
         tb_name = "jyo_master"
-        schema = [("jyo_name", "VARCHAR(100)"), ("jyo_cd", "INT", "PRIMARY KEY")]
+        schema = [
+            ("jyo_name", "VARCHAR(100)"),
+            ("jyo_cd", "INT", "PRIMARY KEY"),
+        ]
         super().run_create_table(tb_name, schema)
         sql = f"INSERT IGNORE INTO {tb_name} VALUES"
         insert_value = ", ".join([val for val in self._csv2rows_generator()])
@@ -69,7 +74,9 @@ class JyoMasterTableCreator(TableCreator):
         self.sql_executer.run_query(query)
 
     def _csv2rows_generator(self):
-        csv_filepath = Path(__file__).parent.joinpath("jyo_master.csv").resolve()
+        csv_filepath = (
+            Path(__file__).parent.joinpath("jyo_master.csv").resolve()
+        )
         jyomaster_df = pd.read_csv(csv_filepath, header=0)
         for name, cd in zip(jyomaster_df.jyo_name, jyomaster_df.jyo_cd):
             yield f'("{name}", {cd})'
@@ -182,16 +189,24 @@ class ResultTableCreator(TableCreator):
         # annotationを使う
         for var_name, var_type in ResultCommonInfo.__annotations__.items():
             if var_type == WeatherInfo:
-                for weather_name, weather_type in WeatherInfo.__annotations__.items():
+                for (
+                    weather_name,
+                    weather_type,
+                ) in WeatherInfo.__annotations__.items():
                     schema.append(
                         (
                             weather_name,
-                            self.sql_creator.get_sqltype_from_pytype(weather_type),
+                            self.sql_creator.get_sqltype_from_pytype(
+                                weather_type
+                            ),
                         )
                     )
             else:
                 schema.append(
-                    (var_name, self.sql_creator.get_sqltype_from_pytype(var_type))
+                    (
+                        var_name,
+                        self.sql_creator.get_sqltype_from_pytype(var_type),
+                    )
                 )
         foreign_keys = ["race_id"]
         refs = ["raceinfo_tb"]
@@ -243,7 +258,9 @@ class OddsTableCreator(TableCreator):
                 (var_name, self.sql_creator.get_sqltype_from_pytype(var_type))
             )
 
-        super().run_create_table(tb_name, schema, self.__foreign_keys, self.__refs)
+        super().run_create_table(
+            tb_name, schema, self.__foreign_keys, self.__refs
+        )
 
     def _create_threefuku_table(self):
         """3連複情報"""
@@ -253,7 +270,9 @@ class OddsTableCreator(TableCreator):
             schema.append(
                 (var_name, self.sql_creator.get_sqltype_from_pytype(var_type))
             )
-        super().run_create_table(tb_name, schema, self.__foreign_keys, self.__refs)
+        super().run_create_table(
+            tb_name, schema, self.__foreign_keys, self.__refs
+        )
 
     def _create_tworentan_table(self):
         """2連単情報"""
@@ -263,7 +282,9 @@ class OddsTableCreator(TableCreator):
             schema.append(
                 (var_name, self.sql_creator.get_sqltype_from_pytype(var_type))
             )
-        super().run_create_table(tb_name, schema, self.__foreign_keys, self.__refs)
+        super().run_create_table(
+            tb_name, schema, self.__foreign_keys, self.__refs
+        )
 
     def _create_twofuku_table(self):
         """2連複情報"""
@@ -273,7 +294,9 @@ class OddsTableCreator(TableCreator):
             schema.append(
                 (var_name, self.sql_creator.get_sqltype_from_pytype(var_type))
             )
-        super().run_create_table(tb_name, schema, self.__foreign_keys, self.__refs)
+        super().run_create_table(
+            tb_name, schema, self.__foreign_keys, self.__refs
+        )
 
     def _create_tansho_table(self):
         """単勝情報"""
@@ -283,4 +306,6 @@ class OddsTableCreator(TableCreator):
             schema.append(
                 (var_name, self.sql_creator.get_sqltype_from_pytype(var_type))
             )
-        super().run_create_table(tb_name, schema, self.__foreign_keys, self.__refs)
+        super().run_create_table(
+            tb_name, schema, self.__foreign_keys, self.__refs
+        )

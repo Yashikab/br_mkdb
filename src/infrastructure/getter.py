@@ -95,7 +95,9 @@ class GetParserContent:
             self.logger.debug("retry")
             time.sleep(0.5)
         if not success_flg:
-            raise self.logger.error(f"Didn't succeed in {num_retry} times retry.")
+            raise self.logger.error(
+                f"Didn't succeed in {num_retry} times retry."
+            )
         return html_content
 
     def _html_to_content(

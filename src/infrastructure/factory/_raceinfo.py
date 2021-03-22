@@ -20,13 +20,17 @@ class RaceInfoFactoryImpl(RaceInfoFactory):
     __common: CommonMethods
 
     def __init__(self):
-        self.logger = getLogger(MODULE_LOG_NAME).getChild(self.__class__.__name__)
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
         self.__base_url = "https://www.boatrace.jp/owpc/pc/race/index"
         self.__common = CommonMethods()
 
     def getinfo(self, target_date: date) -> Iterator[HoldRaceInfo]:
         self.logger.debug(f"target_date: {date}")
-        target_url = "?".join([self.__base_url, f"hd={target_date.strftime('%Y%m%d')}"])
+        target_url = "?".join(
+            [self.__base_url, f"hd={target_date.strftime('%Y%m%d')}"]
+        )
         self.logger.debug(f"get info from {target_url}")
         __lx_content = GetParserContent.url_to_content(
             url=target_url, content_type="lxml"
@@ -36,7 +40,9 @@ class RaceInfoFactoryImpl(RaceInfoFactory):
         target_table_xpath = "/html/body/main/div/div/div/div[2]/div[3]/table"
 
         # 開催場名の取得
-        place_name_xpath = "/".join([target_table_xpath, "tbody/tr/td[1]/a/img"])
+        place_name_xpath = "/".join(
+            [target_table_xpath, "tbody/tr/td[1]/a/img"]
+        )
         place_names = list(
             map(self._getplacename, __lx_content.xpath(place_name_xpath))
         )
@@ -46,7 +52,9 @@ class RaceInfoFactoryImpl(RaceInfoFactory):
 
         # 進行状況の取得
         shinko_info_xpath = "/".join([target_table_xpath, "tbody/tr/td[2]"])
-        shinkos = list(map(self._getshinkoinfo, __lx_content.xpath(shinko_info_xpath)))
+        shinkos = list(
+            map(self._getshinkoinfo, __lx_content.xpath(shinko_info_xpath))
+        )
 
         # 終了レース番号の取得
         ed_races = [self._get_end_raceno(shinko) for shinko in shinkos]
@@ -69,14 +77,19 @@ class RaceInfoFactoryImpl(RaceInfoFactory):
         # jyo master取得
         # TODO : jyo masterの場所を考える
         filepath = (
-            Path(__file__).resolve().parents[2].joinpath("domain", "jyo_master.csv")
+            Path(__file__)
+            .resolve()
+            .parents[2]
+            .joinpath("domain", "jyo_master.csv")
         )
         jyo_master = pd.read_csv(filepath, header=0)
         self.logger.debug("loading table to df done.")
         # 会場名をインデックスにする
         jyo_master.set_index("jyo_name", inplace=True)
         # コードへ返還
-        code_names = list(map(lambda x: jyo_master.at[x, "jyo_cd"], place_names))
+        code_names = list(
+            map(lambda x: jyo_master.at[x, "jyo_cd"], place_names)
+        )
         return code_names
 
     def _getplacename(self, target_el: lxml.Element) -> str:

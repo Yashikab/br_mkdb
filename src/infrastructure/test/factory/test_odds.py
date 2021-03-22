@@ -46,7 +46,9 @@ class TestOddsInfoFactoryImpl:
             / f"odds_3tan_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         oif = OddsInfoFactoryImpl()
         three_rentans = oif._three_rentan(target_date, target_jyo, race_no)
         three_rentans = asdict(three_rentans)
@@ -81,7 +83,9 @@ class TestOddsInfoFactoryImpl:
             / f"odds_3fuku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         oif = OddsInfoFactoryImpl()
         three_renfukus = oif._three_renfuku(target_date, target_jyo, race_no)
         three_renfukus = asdict(three_renfukus)
@@ -116,7 +120,9 @@ class TestOddsInfoFactoryImpl:
             / f"odds_2tanfuku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         oif = OddsInfoFactoryImpl()
         two_rentans = oif._two_rentan(target_date, target_jyo, race_no)
         two_rentans = asdict(two_rentans)
@@ -149,7 +155,9 @@ class TestOddsInfoFactoryImpl:
             / f"odds_2tanfuku_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         oif = OddsInfoFactoryImpl()
         two_renfukus = oif._two_renfuku(target_date, target_jyo, race_no)
         two_renfukus = asdict(two_renfukus)
@@ -178,7 +186,9 @@ class TestOddsInfoFactoryImpl:
             / f"odds_1tan_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         oif = OddsInfoFactoryImpl()
         tanshos = oif._tansho(target_date, target_jyo, race_no)
         tanshos = asdict(tanshos)

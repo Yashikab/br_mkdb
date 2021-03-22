@@ -43,10 +43,13 @@ class TestProgramFactoryImpl:
         mocker,
     ):
         filepath = (
-            FILEPATH / f"pro_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
+            FILEPATH
+            / f"pro_{target_date.strftime('%Y%m%d')}{target_jyo}{race_no}.html"
         )
         lx_content = GetParserContent.file_to_content(filepath, "lxml")
-        mocker.patch.object(GetParserContent, "url_to_content", return_value=lx_content)
+        mocker.patch.object(
+            GetParserContent, "url_to_content", return_value=lx_content
+        )
         pif = ProgramInfoFactoryImpl()
         programinfo = pif._raceinfo(target_date, target_jyo, race_no)
 
@@ -56,7 +59,9 @@ class TestProgramFactoryImpl:
 
     @pytest.mark.parametrize("ed_race_no", [(12), (0), (8)])
     def test_each_jyoinfo(self, ed_race_no, mocker):
-        raceinfo_func = mocker.patch.object(ProgramInfoFactoryImpl, "_raceinfo")
+        raceinfo_func = mocker.patch.object(
+            ProgramInfoFactoryImpl, "_raceinfo"
+        )
         pif = ProgramInfoFactoryImpl()
         list(pif.each_jyoinfo(date(2020, 4, 8), 6, ed_race_no))
         assert raceinfo_func.call_count == ed_race_no

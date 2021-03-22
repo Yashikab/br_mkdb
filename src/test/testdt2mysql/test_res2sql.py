@@ -23,13 +23,18 @@ class TestResult2sql(CommonMethod):
         self.__res2sql.insert2table(
             date=self.__target_date,
             jyo_cd_list=[self.__jyo_cd],
-            raceno_dict={self.__jyo_cd: range(self.__race_no, self.__race_no + 1)},
+            raceno_dict={
+                self.__jyo_cd: range(self.__race_no, self.__race_no + 1)
+            },
         )
 
     cols = []
     for var_name, var_type in ResultCommonInfo.__annotations__.items():
         if var_type == WeatherInfo:
-            for weather_name, weather_type in WeatherInfo.__annotations__.items():
+            for (
+                weather_name,
+                weather_type,
+            ) in WeatherInfo.__annotations__.items():
                 cols.append(weather_name)
         else:
             cols.append(var_name)
@@ -56,7 +61,13 @@ class TestResult2sql(CommonMethod):
     @pytest.mark.parametrize(
         "tb_nm, id_nm, t_id, col_list, expected",
         [
-            ("race_result_tb", "race_id", race_id, race_col_list, race_expected),
+            (
+                "race_result_tb",
+                "race_id",
+                race_id,
+                race_col_list,
+                race_expected,
+            ),
             ("player_result_tb", "waku_id", waku_id, waku_col_list, waku_ex),
         ],
     )

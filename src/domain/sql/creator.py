@@ -53,7 +53,9 @@ class SqlCreator:
                 set(foreign_keys) <= schema_names
             ), "foregin key must be in the set of columns."
             for f, r in zip(foreign_keys, refs):
-                foreign_phases.append(f"FOREIGN KEY ({f}) REFERENCES {r} ({f})")
+                foreign_phases.append(
+                    f"FOREIGN KEY ({f}) REFERENCES {r} ({f})"
+                )
 
         if len(foreign_phases) > 1:
             foreign_phrase = ", ".join(foreign_phases)

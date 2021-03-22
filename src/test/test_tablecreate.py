@@ -96,7 +96,8 @@ class TestRaceInfoTableCreator(CommonMethod):
     )
 
     @pytest.mark.parametrize(
-        "tb_name, col_set", [("raceinfo_tb", ri_col_set), ("program_tb", pr_col_set)]
+        "tb_name, col_set",
+        [("raceinfo_tb", ri_col_set), ("program_tb", pr_col_set)],
     )
     def test_exist_table_raceinfo(self, tb_name, col_set):
         # カラム名の一致でテスト
@@ -138,7 +139,10 @@ class TestResultInfoTableCreator(CommonMethod):
     cols = []
     for var_name, var_type in ResultCommonInfo.__annotations__.items():
         if var_type == WeatherInfo:
-            for weather_name, weather_type in WeatherInfo.__annotations__.items():
+            for (
+                weather_name,
+                weather_type,
+            ) in WeatherInfo.__annotations__.items():
                 cols.append(weather_name)
         else:
             cols.append(var_name)

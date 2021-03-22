@@ -15,5 +15,7 @@ class ChokuzenInfoFactory(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def _raceinfo(self, target_date: date, jyo_cd: int, race_no: int) -> ChokuzenInfo:
+    def _raceinfo(
+        self, target_date: date, jyo_cd: int, race_no: int
+    ) -> ChokuzenInfo:
         raise NotImplementedError()

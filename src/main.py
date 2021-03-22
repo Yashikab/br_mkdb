@@ -28,7 +28,9 @@ if __name__ == "__main__":
     coloredlogs.CAN_USE_BOLD_FONT = True
     coloredlogs.DEFAULT_FIELD_STYLES = CL_FIELD_STYLES
     coloredlogs.DEFAULT_LEVEL_STYLES = CL_LEVEL_STYLES
-    coloredlogs.install(level="DEBUG", logger=main_logger, fmt=FMT, datefmt=DATE_FMT)
+    coloredlogs.install(
+        level="DEBUG", logger=main_logger, fmt=FMT, datefmt=DATE_FMT
+    )
 
     # モジュール側の設定(INFOのみ)
     handler = StreamHandler()
@@ -46,7 +48,9 @@ if __name__ == "__main__":
         "--table", action="store_true", help="if you want to create table."
     )
     parser.add_argument(
-        "--gcs", action="store_true", help="if you want to use gcs as MySQL db."
+        "--gcs",
+        action="store_true",
+        help="if you want to use gcs as MySQL db.",
     )
     args = parser.parse_args()
     if args.gcs:
