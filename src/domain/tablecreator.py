@@ -19,7 +19,7 @@ from domain.model.info import (
     TwoRentan,
     WeatherInfo,
 )
-from domain.sql import SqlCreator, SqlExecuter
+from infrastructure.mysql import MysqlCreator, MysqlExecuter
 
 # TODO : Run Create Tableはinfraに追いやる
 
@@ -40,12 +40,12 @@ def create_table(sql_executer) -> Optional[Exception]:
 
 
 class TableCreator(metaclass=ABCMeta):
-    sql_executer: SqlExecuter
-    sql_creator: SqlCreator
+    sql_executer: MysqlExecuter
+    sql_creator: MysqlCreator
 
-    def __init__(self, sql_executer: SqlExecuter):
+    def __init__(self, sql_executer: MysqlExecuter):
         self.sql_executer = sql_executer
-        self.sql_creator = SqlCreator()
+        self.sql_creator = MysqlCreator()
 
     @abstractmethod
     def create_table(self) -> None:
@@ -234,7 +234,7 @@ class OddsTableCreator(TableCreator):
     __foreign_keys: List[str]
     __refs: List[str]
 
-    def __init__(self, sql_executer: SqlExecuter):
+    def __init__(self, sql_executer: MysqlExecuter):
         super().__init__(sql_executer)
         self.__ids = [("race_id", "BIGINT", "PRIMARY KEY")]
         self.__foreign_keys = ["race_id"]
