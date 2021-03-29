@@ -1,10 +1,11 @@
 import pytest
-from infrastructure.repository import MysqlJyoMasterRepositoryImpl
 
+from infrastructure.repository import MysqlJyoMasterRepositoryImpl
 
 from ._common import CommonMethod
 
 
+@pytest.mark.run(order=1)
 class TestJyoMasterTableCreator(CommonMethod):
     __table_name: str = "jyo_master"
 
