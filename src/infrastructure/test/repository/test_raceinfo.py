@@ -1,5 +1,7 @@
 import pytest
 
+from domain.model.info import HoldRaceInfo
+
 from ._common import CommonMethod
 from infrastructure.repository import MysqlRaceInfoRepositoryImpl
 
@@ -25,3 +27,8 @@ class TestRaceInfoRepository:
             "ed_race_no",
         }
         assert get_set == expected_set
+
+    def test_save_data(self):
+        holdraceinfo_sample = HoldRaceInfo("サンプル場1", 1, "進行状況", 5)
+        self.rir.save_info([holdraceinfo_sample])
+        # res_tpl = self.__common.get_targetdata(self.__table_name, "datejyo_id")

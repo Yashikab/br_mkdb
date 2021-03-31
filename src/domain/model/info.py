@@ -1,4 +1,5 @@
 from dataclasses import make_dataclass
+from datetime import date
 from typing import List
 
 from pydantic.dataclasses import dataclass
@@ -6,6 +7,7 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class HoldRaceInfo:
+    date: date
     jyo_name: str
     jyo_cd: int
     shinko: str  # 進行状況

@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterable
 
 
 from domain.model.info import HoldRaceInfo
@@ -11,7 +11,7 @@ class MysqlRaceInfoRepositoryImpl(RaceInfoRepository):
     def __init__(self):
         self.tb_name = "holdjyo_tb"
 
-    def save_info(self, data_itr: Iterator[HoldRaceInfo]) -> None:
+    def save_info(self, data_itr: Iterable[HoldRaceInfo]) -> None:
         pass
 
     def create_table_if_not_exists():
