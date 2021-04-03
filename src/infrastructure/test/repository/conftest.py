@@ -11,7 +11,7 @@ from infrastructure.dbcontroller import LocalSqlController
 
 
 # 場コードマスタだけ最初に入れておく
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def prepare():
     # 環境変数でmysqlの接続先を入れ替える
     os.environ["MYSQL_HOST"] = "testmysql"
