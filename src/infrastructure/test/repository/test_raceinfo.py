@@ -40,5 +40,5 @@ class TestRaceInfoRepository:
         res_tpl = self.__common.get_targetdata(
             self.__table_name, "datejyo_id", "2020010101", self.__col_list
         )
-        expected_tpl = (2020010101, 1, "進行状況", 5)
+        expected_tpl = (2020010101, date(2020, 1, 1), 1, "サンプル場1", "進行状況", 5)
         assert res_tpl == expected_tpl
