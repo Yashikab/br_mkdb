@@ -11,6 +11,7 @@ from infrastructure.repository import MysqlRaceInfoRepositoryImpl
 @pytest.mark.run(order=2)
 class TestRaceInfoRepository:
     __common = CommonMethod()
+    __rir = MysqlRaceInfoRepositoryImpl()
     __table_name: str = "holdjyo_tb"
     __col_list: List[str] = [
         "datejyo_id",
@@ -23,8 +24,7 @@ class TestRaceInfoRepository:
 
     @pytest.fixture(scope="class", autouse=True)
     def preparation(self):
-        self.rir = MysqlRaceInfoRepositoryImpl()
-        self.rir.create_table_if_not_exists()
+        self.__rir.create_table_if_not_exists()
 
     def test_create_table(self):
         get_set = self.__common.get_columns(self.__table_name)
@@ -36,7 +36,7 @@ class TestRaceInfoRepository:
             date(2020, 1, 1), "サンプル場1", 1, "進行状況", 5
         )
 
-        self.rir.save_info([holdraceinfo_sample])
+        self.__rir.save_info([holdraceinfo_sample])
         res_tpl = self.__common.get_targetdata(
             self.__table_name, "datejyo_id", "2020010101", self.__col_list
         )
