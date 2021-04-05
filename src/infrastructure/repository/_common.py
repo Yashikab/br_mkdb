@@ -1,5 +1,5 @@
-from typing import Any
 from datetime import date
+from typing import Any
 
 
 class CommonMethod:

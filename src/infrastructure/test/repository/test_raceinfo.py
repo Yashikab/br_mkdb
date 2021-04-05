@@ -1,11 +1,12 @@
 from datetime import date
 from typing import List
+
 import pytest
 
 from domain.model.info import HoldRaceInfo
+from infrastructure.repository import MysqlRaceInfoRepositoryImpl
 
 from ._common import CommonMethod
-from infrastructure.repository import MysqlRaceInfoRepositoryImpl
 
 
 @pytest.mark.run(order=2)

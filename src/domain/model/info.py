@@ -54,6 +54,9 @@ class ProgramCommonInfo:
 
 @dataclass
 class ProgramInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     common: ProgramCommonInfo
     players: List[ProgramPlayerInfo]
 

@@ -4,6 +4,6 @@ from domain.model.info import ProgramInfo
 from domain.repository import ProgramInfoRepository
 
 
-class ProgramInfoRepositoryImpl(ProgramInfoRepository):
+class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
     def save_info(self, data_itr: Iterator[ProgramInfo]) -> None:
         pass

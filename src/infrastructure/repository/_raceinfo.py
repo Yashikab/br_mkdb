@@ -1,12 +1,11 @@
-from typing import Iterable
 from logging import getLogger
+from typing import Iterable
 
 from domain.model.info import HoldRaceInfo
 from domain.repository import RaceInfoRepository
+from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.mysql.creator import MysqlCreator
 from infrastructure.mysql.executer import MysqlExecuter
-from infrastructure.const import MODULE_LOG_NAME
-from ._common import CommonMethod
 
 
 class MysqlRaceInfoRepositoryImpl(RaceInfoRepository):

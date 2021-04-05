@@ -46,7 +46,7 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
         common = self._commoninfo(lx_content)
         players = list(self._playersinfo(lx_content))
 
-        return ProgramInfo(common, players)
+        return ProgramInfo(target_date, jyo_cd, race_no, common, players)
 
     def _commoninfo(self, lx_content: lxml.HtmlElement) -> ProgramCommonInfo:
         self.logger.debug("get Common info.")
