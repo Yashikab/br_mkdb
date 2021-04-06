@@ -2,11 +2,7 @@ from datetime import date
 
 import pytest
 
-from domain.model.info import (
-    HoldRaceInfo,
-    ProgramCommonInfo,
-    ProgramPlayerInfo,
-)
+from domain.model.info import ProgramCommonInfo, ProgramInfo, ProgramPlayerInfo
 from infrastructure.repository import MysqlProgramInfoRepositoryImpl
 
 from ._common import CommonMethod
@@ -41,14 +37,62 @@ class TestProgramInfoRepository:
         get_set = self.__common.get_columns(tb_name)
         assert get_set == col_set
 
-    # def test_save_data(self):
-    #     holdraceinfo_sample = HoldRaceInfo(
-    #         date(2020, 1, 1), "サンプル場1", 1, "進行状況", 5
-    #     )
+    def test_save_data(self):
+        p_common_info = ProgramCommonInfo(
+            "さんぷる大会", "is-G1b", "予選", 1800, False, True
+        )
+        p_player_info = ProgramPlayerInfo(
+            "サンプル太郎",
+            8400,
+            "B1",
+            "宮城",
+            "宮城",
+            48,
+            84.5,
+            1,
+            0,
+            0.25,
+            0.20,
+            0.30,
+            0.40,
+            0.25,
+            0.35,
+            0.45,
+            50,
+            0.40,
+            0.5,
+            41,
+            0.41,
+            0.42,
+        )
+        program_info = ProgramInfo(
+            date(2020, 1, 1), 1, 4, p_common_info, [p_player_info]
+        )
 
-    #     self.__rir.save_info([holdraceinfo_sample])
-    #     res_tpl = self.__common.get_targetdata(
-    #         self.__table_name, "datejyo_id", "2020010101", self.__col_list
-    #     )
-    #     expected_tpl = (2020010101, date(2020, 1, 1), 1, "サンプル場1", "進行状況", 5)
-    #     assert res_tpl == expected_tpl
+        self.__pir.save_info([program_info])
+        common_check_cols = [
+            "race_id",
+            "datejyo_id",
+            "taikai_name",
+            "grade",
+            "is_shinnyukotei",
+        ]
+        res_common_tpl = self.__common.get_targetdata(
+            self.__common_table_name,
+            "race_id",
+            "202001010104",
+            common_check_cols,
+        )
+        ex_common_cols = (202001010104, 2020010101, "サンプル大会", "is-G1b", True)
+
+        player_check_cols = ["waku_id", "race_id", "name", "age"]
+        res_player_tpl = self.__common.get_targetdata(
+            self.__player_table_name,
+            "waku_id",
+            "20200101010401",
+            player_check_cols,
+        )
+        ex_player_cols = (20200101010401, 202001010104, "サンプル太郎", 48)
+
+        assert res_common_tpl == ex_common_cols
+        assert res_player_tpl == ex_player_cols
