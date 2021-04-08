@@ -4,8 +4,9 @@
 dt2sqlモジュール用単体テストの共通関数
 """
 from logging import getLogger
+from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, List
 
 from infrastructure import const
 from infrastructure.connector import MysqlConnector
