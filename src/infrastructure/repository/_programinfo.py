@@ -1,12 +1,59 @@
+from logging import getLogger
 from typing import Iterator
 
-from domain.model.info import ProgramInfo
+
+from domain.model.info import ProgramInfo, ProgramCommonInfo, ProgramPlayerInfo
 from domain.repository import ProgramInfoRepository
+from infrastructure.mysql import MysqlCreator, MysqlExecuter
+from infrastructure.const import MODULE_LOG_NAME
 
 
 class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
-    def save_info(self, data_itr: Iterator[ProgramInfo]) -> None:
-        pass
+    def __init__(self):
+        self.common_tb_name = "raceinfo_tb"
+        self.player_tb_name = "program_tb"
+        self.__executer = MysqlExecuter()
+        self.__creator = MysqlCreator()
+        self.logger = getLogger(MODULE_LOG_NAME).getChild(
+            self.__class__.__name__
+        )
 
     def create_table_if_not_exists(self) -> None:
+        self.logger.info("Create table if not exists.")
+        self._create_common_table()
+        self._create_player_table()
+
+    def _create_common_table(self) -> None:
+        self.logger.debug("Create table for common info.")
+        schema = [
+            ("race_id", "BIGINT", "PRIMARY KEY"),
+            ("datejyo_id", "INT"),
+        ]
+        # annotationを使う
+        for var_name, var_type in ProgramCommonInfo.__annotations__.items():
+            schema.append(
+                (var_name, self.__creator.get_sqltype_from_pytype(var_type))
+            )
+        foreign_keys = ["datejyo_id"]
+        refs = ["holdjyo_tb"]
+        query = self.__creator.sql_for_create_table(
+            self.common_tb_name, schema, foreign_keys, refs
+        )
+        self.__executer.run_query(query)
+
+    def _create_player_table(self) -> None:
+        self.logger.debug("Create table for player.")
+        schema = [("waku_id", "BIGINT", "PRIMARY KEY"), ("race_id", "BIGINT")]
+        for var_name, var_type in ProgramPlayerInfo.__annotations__.items():
+            schema.append(
+                (var_name, self.__creator.get_sqltype_from_pytype(var_type))
+            )
+        foreign_keys = ["race_id"]
+        refs = ["raceinfo_tb"]
+        query = self.__creator.sql_for_create_table(
+            self.player_tb_name, schema, foreign_keys, refs
+        )
+        self.__executer.run_query(query)
+
+    def save_info(self, data_itr: Iterator[ProgramInfo]) -> None:
         pass
