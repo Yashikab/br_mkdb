@@ -6,10 +6,10 @@ from typing import Any, List
 class CommonMethod:
     def to_query_phrase(self, value: Any) -> str:
         """ valueをsqlに挿入できる形にする"""
-        if value_type := type(value) is str:
+        if isinstance(value, str):
             # ''で囲む
             value = f"'{value}'"
-        elif value_type is date:
+        elif isinstance(value, date):
             value = value.strftime("%Y%m%d")
 
         elif value is None:
