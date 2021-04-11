@@ -1,4 +1,3 @@
-from datetime import date
 from logging import getLogger
 from typing import Iterable
 
@@ -7,6 +6,7 @@ from domain.repository import RaceInfoRepository
 from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.mysql.creator import MysqlCreator
 from infrastructure.mysql.executer import MysqlExecuter
+
 from ._common import CommonMethod
 
 
