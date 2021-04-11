@@ -83,7 +83,7 @@ class TestProgramInfoRepository:
             "202001010104",
             common_check_cols,
         )
-        ex_common_cols = (202001010104, 2020010101, "サンプル大会", "is-G1b", True)
+        ex_common_cols = (202001010104, 2020010101, "さんぷる大会", "is-G1b", 1)
 
         player_check_cols = ["waku_id", "race_id", "name", "age"]
         res_player_tpl = self.__common.get_targetdata(
