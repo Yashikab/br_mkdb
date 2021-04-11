@@ -91,6 +91,7 @@ class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
         )
         self.logger.debug(common_sql)
         self.logger.debug(player_sql)
+        print(player_sql)
         self.__executer.run_query(common_sql)
         self.__executer.run_query(player_sql)
 
@@ -102,7 +103,7 @@ class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
     ) -> str:
         players_insert_phrase = list()
         for w, player_info in enumerate(players_info):
-            waku_id = f"{race_id}{w}"
+            waku_id = f"{race_id}{w+1}"
             player_inserts = [waku_id, race_id]
             player_inserts += self.__common.get_insertlist(
                 player_info, player_cols[2:]

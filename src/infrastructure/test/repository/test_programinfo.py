@@ -89,10 +89,10 @@ class TestProgramInfoRepository:
         res_player_tpl = self.__common.get_targetdata(
             self.__player_table_name,
             "waku_id",
-            "20200101010401",
+            "2020010101041",
             player_check_cols,
         )
-        ex_player_cols = (20200101010401, 202001010104, "サンプル太郎", 48)
+        ex_player_cols = (2020010101041, 202001010104, "サンプル太郎", 48)
 
         assert res_common_tpl == ex_common_cols
         assert res_player_tpl == ex_player_cols
