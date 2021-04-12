@@ -42,6 +42,7 @@ class TestProgramInfoRepository:
             "さんぷる大会", "is-G1b", "予選", 1800, False, True
         )
         p_player_info = ProgramPlayerInfo(
+            1,
             "サンプル太郎",
             8400,
             "B1",

@@ -102,8 +102,8 @@ class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
         player_cols: List[str],
     ) -> str:
         players_insert_phrase = list()
-        for w, player_info in enumerate(players_info):
-            waku_id = f"{race_id}{w+1}"
+        for player_info in players_info:
+            waku_id = f"{race_id}{player_info.waku}"
             player_inserts = [waku_id, race_id]
             player_inserts += self.__common.get_insertlist(
                 player_info, player_cols[2:]

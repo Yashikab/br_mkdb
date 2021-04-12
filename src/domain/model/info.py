@@ -18,6 +18,7 @@ class HoldRaceInfo:
 class ProgramPlayerInfo:
     """番組表記載の選手情報"""
 
+    waku: int
     name: str
     id: int
     level: str
@@ -63,6 +64,7 @@ class ProgramInfo:
 
 @dataclass
 class ChokuzenPlayerInfo:
+    waku: int
     name: str
     weight: float
     chosei_weight: float
@@ -90,6 +92,7 @@ class ChokuzenInfo:
 
 @dataclass
 class ResultPlayerInfo:
+    waku: int
     rank: int
     name: str
     no: int

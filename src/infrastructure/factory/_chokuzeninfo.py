@@ -101,5 +101,12 @@ class ChokuzenInfoFactoryImpl(ChokuzenInfoFactory):
             )
 
             yield ChokuzenPlayerInfo(
-                name, weight, chosei_weight, tenji_T, tilt, tenji_C, tenji_ST
+                waku,
+                name,
+                weight,
+                chosei_weight,
+                tenji_T,
+                tilt,
+                tenji_C,
+                tenji_ST,
             )

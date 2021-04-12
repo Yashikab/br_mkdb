@@ -1,7 +1,7 @@
 import json
 from datetime import date
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 import pytest
 
@@ -19,11 +19,11 @@ class TestChokuzenFactoryImpl:
         common = WeatherInfo(**json.load(f))
 
     with open(SAMPLEPATH / "p1_1.json", "r") as f:
-        p1_1 = (ChokuzenPlayerInfo(**json.load(f)), 0)
-    with open(SAMPLEPATH / "p1_5.json", "r") as f:
-        p1_5 = (ChokuzenPlayerInfo(**json.load(f)), 5)
+        p1_1 = ChokuzenPlayerInfo(**json.load(f))
+    with open(SAMPLEPATH / "p1_6.json", "r") as f:
+        p1_6 = ChokuzenPlayerInfo(**json.load(f))
 
-    players = [p1_1, p1_5]
+    players = [p1_1, p1_6]
 
     @pytest.mark.parametrize(
         ("target_date, target_jyo, race_no, ex_common, ex_players"),
@@ -35,7 +35,7 @@ class TestChokuzenFactoryImpl:
         target_jyo: int,
         race_no: int,
         ex_common: WeatherInfo,
-        ex_players: List[Tuple[ChokuzenPlayerInfo, int]],
+        ex_players: List[ChokuzenPlayerInfo],
         mocker,
     ):
         filename = (
@@ -51,8 +51,8 @@ class TestChokuzenFactoryImpl:
         chokuinfo = chif._raceinfo(target_date, target_jyo, race_no)
 
         assert chokuinfo.common == ex_common
-        for ex_p, idx in ex_players:
-            assert chokuinfo.players[idx] == ex_p
+        for ex_p in ex_players:
+            assert chokuinfo.players[ex_p.waku - 1] == ex_p
 
     @pytest.mark.parametrize("ed_race_no", [(12), (0), (8)])
     def test_each_jyoinfo(self, ed_race_no, mocker):

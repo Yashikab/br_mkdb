@@ -4,6 +4,13 @@
 
 # raceinfotableの作成
 
-- [ ] create_table_if_not_exists
-- [ ] save_info
-  - [ ] 受け取るデータはmockしたものを使う
+- [x] create_table_if_not_exists
+- [x] save_info
+  - [x] 受け取るデータはmockしたものを使う
+
+# programtableの作成
+
+- [x] create_table_player
+- [x] create_table_common
+- [x] insert_common
+- [x] insert_player

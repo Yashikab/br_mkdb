@@ -238,6 +238,7 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             self.logger.debug("get target player info completed.")
 
             yield ProgramPlayerInfo(
+                waku,
                 player_name,
                 player_id,
                 player_level,

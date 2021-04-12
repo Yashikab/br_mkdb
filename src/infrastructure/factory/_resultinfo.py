@@ -212,6 +212,7 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
             )
 
             yield ResultPlayerInfo(
+                waku,
                 waku_dict[waku]["rank"],
                 waku_dict[waku]["name"],
                 waku_dict[waku]["no"],

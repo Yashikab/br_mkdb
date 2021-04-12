@@ -1,7 +1,7 @@
 import json
 from datetime import date
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 import pytest
 
@@ -19,7 +19,7 @@ class TestResultFactoryImpl:
         common = ResultCommonInfo(**json.load(f))
 
     with open(SAMPLEPATH / "p1_1.json", "r") as f:
-        p1_1 = (ResultPlayerInfo(**json.load(f)), 0)
+        p1_1 = ResultPlayerInfo(**json.load(f))
 
     players = [p1_1]
 
@@ -33,7 +33,7 @@ class TestResultFactoryImpl:
         target_jyo: int,
         race_no: int,
         ex_common: ResultCommonInfo,
-        ex_players: List[Tuple[ResultPlayerInfo, int]],
+        ex_players: List[ResultPlayerInfo],
         mocker,
     ):
         filepath = (
@@ -49,8 +49,8 @@ class TestResultFactoryImpl:
         resinfo = rif._raceinfo(target_date, target_jyo, race_no)
 
         assert resinfo.common == ex_common
-        for ex_p, idx in ex_players:
-            assert resinfo.players[idx] == ex_p
+        for ex_p in ex_players:
+            assert resinfo.players[ex_p.waku - 1] == ex_p
 
     @pytest.mark.parametrize("ed_race_no", [(12), (0), (8)])
     def test_each_jyoinfo(self, ed_race_no, mocker):
