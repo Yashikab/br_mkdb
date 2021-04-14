@@ -42,7 +42,7 @@ class ChokuzenInfoFactoryImpl(ChokuzenInfoFactory):
         # common
         common = self._commoninfo(lx_content)
         players = list(self._playersinfo(lx_content))
-        return ChokuzenInfo(common, players)
+        return ChokuzenInfo(target_date, jyo_cd, race_no, common, players)
 
     def _commoninfo(self, lx_content: lxml.HtmlElement) -> WeatherInfo:
         self.logger.debug("get common info")

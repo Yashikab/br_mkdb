@@ -86,6 +86,9 @@ class WeatherInfo:
 
 @dataclass
 class ChokuzenInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     common: WeatherInfo
     players: List[ChokuzenPlayerInfo]
 
