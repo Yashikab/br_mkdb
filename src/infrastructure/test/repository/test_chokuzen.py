@@ -43,16 +43,14 @@ class TestChokuzenInfoRepository:
             1,
             "さんぷる太郎",
             54.2,
+            0.1,
             6.74,
             -0.5,
             5,
             0.12,
         )
-        player2_info = ChokuzenPlayerInfo(
-            2, "サンプル二郎", 56.3, 6.85, 1.0, 1, -0.02
-        )
         program_info = ChokuzenInfo(
-            date(2020, 1, 1), 1, 4, cond_info, [player1_info, player2_info]
+            date(2020, 1, 1), 1, 4, cond_info, [player1_info]
         )
 
         self.__cir.save_info([program_info])
@@ -68,7 +66,7 @@ class TestChokuzenInfoRepository:
             "202001010104",
             cond_check_cols,
         )
-        ex_common_cols = (202001010104, 2020010101, "晴れ", 2)
+        ex_common_cols = (202001010104, 2020010101, "晴", 2)
 
         player_check_cols = ["waku_id", "race_id", "tilt", "tenji_st"]
         res_player1_tpl = self.__common.get_targetdata(
@@ -79,14 +77,5 @@ class TestChokuzenInfoRepository:
         )
         ex_player1_cols = (2020010101041, 202001010104, -0.5, 0.12)
 
-        res_player2_tpl = self.__common.get_targetdata(
-            self.__player_table_name,
-            "waku_id",
-            "2020010101042",
-            player_check_cols,
-        )
-        ex_player2_cols = (2020010101041, 202001010104, 1.0, -0.02)
-
         assert res_common_tpl == ex_common_cols
         assert res_player1_tpl == ex_player1_cols
-        assert res_player2_tpl == ex_player2_cols

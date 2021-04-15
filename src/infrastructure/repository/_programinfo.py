@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Iterator, List
+from typing import Iterator
 
 from domain.model.info import ProgramCommonInfo, ProgramInfo, ProgramPlayerInfo
 from domain.repository import ProgramInfoRepository
@@ -14,7 +14,7 @@ class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
         self.logger = getLogger(MODULE_LOG_NAME).getChild(
             self.__class__.__name__
         )
-        self.__executer = MysqlExecuter()
+        self.executer = MysqlExecuter()
         self.__creator = MysqlCreator()
         self.__common = CommonMethod()
         self.common_tb_name = "raceinfo_tb"
@@ -50,7 +50,7 @@ class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
         query = self.__creator.sql_for_create_table(
             self.common_tb_name, self.common_schema, foreign_keys, refs
         )
-        self.__executer.run_query(query)
+        self.executer.run_query(query)
 
     def _create_player_table(self) -> None:
         self.logger.debug("Create table for player.")
@@ -60,54 +60,15 @@ class MysqlProgramInfoRepositoryImpl(ProgramInfoRepository):
         query = self.__creator.sql_for_create_table(
             self.player_tb_name, self.player_schema, foreign_keys, refs
         )
-        self.__executer.run_query(query)
+        self.executer.run_query(query)
 
-    # common とplayer 分ける
     def save_info(self, pi_itr: Iterator[ProgramInfo]) -> None:
-        common_insert_phrases = list()
-        player_insert_phrases = list()
-        common_cols = list(map(lambda x: x[0], self.common_schema))
-        player_cols = list(map(lambda x: x[0], self.player_schema))
-        for pi in pi_itr:
-            holddate = self.__common.to_query_phrase(pi.date)
-            datejyo_id = f"{holddate}{pi.jyo_cd:02}"
-            race_id = f"{datejyo_id}{pi.race_no:02}"
-            common_inserts = [race_id, datejyo_id]
-            common_inserts += self.__common.get_insertlist(
-                pi.common, common_cols[2:]
-            )
-            common_insert_phrases.append(f"({', '.join(common_inserts)})")
-            player_insert_phrases.append(
-                self._player_inserts(race_id, pi.players, player_cols)
-            )
 
-        common_phrase = ", ".join(common_insert_phrases)
-        player_phrase = ", ".join(player_insert_phrases)
-        common_sql = (
-            f"INSERT IGNORE INTO {self.common_tb_name} VALUES {common_phrase};"
+        self.__common.common_player_save_info(
+            pi_itr,
+            self.common_tb_name,
+            self.common_schema,
+            self.player_tb_name,
+            self.player_schema,
+            self.executer,
         )
-        player_sql = (
-            f"INSERT IGNORE INTO {self.player_tb_name} VALUES {player_phrase};"
-        )
-        self.logger.debug(common_sql)
-        self.logger.debug(player_sql)
-        print(player_sql)
-        self.__executer.run_query(common_sql)
-        self.__executer.run_query(player_sql)
-
-    def _player_inserts(
-        self,
-        race_id: int,
-        players_info: List[ProgramPlayerInfo],
-        player_cols: List[str],
-    ) -> str:
-        players_insert_phrase = list()
-        for player_info in players_info:
-            waku_id = f"{race_id}{player_info.waku}"
-            player_inserts = [waku_id, race_id]
-            player_inserts += self.__common.get_insertlist(
-                player_info, player_cols[2:]
-            )
-            players_insert_phrase.append(f"({', '.join(player_inserts)})")
-
-        return ", ".join(players_insert_phrase)

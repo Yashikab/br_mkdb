@@ -6,7 +6,7 @@ from domain.model.info import ChokuzenInfo
 
 class ChokuzenInfoRepository(metaclass=ABCMeta):
     @abstractmethod
-    def save_info(self, data_itr: Iterator[ChokuzenInfo]) -> None:
+    def save_info(self, ci_itr: Iterator[ChokuzenInfo]) -> None:
         raise NotImplementedError()
 
     @abstractmethod

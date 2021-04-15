@@ -124,6 +124,9 @@ class ResultCommonInfo:
 
 @dataclass
 class ResultInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     common: ResultCommonInfo
     players: List[ResultPlayerInfo]
 

@@ -17,7 +17,7 @@
 
 # chokuzentableの作成
 
-- [ ] create-table-chokuzen-cond
-- [ ] create-table-player
-- [ ] insert cond
-- [ ] insert player
+- [x] create-table-chokuzen-cond
+- [x] create-table-player
+- [x] insert cond
+- [x] insert player
