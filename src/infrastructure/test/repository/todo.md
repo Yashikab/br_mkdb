@@ -21,3 +21,10 @@
 - [x] create-table-player
 - [x] insert cond
 - [x] insert player
+
+# resulttabelの作成
+
+- [ ] create_race_result_tb
+- [ ] create_player_result_tb
+- [ ] insert race_result
+- [ ] insert player_result
