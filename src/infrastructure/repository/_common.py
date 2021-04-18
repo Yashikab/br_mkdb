@@ -1,4 +1,4 @@
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from datetime import date
 from logging import getLogger
 from typing import Any, Iterator, List, Union
@@ -21,7 +21,7 @@ class CommonMethod:
             value = f"'{value}'"
         elif isinstance(value, date):
             value = value.strftime("%Y%m%d")
-
+        # weatherinfo用に開発する必要がある(dataclassは再帰的に分岐とか)
         elif value is None:
             value = "null"
         else:
