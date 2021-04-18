@@ -58,6 +58,7 @@ class CommonMethod:
             for k in dct.keys():
                 if isinstance(dct[k], dict):
                     return self._unpack(dct[k], col)
+            raise KeyError(f"key({col}) does not exist recursively.")
 
     def common_player_save_info(
         self,
