@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from datetime import date
 from logging import getLogger
 from typing import Any, Iterator, List, Union
@@ -47,9 +47,17 @@ class CommonMethod:
         inserts = list()
         data_dict = asdict(data_obj)
         for col in cols:
-            inserts.append(self.to_query_phrase(data_dict[col]))
-        print(inserts)
+            inserts.append(self.to_query_phrase(self._unpack(data_dict, col)))
         return inserts
+
+    # weather infoが入れ子構造になっているため必要
+    def _unpack(self, dct: dict, col: str):
+        if col in dct.keys():
+            return dct[col]
+        else:
+            for k in dct.keys():
+                if isinstance(dct[k], dict):
+                    return self._unpack(dct[k], col)
 
     def common_player_save_info(
         self,

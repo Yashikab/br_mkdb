@@ -1,6 +1,6 @@
-from typing import Iterator
 from logging import getLogger
-from infrastructure.const import MODULE_LOG_NAME
+from typing import Iterator
+
 from domain.model.info import (
     ResultCommonInfo,
     ResultInfo,
@@ -8,7 +8,9 @@ from domain.model.info import (
     WeatherInfo,
 )
 from domain.repository import ResultInfoRepository
-from infrastructure.mysql import MysqlExecuter, MysqlCreator
+from infrastructure.const import MODULE_LOG_NAME
+from infrastructure.mysql import MysqlCreator, MysqlExecuter
+
 from ._common import CommonMethod
 
 
@@ -43,7 +45,10 @@ class MysqlResultInfoRepositoryImpl(ResultInfoRepository):
                     )
             else:
                 self.common_schema.append(
-                    (var_name, self.__creator.get_sqltype_from_pytype(var_type))
+                    (
+                        var_name,
+                        self.__creator.get_sqltype_from_pytype(var_type),
+                    )
                 )
         self.player_schema = [
             ("waku_id", "BIGINT", "PRIMARY KEY"),

@@ -24,7 +24,6 @@
 
 # resulttabelの作成
 
-- [ ] create_race_result_tb
-- [ ] create_player_result_tb
-- [ ] insert race_result
-- [ ] insert player_result
+- [x] create_player_result_tb
+- [x] insert race_result
+- [x] insert player_result
