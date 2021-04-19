@@ -22,8 +22,13 @@
 - [x] insert cond
 - [x] insert player
 
-# resulttabelの作成
+# resulttableの作成
 
 - [x] create_player_result_tb
 - [x] insert race_result
 - [x] insert player_result
+
+# oddstableの作成
+
+- [ ] create 3tan, 3fuku, 2tan, 2fuku, tan
+- [ ] insert 3tan, 3fuku, 2tan, 2fuku, tan
