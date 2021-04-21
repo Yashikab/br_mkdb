@@ -1,4 +1,5 @@
 from datetime import date
+import enum
 
 import pytest
 
@@ -52,3 +53,10 @@ class TestOddsInfoRepository:
     def test_create_table(self, tb_name, col_set):
         get_set = self.__common.get_columns(tb_name)
         assert get_set == col_set
+
+    def test_save_info(self):
+        three_tan_dict = dict()
+        for i, k in enumerate(list(self.three_rentan_key)):
+            three_tan_dict[k] = 0.1 * i
+        three_tan_dict.pop("race_id")
+        print(ThreeRentan(**three_tan_dict))
