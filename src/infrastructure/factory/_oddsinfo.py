@@ -26,6 +26,9 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
         self, target_date: date, jyo_cd: int, race_no: int
     ) -> OddsInfo:
         return OddsInfo(
+            target_date,
+            jyo_cd,
+            race_no,
             self._three_rentan(target_date, jyo_cd, race_no),
             self._three_renfuku(target_date, jyo_cd, race_no),
             self._two_rentan(target_date, jyo_cd, race_no),

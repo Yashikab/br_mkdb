@@ -205,6 +205,9 @@ TwoRenfuku = dataclass(TwoRenfuku)
 
 @dataclass
 class OddsInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     three_rentan: ThreeRentan
     three_renfuku: ThreeRenfuku
     two_rentan: TwoRentan

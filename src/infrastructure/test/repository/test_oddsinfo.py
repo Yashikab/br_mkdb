@@ -4,6 +4,7 @@ import enum
 import pytest
 
 from domain.model.info import (
+    OddsInfo,
     ResultCommonInfo,
     ResultInfo,
     ResultPlayerInfo,
@@ -59,4 +60,75 @@ class TestOddsInfoRepository:
         for i, k in enumerate(list(self.three_rentan_key)):
             three_tan_dict[k] = 0.1 * i
         three_tan_dict.pop("race_id")
-        print(ThreeRentan(**three_tan_dict))
+        three_tan = ThreeRentan(**three_tan_dict)
+        three_fuku_dict = dict()
+        for i, k in enumerate(list(self.three_renfuku_key)):
+            three_fuku_dict[k] = 0.1 * i
+        three_fuku_dict.pop("race_id")
+        three_fuku = ThreeRenfuku(**three_fuku_dict)
+        two_tan_dict = dict()
+        for i, k in enumerate(list(self.two_rentan_key)):
+            two_tan_dict[k] = 0.1 * i
+        two_tan_dict.pop("race_id")
+        two_tan = TwoRentan(**two_tan_dict)
+        two_fuku_dict = dict()
+        for i, k in enumerate(list(self.two_renfuku_key)):
+            two_fuku_dict[k] = 0.1 * i
+        two_fuku_dict.pop("race_id")
+        two_fuku = TwoRenfuku(**two_fuku_dict)
+        tansho_dict = dict()
+        for i, k in enumerate(list(self.one_rentan_key)):
+            tansho_dict[k] = 0.1 * i
+        tansho_dict.pop("race_id")
+        tansho = Tansho(**tansho_dict)
+
+        odds_info = OddsInfo(
+            date(2020, 1, 1),
+            1,
+            4,
+            three_tan,
+            three_fuku,
+            two_tan,
+            two_fuku,
+            tansho,
+        )
+        three_tan_actual = self.__common.get_targetdata(
+            self.__3tan_table_name,
+            "race_id",
+            "202001010104",
+            ["comb_123", "comb_654"],
+        )
+        three_tan_ex = (0.1, 0.1 * (len(self.three_rentan_key) - 1))
+        three_fuku_actual = self.__common.get_targetdata(
+            self.__3fuku_table_name,
+            "race_id",
+            "202001010104",
+            ["comb_123", "comb_456"],
+        )
+        three_fuku_ex = (0.1, 0.1 * (len(self.three_renfuku_key) - 1))
+        two_tan_actual = self.__common.get_targetdata(
+            self.__2tan_table_name,
+            "race_id",
+            "202001010104",
+            ["comb_12", "comb_65"],
+        )
+        two_tan_ex = (0.1, 0.1 * (len(self.two_rentan_key) - 1))
+        two_fuku_actual = self.__common.get_targetdata(
+            self.__2fuku_table_name,
+            "race_id",
+            "202001010104",
+            ["comb_12", "comb_45"],
+        )
+        two_fuku_ex = (0.1, 0.1 * (len(self.two_renfuku_key) - 1))
+        tansho_actual = self.__common.get_targetdata(
+            self.__tansho_table_name,
+            "race_id",
+            "202001010104",
+            ["comb_1", "comb_6"],
+        )
+        tansho_ex = (0.1, 0.6)
+        assert three_tan_actual == three_tan_ex
+        assert three_fuku_actual == three_fuku_ex
+        assert two_tan_actual == two_tan_ex
+        assert two_fuku_actual == two_fuku_ex
+        assert tansho_actual == tansho_ex
