@@ -92,6 +92,7 @@ class TestOddsInfoRepository:
             two_fuku,
             tansho,
         )
+        self.__oir.save_info([odds_info])
         three_tan_actual = self.__common.get_targetdata(
             self.__3tan_table_name,
             "race_id",
