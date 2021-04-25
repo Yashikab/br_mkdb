@@ -1,19 +1,14 @@
 from datetime import date
-import enum
 
 import pytest
 
 from domain.model.info import (
     OddsInfo,
-    ResultCommonInfo,
-    ResultInfo,
-    ResultPlayerInfo,
-    WeatherInfo,
-    ThreeRentan,
-    ThreeRenfuku,
-    TwoRentan,
-    TwoRenfuku,
     Tansho,
+    ThreeRenfuku,
+    ThreeRentan,
+    TwoRenfuku,
+    TwoRentan,
 )
 from infrastructure.repository import MysqlOddsInfoRepositoryImpl
 

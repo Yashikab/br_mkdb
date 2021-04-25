@@ -1,21 +1,20 @@
 import copy
-from functools import singledispatchmethod
-from dataclasses import asdict, dataclass
-from typing import Iterator, Union
+from dataclasses import dataclass
 from logging import getLogger
+from typing import Iterator, Union
 
-
-from domain.model.info import OddsInfo
-from domain.repository import OddsInfoRepository
 from domain.model.info import (
+    OddsInfo,
+    Tansho,
     ThreeRenfuku,
     ThreeRentan,
     TwoRenfuku,
     TwoRentan,
-    Tansho,
 )
+from domain.repository import OddsInfoRepository
 from infrastructure.const import MODULE_LOG_NAME
-from infrastructure.mysql import MysqlExecuter, MysqlCreator
+from infrastructure.mysql import MysqlCreator, MysqlExecuter
+
 from ._common import CommonMethod
 
 
@@ -44,7 +43,9 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
         self._create_table_and_get_schema(self.__2fuku_tb_name, TwoRenfuku)
         self._create_table_and_get_schema(self.__tansho_tb_name, Tansho)
 
-    def _create_table_and_get_schema(self, tb_name: str, data_class: dataclass):
+    def _create_table_and_get_schema(
+        self, tb_name: str, data_class: dataclass
+    ):
         """3連単情報"""
         schema = copy.deepcopy(self.__ids)
         for var_name, var_type in data_class.__annotations__.items():
