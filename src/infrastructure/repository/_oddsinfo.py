@@ -1,4 +1,5 @@
 import copy
+from functools import singledispatchmethod
 from dataclasses import asdict, dataclass
 from typing import Iterator, Union
 from logging import getLogger
@@ -56,21 +57,77 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
         self.executer.run_query(query)
 
     def save_info(self, odds_itr: Iterator[OddsInfo]) -> None:
-        self.__save_info_3tan(odds_itr)
+        self.__save_info_each(odds_itr, ThreeRentan)
+        self.__save_info_each(odds_itr, ThreeRenfuku)
+        self.__save_info_each(odds_itr, TwoRentan)
+        self.__save_info_each(odds_itr, TwoRenfuku)
+        self.__save_info_each(odds_itr, Tansho)
 
-    def __save_info_3tan(self, odds_itr: Iterator[OddsInfo]) -> None:
+    def __save_info_each(
+        self,
+        odds_itr: Iterator[OddsInfo],
+        odds_type: Union[
+            ThreeRentan, ThreeRenfuku, TwoRentan, TwoRenfuku, Tansho
+        ],
+    ) -> None:
         common_insert_phrases = list()
         for odds_info in odds_itr:
             holddate = self.__common.to_query_phrase(odds_info.date)
             race_id = f"{holddate}{odds_info.jyo_cd:02}{odds_info.race_no:02}"
             common_inserts = [race_id]
             common_inserts += self.__common.get_insertlist(
-                odds_info.three_rentan, list(ThreeRentan.__annotations__.keys())
+                self._value_of_info(odds_type, odds_info),
+                list(odds_type.__annotations__.keys()),
             )
             common_insert_phrases.append(f"({', '.join(common_inserts)})")
         common_phrase = ", ".join(common_insert_phrases)
         common_sql = (
-            f"INSERT IGNORE INTO {self.__3tan_tb_name} VALUES {common_phrase};"
+            f"INSERT IGNORE INTO {self._value_of_tb(odds_type)} "
+            f"VALUES {common_phrase};"
         )
+        print(common_sql)
         self.logger.debug(common_sql)
         self.executer.run_query(common_sql)
+
+    def _value_of_info(
+        self,
+        odds_type: Union[
+            ThreeRentan, ThreeRenfuku, TwoRentan, TwoRenfuku, Tansho
+        ],
+        odds_info: OddsInfo,
+    ):
+        if odds_type is ThreeRentan:
+            return odds_info.three_rentan
+
+        elif odds_type is ThreeRenfuku:
+            return odds_info.three_renfuku
+
+        elif odds_type is TwoRentan:
+            return odds_info.two_rentan
+
+        elif odds_type is TwoRenfuku:
+            return odds_info.two_renfuku
+
+        elif odds_type is Tansho:
+            return odds_info.tansho
+
+    def _value_of_tb(
+        self,
+        odds_type: Union[
+            ThreeRentan, ThreeRenfuku, TwoRentan, TwoRenfuku, Tansho
+        ],
+    ):
+        if odds_type is ThreeRentan:
+            return self.__3tan_tb_name
+
+        elif odds_type is ThreeRenfuku:
+            return self.__3fuku_tb_name
+
+        elif odds_type is TwoRentan:
+            return self.__2tan_tb_name
+
+        elif odds_type is TwoRenfuku:
+            return self.__2fuku_tb_name
+
+        elif odds_type is Tansho:
+            return self.__tansho_tb_name

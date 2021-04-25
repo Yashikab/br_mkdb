@@ -95,6 +95,7 @@ class TestOddsInfoRepository:
             ["comb_123", "comb_654"],
         )
         three_tan_ex = (0.1, 0.1 * (len(self.three_rentan_key) - 1))
+
         three_fuku_actual = self.__common.get_targetdata(
             self.__3fuku_table_name,
             "race_id",
@@ -102,6 +103,7 @@ class TestOddsInfoRepository:
             ["comb_123", "comb_456"],
         )
         three_fuku_ex = (0.1, 0.1 * (len(self.three_renfuku_key) - 1))
+
         two_tan_actual = self.__common.get_targetdata(
             self.__2tan_table_name,
             "race_id",
@@ -109,13 +111,15 @@ class TestOddsInfoRepository:
             ["comb_12", "comb_65"],
         )
         two_tan_ex = (0.1, 0.1 * (len(self.two_rentan_key) - 1))
+
         two_fuku_actual = self.__common.get_targetdata(
             self.__2fuku_table_name,
             "race_id",
             "202001010104",
-            ["comb_12", "comb_45"],
+            ["comb_12", "comb_56"],
         )
         two_fuku_ex = (0.1, 0.1 * (len(self.two_renfuku_key) - 1))
+
         tansho_actual = self.__common.get_targetdata(
             self.__tansho_table_name,
             "race_id",
