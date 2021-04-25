@@ -57,29 +57,24 @@ class TestOddsInfoRepository:
 
     def test_save_info(self):
         three_tan_dict = dict()
-        for i, k in enumerate(list(self.three_rentan_key)):
-            three_tan_dict[k] = 0.1 * i
-        three_tan_dict.pop("race_id")
+        for i, k in enumerate(list(ThreeRentan.__annotations__.keys())):
+            three_tan_dict[k] = 0.1 * (i + 1)
         three_tan = ThreeRentan(**three_tan_dict)
         three_fuku_dict = dict()
-        for i, k in enumerate(list(self.three_renfuku_key)):
-            three_fuku_dict[k] = 0.1 * i
-        three_fuku_dict.pop("race_id")
+        for i, k in enumerate(list(ThreeRenfuku.__annotations__.keys())):
+            three_fuku_dict[k] = 0.1 * (i + 1)
         three_fuku = ThreeRenfuku(**three_fuku_dict)
         two_tan_dict = dict()
-        for i, k in enumerate(list(self.two_rentan_key)):
-            two_tan_dict[k] = 0.1 * i
-        two_tan_dict.pop("race_id")
+        for i, k in enumerate(list(TwoRentan.__annotations__.keys())):
+            two_tan_dict[k] = 0.1 * (i + 1)
         two_tan = TwoRentan(**two_tan_dict)
         two_fuku_dict = dict()
-        for i, k in enumerate(list(self.two_renfuku_key)):
-            two_fuku_dict[k] = 0.1 * i
-        two_fuku_dict.pop("race_id")
+        for i, k in enumerate(list(TwoRenfuku.__annotations__.keys())):
+            two_fuku_dict[k] = 0.1 * (i + 1)
         two_fuku = TwoRenfuku(**two_fuku_dict)
         tansho_dict = dict()
-        for i, k in enumerate(list(self.one_rentan_key)):
-            tansho_dict[k] = 0.1 * i
-        tansho_dict.pop("race_id")
+        for i, k in enumerate(list(Tansho.__annotations__.keys())):
+            tansho_dict[k] = 0.1 * (i + 1)
         tansho = Tansho(**tansho_dict)
 
         odds_info = OddsInfo(
