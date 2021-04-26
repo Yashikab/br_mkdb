@@ -75,6 +75,7 @@ class TestRaceInfoFactoryImpl:
         shinkos = list()
         ed_races = list()
         for hri in holdrace_info_itr:
+            assert hri.date == target_date
             names.append(hri.jyo_name)
             codes.append(hri.jyo_cd)
             shinkos.append(hri.shinko)

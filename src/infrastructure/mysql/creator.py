@@ -4,14 +4,14 @@ from typing import List, Optional, Tuple
 logger = getLogger(__name__)
 
 
-class SqlCreator:
+class MysqlCreator:
     def sql_for_create_table(
         self,
         tb_name: str,
         schema: List[Tuple[str, ...]],
         foreign_keys: Optional[List[str]] = None,
         refs: Optional[List[str]] = None,
-        replace: bool = True,
+        if_not_exists: bool = True,
     ) -> str:
         """テーブル作成のためのクエリ作成
 
@@ -27,8 +27,8 @@ class SqlCreator:
             外部キーリスト （指定した場合refsで参照先がないとエラーになる）
         refs: List[str]
             外部キーリスト参照先テーブルのリスト
-        replace : Optional[bool]
-            テーブルが存在するとき置換するかどうか。
+        if_not_exists : Optional[bool]
+            テーブルが存在しないときのみ作成
 
         Returns
         -------
@@ -36,9 +36,9 @@ class SqlCreator:
             テーブル作成のためのクエリ
         """
         schema_phrase = ", \n".join(list(map(lambda s: " ".join(s), schema)))
-        replace_txt = ""
-        if replace:
-            replace_txt = "IF NOT EXISTS"
+        if_not_exists_txt = ""
+        if if_not_exists:
+            if_not_exists_txt = "IF NOT EXISTS"
 
         # foregin key(option)
         # schemaからつなぐカンマをjoin時に入れるため、から文字列を入れておく
@@ -63,7 +63,7 @@ class SqlCreator:
             foreign_phrase = ""
 
         sql = (
-            f"CREATE TABLE {replace_txt} {tb_name}"
+            f"CREATE TABLE {if_not_exists_txt} {tb_name}"
             f"( {schema_phrase} {foreign_phrase} ) "
             f"CHARACTER SET utf8;"
         )

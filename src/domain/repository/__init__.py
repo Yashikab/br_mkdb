@@ -1,4 +1,5 @@
 from ._chokuzeninfo import ChokuzenInfoRepository
+from ._jyocdmaster import JyocdMasterRepository
 from ._oddsinfo import OddsInfoRepository
 from ._programinfo import ProgramInfoRepository
 from ._raceinfo import RaceInfoRepository
@@ -10,4 +11,5 @@ __all__ = [
     "ChokuzenInfoRepository",
     "ResultInfoRepository",
     "OddsInfoRepository",
+    "JyocdMasterRepository",
 ]

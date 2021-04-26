@@ -42,7 +42,7 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
         common = self._commoninfo(lx_content)
         players = list(self._playerinfo(lx_content))
         self.logger.debug("Completed.")
-        return ResultInfo(common, players)
+        return ResultInfo(target_date, jyo_cd, race_no, common, players)
 
     def _commoninfo(self, lx_content: lxml.HtmlElement) -> ResultCommonInfo:
         """
@@ -212,6 +212,7 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
             )
 
             yield ResultPlayerInfo(
+                waku,
                 waku_dict[waku]["rank"],
                 waku_dict[waku]["name"],
                 waku_dict[waku]["no"],

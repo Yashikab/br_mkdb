@@ -66,6 +66,7 @@ class RaceInfoFactoryImpl(RaceInfoFactory):
             ed_races,
         ):
             yield HoldRaceInfo(
+                date=target_date,
                 jyo_name=p_name,
                 jyo_cd=p_code,
                 shinko=shinko,

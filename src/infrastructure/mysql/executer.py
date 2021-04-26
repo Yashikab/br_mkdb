@@ -1,13 +1,12 @@
 from logging import getLogger
 
-from domain.sql import SqlExecuter
 from infrastructure import const
 from infrastructure.connector import MysqlConnector
 
 logger = getLogger(__name__)
 
 
-class MysqlExecuter(SqlExecuter):
+class MysqlExecuter:
     @classmethod
     def run_query(cls, query: str) -> None:
         try:

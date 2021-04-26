@@ -1,4 +1,5 @@
 from dataclasses import make_dataclass
+from datetime import date
 from typing import List
 
 from pydantic.dataclasses import dataclass
@@ -6,6 +7,7 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class HoldRaceInfo:
+    date: date
     jyo_name: str
     jyo_cd: int
     shinko: str  # 進行状況
@@ -16,6 +18,7 @@ class HoldRaceInfo:
 class ProgramPlayerInfo:
     """番組表記載の選手情報"""
 
+    waku: int
     name: str
     id: int
     level: str
@@ -52,12 +55,16 @@ class ProgramCommonInfo:
 
 @dataclass
 class ProgramInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     common: ProgramCommonInfo
     players: List[ProgramPlayerInfo]
 
 
 @dataclass
 class ChokuzenPlayerInfo:
+    waku: int
     name: str
     weight: float
     chosei_weight: float
@@ -79,12 +86,16 @@ class WeatherInfo:
 
 @dataclass
 class ChokuzenInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     common: WeatherInfo
     players: List[ChokuzenPlayerInfo]
 
 
 @dataclass
 class ResultPlayerInfo:
+    waku: int
     rank: int
     name: str
     no: int
@@ -113,6 +124,9 @@ class ResultCommonInfo:
 
 @dataclass
 class ResultInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     common: ResultCommonInfo
     players: List[ResultPlayerInfo]
 
@@ -191,6 +205,9 @@ TwoRenfuku = dataclass(TwoRenfuku)
 
 @dataclass
 class OddsInfo:
+    date: date
+    jyo_cd: int
+    race_no: int
     three_rentan: ThreeRentan
     three_renfuku: ThreeRenfuku
     two_rentan: TwoRentan

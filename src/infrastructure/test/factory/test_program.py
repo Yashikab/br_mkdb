@@ -1,7 +1,6 @@
 import json
 from datetime import date
 from pathlib import Path
-from typing import Tuple
 
 import pytest
 
@@ -23,13 +22,11 @@ class TestProgramFactoryImpl:
         p1_1 = ProgramPlayerInfo(**json.load(f))
     with open(SAMPLEPATH / "p1_2.json", "r") as f:
         p1_2 = ProgramPlayerInfo(**json.load(f))
-    player1_1 = (p1_1, 0)
-    player1_2 = (p1_2, 1)
 
     @pytest.mark.parametrize(
         ("target_date, target_jyo, race_no, ex_common, ex_p1, ex_p2"),
         [
-            (date(2020, 4, 8), 6, 3, common1, player1_1, player1_2),
+            (date(2020, 4, 8), 6, 3, common1, p1_1, p1_2),
         ],
     )
     def test_raceinfo(
@@ -38,8 +35,8 @@ class TestProgramFactoryImpl:
         target_jyo: int,
         race_no: int,
         ex_common: ProgramCommonInfo,
-        ex_p1: Tuple[ProgramPlayerInfo, int],
-        ex_p2: Tuple[ProgramPlayerInfo, int],
+        ex_p1: ProgramPlayerInfo,
+        ex_p2: ProgramPlayerInfo,
         mocker,
     ):
         filepath = (
@@ -54,8 +51,8 @@ class TestProgramFactoryImpl:
         programinfo = pif._raceinfo(target_date, target_jyo, race_no)
 
         assert programinfo.common == ex_common
-        assert programinfo.players[ex_p1[1]] == ex_p1[0]
-        assert programinfo.players[ex_p2[1]] == ex_p2[0]
+        assert programinfo.players[ex_p1.waku - 1] == ex_p1
+        assert programinfo.players[ex_p2.waku - 1] == ex_p2
 
     @pytest.mark.parametrize("ed_race_no", [(12), (0), (8)])
     def test_each_jyoinfo(self, ed_race_no, mocker):
