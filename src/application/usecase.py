@@ -13,6 +13,20 @@ from infrastructure.dt2sql import (
     RaceData2sql,
     ResultData2sql,
 )
+from domain.factory import (
+    RaceInfoFactory,
+    ProgramInfoFactory,
+    ChokuzenInfoFactory,
+    ResultInfoFactory,
+    OddsInfoFactory,
+)
+from domain.repository import (
+    RaceInfoRepository,
+    ProgramInfoRepository,
+    ChokuzenInfoRepository,
+    ResultInfoRepository,
+    OddsInfoRepository,
+)
 from infrastructure.getdata import DateRange as dr
 
 # logger
@@ -20,11 +34,32 @@ logger = getLogger(MAIN_LOGNAME)
 
 
 class BoatRaceUsecase:
-    __dbctl: DatabaseController
-    __sql_executer: SqlExecuter
-
-    def __init__(self, dbctl: DatabaseController, sql_executer: SqlExecuter):
+    def __init__(
+        self,
+        dbctl: DatabaseController,
+        raceinfo_factory: RaceInfoFactory,
+        program_factory: ProgramInfoFactory,
+        choku_factory: ChokuzenInfoFactory,
+        result_factory: ResultInfoFactory,
+        odds_factory: OddsInfoFactory,
+        raceinfo_repo: RaceInfoRepository,
+        program_repo: ProgramInfoRepository,
+        choku_repo: ChokuzenInfoRepository,
+        result_repo: ResultInfoRepository,
+        odds_repo: OddsInfoRepository,
+        sql_executer: SqlExecuter,
+    ):
         self.__dbctl = dbctl
+        self.__ri_factory = raceinfo_factory
+        self.__pro_factory = program_factory
+        self.__choku_factory = choku_factory
+        self.__res_factory = result_factory
+        self.__odds_factory = odds_factory
+        self.__ri_repo = raceinfo_repo
+        self.__pro_repo = program_repo
+        self.__choku_repo = choku_repo
+        self.__res_repo = result_repo
+        self.__odds_factory = odds_repo
         self.__sql_executer = sql_executer
 
     def run(self, op: Options):
@@ -61,9 +96,7 @@ class BoatRaceUsecase:
                 logger.debug("Start to insert result data")
                 res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
                 logger.debug("Start to insert odds data")
-                odds2sql.insert2table(
-                    date, jyo_cd_list, jd2sql.map_raceno_dict
-                )
+                odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
 
                 elapsed_time = time.time() - start_time
                 logger.debug(f"completed in {elapsed_time}sec")
