@@ -21,6 +21,7 @@ from domain.factory import (
     OddsInfoFactory,
 )
 from domain.repository import (
+    JyocdMasterRepository,
     RaceInfoRepository,
     ProgramInfoRepository,
     ChokuzenInfoRepository,
@@ -59,7 +60,7 @@ class BoatRaceUsecase:
         self.__pro_repo = program_repo
         self.__choku_repo = choku_repo
         self.__res_repo = result_repo
-        self.__odds_factory = odds_repo
+        self.__odds_repo = odds_repo
         self.__sql_executer = sql_executer
 
     def run(self, op: Options):
@@ -68,39 +69,58 @@ class BoatRaceUsecase:
         logger.info("Done")
 
         logger.info(f"Table Creating: {op.create_table}")
-        logger.debug("load classes from dt2sql")
-        jd2sql = JyoData2sql()
-        rd2sql = RaceData2sql()
-        cd2sql = ChokuzenData2sql()
-        res2sql = ResultData2sql()
-        odds2sql = Odds2sql()
-        logger.debug("Completed loading classes.")
-
         if op.create_table:
-            logger.debug("Create table if it does not exist.")
-            create_table(self.__sql_executer)
+            JyocdMasterRepository.create_table_if_not_exists()
+            self.__ri_repo.create_table_if_not_exists()
+            self.__pro_repo.create_table_if_not_exists()
+            self.__choku_repo.create_table_if_not_exists()
+            self.__res_repo.create_table_if_not_exists()
+            self.__odds_repo.create_table_if_not_exists()
             logger.debug("Completed creating table.")
 
         for date in dr.daterange(op.start_date, op.end_date):
             try:
                 logger.debug(f"target date: {date}")
-                jd2sql.insert2table(date)
-                # jd2sqlで開催場と最終レース番を取得する
-                logger.debug("insert race data: race chokuzen result odds")
-                jyo_cd_list = jd2sql.map_raceno_dict.keys()
-                start_time = time.time()
-                logger.debug("Start to insert race data")
-                rd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                logger.debug("Start to insert chokuzen data")
-                cd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                logger.debug("Start to insert result data")
-                res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                logger.debug("Start to insert odds data")
-                odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                holdraces = list(self.__ri_factory.getinfo(date))
+                self.__ri_repo.save_info(holdraces)
+                for hr in holdraces:
+                    self.__pro_repo.save_info(
+                        self.__pro_factory.each_jyoinfo(
+                            hr.date, hr.jyo_cd, hr.ed_race_no
+                        )
+                    )
+                    self.__choku_repo.save_info(
+                        self.__choku_factory.each_jyoinfo(
+                            hr.date, hr.jyo_cd, hr.ed_race_no
+                        )
+                    )
+                    self.__res_repo.save_info(
+                        self.__res_factory.each_jyoinfo(
+                            hr.date, hr.jyo_cd, hr.ed_race_no
+                        )
+                    )
+                    self.__odds_repo.save_info(
+                        self.__odds_factory.each_jyoinfo(
+                            hr.date, hr.jyo_cd, hr.ed_race_no
+                        )
+                    )
+                    # jd2sql.insert2table(date)
+                    # # jd2sqlで開催場と最終レース番を取得する
+                    # logger.debug("insert race data: race chokuzen result odds")
+                    # jyo_cd_list = jd2sql.map_raceno_dict.keys()
+                    # start_time = time.time()
+                    # logger.debug("Start to insert race data")
+                    # rd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                    # logger.debug("Start to insert chokuzen data")
+                    # cd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                    # logger.debug("Start to insert result data")
+                    # res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
+                    # logger.debug("Start to insert odds data")
+                    # odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
 
-                elapsed_time = time.time() - start_time
-                logger.debug(f"completed in {elapsed_time}sec")
-                logger.debug("insert race data completed.")
+                    # elapsed_time = time.time() - start_time
+                    # logger.debug(f"completed in {elapsed_time}sec")
+                    # logger.debug("insert race data completed.")
             except Exception as e:
                 logger.error(f"{e}")
 
