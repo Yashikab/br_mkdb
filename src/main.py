@@ -19,6 +19,22 @@ from infrastructure.const import (
     MODULE_LOG_NAME,
 )
 from infrastructure.log import TqdmLoggingHandler
+from infrastructure.dbcontroller import LocalSqlController, CloudSqlController
+from infrastructure.factory import (
+    RaceInfoFactoryImpl,
+    ProgramInfoFactoryImpl,
+    ChokuzenInfoFactoryImpl,
+    ResultInfoFactoryImpl,
+    OddsInfoFactoryImpl,
+)
+from infrastructure.repository import (
+    MysqlJyoMasterRepositoryImpl,
+    MysqlRaceInfoRepositoryImpl,
+    MysqlProgramInfoRepositoryImpl,
+    MysqlChokuzenInfoRepositoryImpl,
+    MysqlResultInfoRepositoryImpl,
+    MysqlOddsInfoRepositoryImpl,
+)
 
 if __name__ == "__main__":
     # logging設定
@@ -70,10 +86,37 @@ if __name__ == "__main__":
 
     if op.db_type == "gcs":
         main_logger.info("use Google Cloud SQL.")
-        usecase = BoatRaceUsecase.gcpmysql()
+        usecase = BoatRaceUsecase(
+            CloudSqlController(),
+            RaceInfoFactoryImpl(),
+            ProgramInfoFactoryImpl(),
+            ChokuzenInfoFactoryImpl(),
+            ResultInfoFactoryImpl(),
+            OddsInfoFactoryImpl(),
+            MysqlJyoMasterRepositoryImpl(),
+            MysqlRaceInfoRepositoryImpl(),
+            MysqlProgramInfoRepositoryImpl(),
+            MysqlChokuzenInfoRepositoryImpl(),
+            MysqlResultInfoRepositoryImpl(),
+            MysqlOddsInfoRepositoryImpl(),
+        )
     elif op.db_type == "local":
         main_logger.info("use local mysql server.")
-        usecase = BoatRaceUsecase.localmysql()
+        usecase = BoatRaceUsecase(
+            LocalSqlController(),
+            RaceInfoFactoryImpl(),
+            ProgramInfoFactoryImpl(),
+            ChokuzenInfoFactoryImpl(),
+            ResultInfoFactoryImpl(),
+            OddsInfoFactoryImpl(),
+            MysqlJyoMasterRepositoryImpl(),
+            MysqlRaceInfoRepositoryImpl(),
+            MysqlProgramInfoRepositoryImpl(),
+            MysqlChokuzenInfoRepositoryImpl(),
+            MysqlResultInfoRepositoryImpl(),
+            MysqlOddsInfoRepositoryImpl(),
+        )
+
     else:
         raise Exception("Couldn't build sql controller")
 

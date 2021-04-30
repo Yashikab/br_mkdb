@@ -3,8 +3,6 @@ from logging import getLogger
 
 from application.argument import DBType, Options
 from domain.dbcontroller import DatabaseController  # sqlとはかぎらない
-from domain.sql.executer import SqlExecuter  # sqlとはかぎらない
-from domain.tablecreator import create_table  # 多分domainじゃない
 from infrastructure.const import MAIN_LOGNAME
 from infrastructure.dt2sql import (
     ChokuzenData2sql,
@@ -28,7 +26,9 @@ from domain.repository import (
     ResultInfoRepository,
     OddsInfoRepository,
 )
-from infrastructure.getdata import DateRange as dr
+
+# TODO どこかにおいやる。(domainでいいとおもう)
+from infrastructure.getdata_lxml import DateRange as dr
 
 # logger
 logger = getLogger(MAIN_LOGNAME)
@@ -43,12 +43,12 @@ class BoatRaceUsecase:
         choku_factory: ChokuzenInfoFactory,
         result_factory: ResultInfoFactory,
         odds_factory: OddsInfoFactory,
+        jyocd_master_repo: JyocdMasterRepository,
         raceinfo_repo: RaceInfoRepository,
         program_repo: ProgramInfoRepository,
         choku_repo: ChokuzenInfoRepository,
         result_repo: ResultInfoRepository,
         odds_repo: OddsInfoRepository,
-        sql_executer: SqlExecuter,
     ):
         self.__dbctl = dbctl
         self.__ri_factory = raceinfo_factory
@@ -56,12 +56,12 @@ class BoatRaceUsecase:
         self.__choku_factory = choku_factory
         self.__res_factory = result_factory
         self.__odds_factory = odds_factory
+        self.__jm_repo = jyocd_master_repo
         self.__ri_repo = raceinfo_repo
         self.__pro_repo = program_repo
         self.__choku_repo = choku_repo
         self.__res_repo = result_repo
         self.__odds_repo = odds_repo
-        self.__sql_executer = sql_executer
 
     def run(self, op: Options):
         logger.info("Connect MySQL server.")
@@ -70,7 +70,7 @@ class BoatRaceUsecase:
 
         logger.info(f"Table Creating: {op.create_table}")
         if op.create_table:
-            JyocdMasterRepository.create_table_if_not_exists()
+            self.__jm_repo.create_table_if_not_exists()
             self.__ri_repo.create_table_if_not_exists()
             self.__pro_repo.create_table_if_not_exists()
             self.__choku_repo.create_table_if_not_exists()
@@ -130,17 +130,3 @@ class BoatRaceUsecase:
             self.__dbctl.clean()
 
         logger.info("All completed.")
-
-    @classmethod
-    def localmysql(cls):
-        from infrastructure.dbcontroller import LocalSqlController
-        from infrastructure.mysql import MysqlExecuter
-
-        return BoatRaceUsecase(LocalSqlController(), MysqlExecuter())
-
-    @classmethod
-    def gcpmysql(cls):
-        from infrastructure.dbcontroller import CloudSqlController
-        from infrastructure.mysql import MysqlExecuter
-
-        return BoatRaceUsecase(CloudSqlController(), MysqlExecuter())
