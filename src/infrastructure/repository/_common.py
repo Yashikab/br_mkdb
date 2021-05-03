@@ -79,6 +79,7 @@ class CommonMethod:
         self._common_save_info(
             data_itr, common_tb_name, common_schema, executer
         )
+        # TODO 一回まわっちゃうからこの設計だとからになる
         self._player_save_info(
             data_itr, player_tb_name, player_schema, executer
         )
@@ -109,6 +110,7 @@ class CommonMethod:
         player_insert_phrases = list()
         player_cols = list(map(lambda x: x[0], player_schema))
         for pi in data_itr:
+            self.logger.debug(pi)
             holddate = self.to_query_phrase(pi.date)
             datejyo_id = f"{holddate}{pi.jyo_cd:02}"
             race_id = f"{datejyo_id}{pi.race_no:02}"
@@ -116,13 +118,13 @@ class CommonMethod:
                 self._player_inserts(race_id, pi.players, player_cols)
             )
 
+        self.logger.debug(player_insert_phrases)
         player_phrase = ", ".join(player_insert_phrases)
 
         player_sql = (
             f"INSERT IGNORE INTO {player_tb_name} VALUES {player_phrase};"
         )
         self.logger.debug(player_sql)
-        print(player_sql)
         executer.run_query(player_sql)
 
     def _player_inserts(
