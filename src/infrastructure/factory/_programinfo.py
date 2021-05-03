@@ -103,7 +103,9 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
                 f"div[2]/div[4]/table/tbody[{waku}]"
             )
 
-            self.logger.debug("Get player's informaiton.(id, level, name, etc)")
+            self.logger.debug(
+                "Get player's informaiton.(id, level, name, etc)"
+            )
             # 登録番号
             player_id_xpath = "/".join(
                 [target_tbody_xpath, "tr[1]/td[3]/div[1]"]
@@ -116,9 +118,9 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
             raw_player_level = lx_content.xpath(player_level_xpath)[0].text
             # 級が取りうる値かチェックする
             try:
-                player_level = re.search(r"[A,B][1,2]", raw_player_level).group(
-                    0
-                )
+                player_level = re.search(
+                    r"[A,B][1,2]", raw_player_level
+                ).group(0)
             except AttributeError as e:
                 self.logger.error(
                     f"player_level: {raw_player_level} error: {e}"

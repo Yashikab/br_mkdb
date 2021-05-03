@@ -1,31 +1,23 @@
-import time
 from logging import getLogger
 
 from application.argument import DBType, Options
 from domain.dbcontroller import DatabaseController  # sqlとはかぎらない
-from infrastructure.const import MAIN_LOGNAME
-from infrastructure.dt2sql import (
-    ChokuzenData2sql,
-    JyoData2sql,
-    Odds2sql,
-    RaceData2sql,
-    ResultData2sql,
-)
 from domain.factory import (
-    RaceInfoFactory,
-    ProgramInfoFactory,
     ChokuzenInfoFactory,
-    ResultInfoFactory,
     OddsInfoFactory,
+    ProgramInfoFactory,
+    RaceInfoFactory,
+    ResultInfoFactory,
 )
 from domain.repository import (
-    JyocdMasterRepository,
-    RaceInfoRepository,
-    ProgramInfoRepository,
     ChokuzenInfoRepository,
-    ResultInfoRepository,
+    JyocdMasterRepository,
     OddsInfoRepository,
+    ProgramInfoRepository,
+    RaceInfoRepository,
+    ResultInfoRepository,
 )
+from infrastructure.const import MAIN_LOGNAME
 
 # TODO どこかにおいやる。(domainでいいとおもう)
 from infrastructure.getdata_lxml import DateRange as dr

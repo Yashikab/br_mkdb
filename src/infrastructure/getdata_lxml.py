@@ -239,7 +239,9 @@ class GetHoldPlacePast(CommonMethods4Official):
         # 進行状況のパス
         shinko_info_xpath = "/".join([target_table_xpath, "tbody/tr/td[2]"])
         self.shinko_info_list = list(
-            map(self._getshinkoinfo, self.__lx_content.xpath(shinko_info_xpath))
+            map(
+                self._getshinkoinfo, self.__lx_content.xpath(shinko_info_xpath)
+            )
         )
 
     def holdplace2strlist(self) -> list:
@@ -713,7 +715,9 @@ class OfficialResults(CommonMethods4Official):
             else:
                 return None
 
-        henkantei_list = list(map(lambda x: teistr2str(x.text), henkantei_list))
+        henkantei_list = list(
+            map(lambda x: teistr2str(x.text), henkantei_list)
+        )
 
         # 返還艇があればリスト長が1以上になる
         if len(henkantei_list) > 0:
@@ -1019,7 +1023,9 @@ class OfficialOdds(CommonMethods4Official):
             html_type = "tf"
 
         # htmlをload
-        base_url = f"https://boatrace.jp/owpc/pc/race/" f"odds{num}{html_type}?"
+        base_url = (
+            f"https://boatrace.jp/owpc/pc/race/" f"odds{num}{html_type}?"
+        )
         target_url = (
             f"{base_url}rno={self.race_no}&"
             f"jcd={self.jyo_code:02}&hd={self.date}"

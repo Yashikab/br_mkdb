@@ -76,20 +76,10 @@ class CommonMethod:
         data_itr : Iterator[Union[ProgramInfo, ChokuzenInfo, ResultInfo]]
             [description]
         """
-        self._common_save_info(
-            data_itr, common_tb_name, common_schema, executer
-        )
-        # TODO 一回まわっちゃうからこの設計だとからになる
-        self._player_save_info(
-            data_itr, player_tb_name, player_schema, executer
-        )
-
-    # common とplayer 分ける
-    def _common_save_info(
-        self, data_itr, common_tb_name, common_schema, executer
-    ):
         common_insert_phrases = list()
         common_cols = list(map(lambda x: x[0], common_schema))
+        player_insert_phrases = list()
+        player_cols = list(map(lambda x: x[0], player_schema))
         for di in data_itr:
             holddate = self.to_query_phrase(di.date)
             datejyo_id = f"{holddate}{di.jyo_cd:02}"
@@ -97,33 +87,19 @@ class CommonMethod:
             common_inserts = [race_id, datejyo_id]
             common_inserts += self.get_insertlist(di.common, common_cols[2:])
             common_insert_phrases.append(f"({', '.join(common_inserts)})")
+            player_insert_phrases.append(
+                self._player_inserts(race_id, di.players, player_cols)
+            )
         common_phrase = ", ".join(common_insert_phrases)
         common_sql = (
             f"INSERT IGNORE INTO {common_tb_name} VALUES {common_phrase};"
         )
-        self.logger.debug(common_sql)
-        executer.run_query(common_sql)
-
-    def _player_save_info(
-        self, data_itr, player_tb_name, player_schema, executer
-    ) -> None:
-        player_insert_phrases = list()
-        player_cols = list(map(lambda x: x[0], player_schema))
-        for pi in data_itr:
-            self.logger.debug(pi)
-            holddate = self.to_query_phrase(pi.date)
-            datejyo_id = f"{holddate}{pi.jyo_cd:02}"
-            race_id = f"{datejyo_id}{pi.race_no:02}"
-            player_insert_phrases.append(
-                self._player_inserts(race_id, pi.players, player_cols)
-            )
-
-        self.logger.debug(player_insert_phrases)
         player_phrase = ", ".join(player_insert_phrases)
-
         player_sql = (
             f"INSERT IGNORE INTO {player_tb_name} VALUES {player_phrase};"
         )
+        self.logger.debug(common_sql)
+        executer.run_query(common_sql)
         self.logger.debug(player_sql)
         executer.run_query(player_sql)
 

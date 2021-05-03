@@ -4,7 +4,7 @@
 MYSQLへ公式データを格納する
 """
 import argparse
-from logging import INFO, Formatter, StreamHandler, getLogger, DEBUG
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 
 import coloredlogs
 
@@ -18,22 +18,22 @@ from infrastructure.const import (
     MAIN_LOGNAME,
     MODULE_LOG_NAME,
 )
-from infrastructure.log import TqdmLoggingHandler
-from infrastructure.dbcontroller import LocalSqlController, CloudSqlController
+from infrastructure.dbcontroller import CloudSqlController, LocalSqlController
 from infrastructure.factory import (
-    RaceInfoFactoryImpl,
-    ProgramInfoFactoryImpl,
     ChokuzenInfoFactoryImpl,
-    ResultInfoFactoryImpl,
     OddsInfoFactoryImpl,
+    ProgramInfoFactoryImpl,
+    RaceInfoFactoryImpl,
+    ResultInfoFactoryImpl,
 )
+from infrastructure.log import TqdmLoggingHandler
 from infrastructure.repository import (
-    MysqlJyoMasterRepositoryImpl,
-    MysqlRaceInfoRepositoryImpl,
-    MysqlProgramInfoRepositoryImpl,
     MysqlChokuzenInfoRepositoryImpl,
-    MysqlResultInfoRepositoryImpl,
+    MysqlJyoMasterRepositoryImpl,
     MysqlOddsInfoRepositoryImpl,
+    MysqlProgramInfoRepositoryImpl,
+    MysqlRaceInfoRepositoryImpl,
+    MysqlResultInfoRepositoryImpl,
 )
 
 if __name__ == "__main__":
