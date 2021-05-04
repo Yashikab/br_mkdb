@@ -68,10 +68,10 @@ class ChokuzenPlayerInfo:
     name: str
     weight: float
     chosei_weight: float
-    tenji_time: float
-    tilt: float
-    tenji_course: int
-    tenji_st: float
+    tenji_time: Optional[float]
+    tilt: Optional[float]
+    tenji_course: Optional[int]
+    tenji_st: Optional[float]
 
 
 @dataclass
@@ -99,9 +99,9 @@ class ResultPlayerInfo:
     rank: int
     name: str
     no: int
-    racetime: float
-    course: int
-    st_time: float
+    racetime: Optional[float]
+    course: Optional[int]
+    st_time: Optional[float]
 
 
 @dataclass
@@ -110,16 +110,16 @@ class ResultCommonInfo:
     henkantei_list: str  # カンマ区切り
     is_henkan: bool
     kimarite: str
-    biko: str
-    payout_3tan: int
-    popular_3tan: int
-    payout_3fuku: int
-    popular_3fuku: int
-    payout_2tan: int
-    popular_2tan: int
-    payout_2fuku: int
-    popular_2fuku: int
-    payout_1tan: int
+    biko: Optional[str]
+    payout_3tan: Optional[int]
+    popular_3tan: Optional[int]
+    payout_3fuku: Optional[int]
+    popular_3fuku: Optional[int]
+    payout_2tan: Optional[int]
+    popular_2tan: Optional[int]
+    payout_2fuku: Optional[int]
+    popular_2fuku: Optional[int]
+    payout_1tan: Optional[int]
 
 
 @dataclass

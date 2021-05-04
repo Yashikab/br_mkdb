@@ -43,9 +43,7 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
         self._create_table_and_get_schema(self.__2fuku_tb_name, TwoRenfuku)
         self._create_table_and_get_schema(self.__tansho_tb_name, Tansho)
 
-    def _create_table_and_get_schema(
-        self, tb_name: str, data_class: dataclass
-    ):
+    def _create_table_and_get_schema(self, tb_name: str, data_class: dataclass):
         """3連単情報"""
         schema = copy.deepcopy(self.__ids)
         for var_name, var_type in data_class.__annotations__.items():
@@ -58,11 +56,13 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
         self.executer.run_query(query)
 
     def save_info(self, odds_itr: Iterator[OddsInfo]) -> None:
-        self.__save_info_each(odds_itr, ThreeRentan)
-        self.__save_info_each(odds_itr, ThreeRenfuku)
-        self.__save_info_each(odds_itr, TwoRentan)
-        self.__save_info_each(odds_itr, TwoRenfuku)
-        self.__save_info_each(odds_itr, Tansho)
+        # generatorだと一回回るとおわっちゃうのでリストにする
+        odds_list = list(odds_itr)
+        self.__save_info_each(odds_list, ThreeRentan)
+        self.__save_info_each(odds_list, ThreeRenfuku)
+        self.__save_info_each(odds_list, TwoRentan)
+        self.__save_info_each(odds_list, TwoRenfuku)
+        self.__save_info_each(odds_list, Tansho)
 
     def __save_info_each(
         self,
