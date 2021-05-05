@@ -71,6 +71,7 @@ class BoatRaceUsecase:
             logger.debug("Completed creating table.")
 
         for date in dr.daterange(op.start_date, op.end_date):
+            # raceごとにtry exceptをかます
             try:
                 logger.debug(f"target date: {date}")
                 holdraces = list(self.__ri_factory.getinfo(date))
