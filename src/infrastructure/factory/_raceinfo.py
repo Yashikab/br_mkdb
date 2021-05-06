@@ -1,3 +1,4 @@
+import traceback
 import re
 from datetime import date
 from logging import getLogger
@@ -65,13 +66,16 @@ class RaceInfoFactoryImpl(RaceInfoFactory):
             shinkos,
             ed_races,
         ):
-            yield HoldRaceInfo(
-                date=target_date,
-                jyo_name=p_name,
-                jyo_cd=p_code,
-                shinko=shinko,
-                ed_race_no=ed_race,
-            )
+            try:
+                yield HoldRaceInfo(
+                    date=target_date,
+                    jyo_name=p_name,
+                    jyo_cd=p_code,
+                    shinko=shinko,
+                    ed_race_no=ed_race,
+                )
+            except Exception:
+                self.logger.error(traceback.format_exc())
 
     def _conversion_to_codes(self, place_names: List[str]) -> int:
         """会場名をコードに変換する"""

@@ -1,6 +1,7 @@
 import re
 from datetime import date, datetime, timedelta
 from logging import getLogger
+import traceback
 from typing import Iterator
 
 import lxml.html as lxml
@@ -24,7 +25,10 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
         self, target_date: date, jyo_cd: int, ed_race_no: int
     ) -> Iterator[ResultInfo]:
         for race_no in range(1, ed_race_no + 1):
-            yield self._raceinfo(target_date, jyo_cd, race_no)
+            try:
+                yield self._raceinfo(target_date, jyo_cd, race_no)
+            except Exception:
+                self.logger.error(traceback.format_exc())
 
     def _raceinfo(
         self, target_date: date, jyo_cd: int, race_no: int
@@ -77,9 +81,7 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
             else:
                 return None
 
-        henkantei_list = list(
-            map(lambda x: teistr2str(x.text), henkantei_list)
-        )
+        henkantei_list = list(map(lambda x: teistr2str(x.text), henkantei_list))
 
         # 返還艇があればリスト長が1以上になる
         if len(henkantei_list) > 0:
