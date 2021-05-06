@@ -71,12 +71,12 @@ class BoatRaceUsecase:
             logger.debug("Completed creating table.")
 
         for date in dr.daterange(op.start_date, op.end_date):
-            # raceごとにtry exceptをかます
-            try:
-                logger.debug(f"target date: {date}")
-                holdraces = list(self.__ri_factory.getinfo(date))
-                self.__ri_repo.save_info(holdraces)
-                for hr in holdraces:
+            logger.debug(f"target date: {date}")
+            holdraces = list(self.__ri_factory.getinfo(date))
+            self.__ri_repo.save_info(holdraces)
+            for hr in holdraces:
+                # TODO これだとどっか1レースでもコケたらスキップされちゃうのでもう少し考える
+                try:
                     self.__pro_repo.save_info(
                         self.__pro_factory.each_jyoinfo(
                             hr.date, hr.jyo_cd, hr.ed_race_no
@@ -97,25 +97,8 @@ class BoatRaceUsecase:
                             hr.date, hr.jyo_cd, hr.ed_race_no
                         )
                     )
-                    # jd2sql.insert2table(date)
-                    # # jd2sqlで開催場と最終レース番を取得する
-                    # logger.debug("insert race data: race chokuzen result odds")
-                    # jyo_cd_list = jd2sql.map_raceno_dict.keys()
-                    # start_time = time.time()
-                    # logger.debug("Start to insert race data")
-                    # rd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                    # logger.debug("Start to insert chokuzen data")
-                    # cd2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                    # logger.debug("Start to insert result data")
-                    # res2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-                    # logger.debug("Start to insert odds data")
-                    # odds2sql.insert2table(date, jyo_cd_list, jd2sql.map_raceno_dict)
-
-                    # elapsed_time = time.time() - start_time
-                    # logger.debug(f"completed in {elapsed_time}sec")
-                    # logger.debug("insert race data completed.")
-            except Exception as e:
-                logger.error(f"{e}")
+                except Exception as e:
+                    logger.error(f"{e}")
 
         # localは実験で落とすと消えてしまうので落とさない
         if op.db_type == DBType.gcs:
