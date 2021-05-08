@@ -1,6 +1,6 @@
+import traceback
 from datetime import date
 from logging import getLogger
-import traceback
 from typing import Iterator
 
 import lxml.html as lxml

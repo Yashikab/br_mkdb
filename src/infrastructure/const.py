@@ -43,7 +43,6 @@ else:
     }
 
 # logに関するconst
-MAIN_LOGNAME = "main"
 MODULE_LOG_NAME = "module"
 FMT = "[%(asctime)s] %(name)s %(levelname)s: %(message)s"
 DATE_FMT = "%Y-%m-%d %H:%M:%S"

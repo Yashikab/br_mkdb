@@ -1,6 +1,6 @@
+import traceback
 from datetime import date
 from typing import Iterator, Union
-import traceback
 
 import numpy as np
 

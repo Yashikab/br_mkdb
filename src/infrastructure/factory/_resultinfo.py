@@ -1,7 +1,7 @@
 import re
+import traceback
 from datetime import date, datetime, timedelta
 from logging import getLogger
-import traceback
 from typing import Iterator
 
 import lxml.html as lxml
@@ -81,7 +81,9 @@ class ResultInfoFactoryImpl(ResultInfoFactory):
             else:
                 return None
 
-        henkantei_list = list(map(lambda x: teistr2str(x.text), henkantei_list))
+        henkantei_list = list(
+            map(lambda x: teistr2str(x.text), henkantei_list)
+        )
 
         # 返還艇があればリスト長が1以上になる
         if len(henkantei_list) > 0:

@@ -43,7 +43,9 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
         self._create_table_and_get_schema(self.__2fuku_tb_name, TwoRenfuku)
         self._create_table_and_get_schema(self.__tansho_tb_name, Tansho)
 
-    def _create_table_and_get_schema(self, tb_name: str, data_class: dataclass):
+    def _create_table_and_get_schema(
+        self, tb_name: str, data_class: dataclass
+    ):
         """3連単情報"""
         schema = copy.deepcopy(self.__ids)
         for var_name, var_type in data_class.__annotations__.items():

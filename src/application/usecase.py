@@ -1,4 +1,6 @@
+from datetime import datetime, timedelta
 from logging import getLogger
+from typing import Iterator
 
 from application.argument import DBType, Options
 from domain.dbcontroller import DatabaseController  # sqlとはかぎらない
@@ -17,13 +19,33 @@ from domain.repository import (
     RaceInfoRepository,
     ResultInfoRepository,
 )
-from infrastructure.const import MAIN_LOGNAME
-
-# TODO どこかにおいやる。(domainでいいとおもう)
-from infrastructure.getdata_lxml import DateRange as dr
 
 # logger
-logger = getLogger(MAIN_LOGNAME)
+logger = getLogger(__name__)
+
+
+class DateRange:
+    """
+    ある日付からある日付までのyyyymmdd型の日付リストを返す
+    """
+
+    @classmethod
+    def daterange(cls, st_date: datetime, ed_date: datetime) -> Iterator:
+        """
+        開始日から終了日までの日付のイテレータ
+
+        Parameters
+        ----------
+            st_date: datetime
+                開始日
+            ed_date: datetime
+                終了日
+        """
+
+        # +1することでeddateも含める
+        for n in range((ed_date - st_date).days + 1):
+            itr_date = st_date + timedelta(n)
+            yield itr_date
 
 
 class BoatRaceUsecase:
@@ -70,12 +92,11 @@ class BoatRaceUsecase:
             self.__odds_repo.create_table_if_not_exists()
             logger.debug("Completed creating table.")
 
-        for date in dr.daterange(op.start_date, op.end_date):
+        for date in DateRange.daterange(op.start_date, op.end_date):
             logger.debug(f"target date: {date}")
             holdraces = list(self.__ri_factory.getinfo(date))
             self.__ri_repo.save_info(holdraces)
             for hr in holdraces:
-                # TODO これだとどっか1レースでもコケたらスキップされちゃうのでもう少し考える
                 try:
                     self.__pro_repo.save_info(
                         self.__pro_factory.each_jyoinfo(

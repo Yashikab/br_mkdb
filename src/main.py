@@ -4,7 +4,7 @@
 MYSQLへ公式データを格納する
 """
 import argparse
-from logging import DEBUG, Formatter, StreamHandler, getLogger
+from logging import INFO, Formatter, StreamHandler, getLogger
 
 import coloredlogs
 
@@ -15,7 +15,6 @@ from infrastructure.const import (
     CL_LEVEL_STYLES,
     DATE_FMT,
     FMT,
-    MAIN_LOGNAME,
     MODULE_LOG_NAME,
 )
 from infrastructure.dbcontroller import CloudSqlController, LocalSqlController
@@ -39,7 +38,7 @@ from infrastructure.repository import (
 if __name__ == "__main__":
     # logging設定
     # mainのlog設定
-    main_logger = getLogger(MAIN_LOGNAME)
+    main_logger = getLogger(__name__)
     main_logger.addHandler(TqdmLoggingHandler())
     coloredlogs.CAN_USE_BOLD_FONT = True
     coloredlogs.DEFAULT_FIELD_STYLES = CL_FIELD_STYLES
@@ -53,7 +52,7 @@ if __name__ == "__main__":
     fmt = Formatter(fmt=FMT, datefmt=DATE_FMT)
     handler.setFormatter(fmt)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
-    getLogger(MODULE_LOG_NAME).setLevel(DEBUG)
+    getLogger(MODULE_LOG_NAME).setLevel(INFO)
 
     # コマンドライン引数オプション
     parser = argparse.ArgumentParser(description="Insert data to MySQL.")
