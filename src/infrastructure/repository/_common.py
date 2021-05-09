@@ -6,6 +6,7 @@ from typing import Any, Iterator, List, Union
 from domain.model.info import ChokuzenInfo, ProgramInfo, ResultInfo
 from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.mysql.executer import MysqlExecuter
+import tqdm
 
 
 class CommonMethod:
@@ -80,7 +81,7 @@ class CommonMethod:
         common_cols = list(map(lambda x: x[0], common_schema))
         player_insert_phrases = list()
         player_cols = list(map(lambda x: x[0], player_schema))
-        for di in data_itr:
+        for di in tqdm(data_itr):
             holddate = self.to_query_phrase(di.date)
             datejyo_id = f"{holddate}{di.jyo_cd:02}"
             race_id = f"{datejyo_id}{di.race_no:02}"

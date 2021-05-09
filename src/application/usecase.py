@@ -93,26 +93,31 @@ class BoatRaceUsecase:
             logger.debug("Completed creating table.")
 
         for date in DateRange.daterange(op.start_date, op.end_date):
-            logger.debug(f"target date: {date}")
+            logger.info(f"target date: {date}")
             holdraces = list(self.__ri_factory.getinfo(date))
             self.__ri_repo.save_info(holdraces)
             for hr in holdraces:
+                logger.info(f"date: {hr.date}/ jyo: {hr.jyo_name}")
                 try:
+                    logger.info("Program Info")
                     self.__pro_repo.save_info(
                         self.__pro_factory.each_jyoinfo(
                             hr.date, hr.jyo_cd, hr.ed_race_no
                         )
                     )
+                    logger.info(f"Chokuzen Info")
                     self.__choku_repo.save_info(
                         self.__choku_factory.each_jyoinfo(
                             hr.date, hr.jyo_cd, hr.ed_race_no
                         )
                     )
+                    logger.info("Result Info")
                     self.__res_repo.save_info(
                         self.__res_factory.each_jyoinfo(
                             hr.date, hr.jyo_cd, hr.ed_race_no
                         )
                     )
+                    logger.info("Odds Info")
                     self.__odds_repo.save_info(
                         self.__odds_factory.each_jyoinfo(
                             hr.date, hr.jyo_cd, hr.ed_race_no

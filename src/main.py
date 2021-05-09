@@ -4,7 +4,7 @@
 MYSQLへ公式データを格納する
 """
 import argparse
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import ERROR, Formatter, StreamHandler, getLogger
 
 import coloredlogs
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     fmt = Formatter(fmt=FMT, datefmt=DATE_FMT)
     handler.setFormatter(fmt)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
-    getLogger(MODULE_LOG_NAME).setLevel(INFO)
+    getLogger(MODULE_LOG_NAME).setLevel(ERROR)
 
     # コマンドライン引数オプション
     parser = argparse.ArgumentParser(description="Insert data to MySQL.")
