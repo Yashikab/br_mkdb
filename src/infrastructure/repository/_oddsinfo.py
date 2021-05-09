@@ -43,9 +43,7 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
         self._create_table_and_get_schema(self.__2fuku_tb_name, TwoRenfuku)
         self._create_table_and_get_schema(self.__tansho_tb_name, Tansho)
 
-    def _create_table_and_get_schema(
-        self, tb_name: str, data_class: dataclass
-    ):
+    def _create_table_and_get_schema(self, tb_name: str, data_class: dataclass):
         """3連単情報"""
         schema = copy.deepcopy(self.__ids)
         for var_name, var_type in data_class.__annotations__.items():
@@ -88,7 +86,6 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
             f"INSERT IGNORE INTO {self._value_of_tb(odds_type)} "
             f"VALUES {common_phrase};"
         )
-        print(common_sql)
         self.logger.debug(common_sql)
         self.executer.run_query(common_sql)
 
