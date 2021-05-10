@@ -3,10 +3,11 @@ from datetime import date
 from logging import getLogger
 from typing import Any, Iterator, List, Union
 
+from tqdm import tqdm
+
 from domain.model.info import ChokuzenInfo, ProgramInfo, ResultInfo
 from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.mysql.executer import MysqlExecuter
-from tqdm import tqdm
 
 
 class CommonMethod:

@@ -4,7 +4,7 @@
 MYSQLへ公式データを格納する
 """
 import argparse
-from logging import DEBUG, ERROR, INFO, Formatter, StreamHandler, getLogger
+from logging import ERROR, Formatter, StreamHandler, getLogger
 
 import coloredlogs
 
@@ -25,7 +25,6 @@ from infrastructure.factory import (
     RaceInfoFactoryImpl,
     ResultInfoFactoryImpl,
 )
-from infrastructure.log import TqdmLoggingHandler
 from infrastructure.repository import (
     MysqlChokuzenInfoRepositoryImpl,
     MysqlJyoMasterRepositoryImpl,
@@ -39,12 +38,14 @@ if __name__ == "__main__":
     # logging設定
     # mainのlog設定
     main_logger = getLogger(__name__)
-    main_logger.addHandler(TqdmLoggingHandler())
     coloredlogs.CAN_USE_BOLD_FONT = True
     coloredlogs.DEFAULT_FIELD_STYLES = CL_FIELD_STYLES
     coloredlogs.DEFAULT_LEVEL_STYLES = CL_LEVEL_STYLES
     coloredlogs.install(
-        level="DEBUG", logger=main_logger, fmt=FMT, datefmt=DATE_FMT
+        level="DEBUG",
+        logger=main_logger,
+        fmt=FMT,
+        datefmt=DATE_FMT,
     )
 
     # モジュール側の設定(INFOのみ)
