@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import traceback
 from logging import getLogger
 from typing import Iterator
 
@@ -21,7 +22,7 @@ from domain.repository import (
 )
 
 # logger
-logger = getLogger(__name__)
+logger = getLogger("__main__")
 
 
 class DateRange:
@@ -105,7 +106,7 @@ class BoatRaceUsecase:
                             hr.date, hr.jyo_cd, hr.ed_race_no
                         )
                     )
-                    logger.info(f"Chokuzen Info")
+                    logger.info("Chokuzen Info")
                     self.__choku_repo.save_info(
                         self.__choku_factory.each_jyoinfo(
                             hr.date, hr.jyo_cd, hr.ed_race_no
@@ -123,8 +124,8 @@ class BoatRaceUsecase:
                             hr.date, hr.jyo_cd, hr.ed_race_no
                         )
                     )
-                except Exception as e:
-                    logger.error(f"{e}")
+                except Exception:
+                    logger.error(f"{traceback.format_exc()}")
 
         # localは実験で落とすと消えてしまうので落とさない
         if op.db_type == DBType.gcs:

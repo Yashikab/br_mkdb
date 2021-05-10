@@ -4,7 +4,7 @@
 MYSQLへ公式データを格納する
 """
 import argparse
-from logging import ERROR, Formatter, StreamHandler, getLogger
+from logging import DEBUG, ERROR, INFO, Formatter, StreamHandler, getLogger
 
 import coloredlogs
 

@@ -6,7 +6,7 @@ from typing import Any, Iterator, List, Union
 from domain.model.info import ChokuzenInfo, ProgramInfo, ResultInfo
 from infrastructure.const import MODULE_LOG_NAME
 from infrastructure.mysql.executer import MysqlExecuter
-import tqdm
+from tqdm import tqdm
 
 
 class CommonMethod:
