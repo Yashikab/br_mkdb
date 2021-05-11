@@ -58,11 +58,13 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
         self.executer.run_query(query)
 
     def save_info(self, odds_itr: Iterator[OddsInfo]) -> None:
-        self.__save_info_each(odds_itr, ThreeRentan)
-        self.__save_info_each(odds_itr, ThreeRenfuku)
-        self.__save_info_each(odds_itr, TwoRentan)
-        self.__save_info_each(odds_itr, TwoRenfuku)
-        self.__save_info_each(odds_itr, Tansho)
+        # generatorだと一回回るとおわっちゃうのでリストにする
+        odds_list = list(odds_itr)
+        self.__save_info_each(odds_list, ThreeRentan)
+        self.__save_info_each(odds_list, ThreeRenfuku)
+        self.__save_info_each(odds_list, TwoRentan)
+        self.__save_info_each(odds_list, TwoRenfuku)
+        self.__save_info_each(odds_list, Tansho)
 
     def __save_info_each(
         self,
@@ -86,7 +88,6 @@ class MysqlOddsInfoRepositoryImpl(OddsInfoRepository):
             f"INSERT IGNORE INTO {self._value_of_tb(odds_type)} "
             f"VALUES {common_phrase};"
         )
-        print(common_sql)
         self.logger.debug(common_sql)
         self.executer.run_query(common_sql)
 

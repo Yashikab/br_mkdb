@@ -1,4 +1,5 @@
 import re
+import traceback
 from datetime import date
 from logging import getLogger
 from typing import Iterator
@@ -26,7 +27,10 @@ class ProgramInfoFactoryImpl(ProgramInfoFactory):
         self, target_date: date, jyo_cd: int, ed_race_no: int
     ) -> Iterator[ProgramInfo]:
         for race_no in range(1, ed_race_no + 1):
-            yield self._raceinfo(target_date, jyo_cd, race_no)
+            try:
+                yield self._raceinfo(target_date, jyo_cd, race_no)
+            except Exception:
+                self.logger.error(traceback.format_exc())
 
     def _raceinfo(
         self, target_date: date, jyo_cd: int, race_no: int

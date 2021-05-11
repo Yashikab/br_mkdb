@@ -75,12 +75,12 @@ class MysqlCreator:
         py_type: type,
     ) -> str:
         sqltype = None
-        if py_type == int:
+        if py_type in [int, Optional[int]]:
             sqltype = "INT"
-        elif py_type == float:
+        elif py_type in [float, Optional[float]]:
             sqltype = "FLOAT"
-        elif py_type == str:
+        elif py_type in [str, Optional[str]]:
             sqltype = "VARCHAR(100)"
-        elif py_type == bool:
+        elif py_type in [bool, Optional[bool]]:
             sqltype = "BOOLEAN"
         return sqltype

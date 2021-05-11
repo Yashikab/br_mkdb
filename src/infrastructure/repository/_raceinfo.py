@@ -50,5 +50,4 @@ class MysqlRaceInfoRepositoryImpl(RaceInfoRepository):
         sql = f"INSERT IGNORE INTO {self.tb_name} VALUES"
         query = " ".join([sql, phrase])
         self.logger.debug(query)
-        print(query)
         self.__executer.run_query(query)

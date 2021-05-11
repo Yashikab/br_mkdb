@@ -4,7 +4,7 @@
 MYSQLへ公式データを格納する
 """
 import argparse
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import ERROR, Formatter, StreamHandler, getLogger
 
 import coloredlogs
 
@@ -15,21 +15,37 @@ from infrastructure.const import (
     CL_LEVEL_STYLES,
     DATE_FMT,
     FMT,
-    MAIN_LOGNAME,
     MODULE_LOG_NAME,
 )
-from infrastructure.log import TqdmLoggingHandler
+from infrastructure.dbcontroller import CloudSqlController, LocalSqlController
+from infrastructure.factory import (
+    ChokuzenInfoFactoryImpl,
+    OddsInfoFactoryImpl,
+    ProgramInfoFactoryImpl,
+    RaceInfoFactoryImpl,
+    ResultInfoFactoryImpl,
+)
+from infrastructure.repository import (
+    MysqlChokuzenInfoRepositoryImpl,
+    MysqlJyoMasterRepositoryImpl,
+    MysqlOddsInfoRepositoryImpl,
+    MysqlProgramInfoRepositoryImpl,
+    MysqlRaceInfoRepositoryImpl,
+    MysqlResultInfoRepositoryImpl,
+)
 
 if __name__ == "__main__":
     # logging設定
     # mainのlog設定
-    main_logger = getLogger(MAIN_LOGNAME)
-    main_logger.addHandler(TqdmLoggingHandler())
+    main_logger = getLogger(__name__)
     coloredlogs.CAN_USE_BOLD_FONT = True
     coloredlogs.DEFAULT_FIELD_STYLES = CL_FIELD_STYLES
     coloredlogs.DEFAULT_LEVEL_STYLES = CL_LEVEL_STYLES
     coloredlogs.install(
-        level="DEBUG", logger=main_logger, fmt=FMT, datefmt=DATE_FMT
+        level="DEBUG",
+        logger=main_logger,
+        fmt=FMT,
+        datefmt=DATE_FMT,
     )
 
     # モジュール側の設定(INFOのみ)
@@ -37,7 +53,7 @@ if __name__ == "__main__":
     fmt = Formatter(fmt=FMT, datefmt=DATE_FMT)
     handler.setFormatter(fmt)
     getLogger(MODULE_LOG_NAME).addHandler(handler)
-    getLogger(MODULE_LOG_NAME).setLevel(INFO)
+    getLogger(MODULE_LOG_NAME).setLevel(ERROR)
 
     # コマンドライン引数オプション
     parser = argparse.ArgumentParser(description="Insert data to MySQL.")
@@ -70,10 +86,37 @@ if __name__ == "__main__":
 
     if op.db_type == "gcs":
         main_logger.info("use Google Cloud SQL.")
-        usecase = BoatRaceUsecase.gcpmysql()
+        usecase = BoatRaceUsecase(
+            CloudSqlController(),
+            RaceInfoFactoryImpl(),
+            ProgramInfoFactoryImpl(),
+            ChokuzenInfoFactoryImpl(),
+            ResultInfoFactoryImpl(),
+            OddsInfoFactoryImpl(),
+            MysqlJyoMasterRepositoryImpl(),
+            MysqlRaceInfoRepositoryImpl(),
+            MysqlProgramInfoRepositoryImpl(),
+            MysqlChokuzenInfoRepositoryImpl(),
+            MysqlResultInfoRepositoryImpl(),
+            MysqlOddsInfoRepositoryImpl(),
+        )
     elif op.db_type == "local":
         main_logger.info("use local mysql server.")
-        usecase = BoatRaceUsecase.localmysql()
+        usecase = BoatRaceUsecase(
+            LocalSqlController(),
+            RaceInfoFactoryImpl(),
+            ProgramInfoFactoryImpl(),
+            ChokuzenInfoFactoryImpl(),
+            ResultInfoFactoryImpl(),
+            OddsInfoFactoryImpl(),
+            MysqlJyoMasterRepositoryImpl(),
+            MysqlRaceInfoRepositoryImpl(),
+            MysqlProgramInfoRepositoryImpl(),
+            MysqlChokuzenInfoRepositoryImpl(),
+            MysqlResultInfoRepositoryImpl(),
+            MysqlOddsInfoRepositoryImpl(),
+        )
+
     else:
         raise Exception("Couldn't build sql controller")
 

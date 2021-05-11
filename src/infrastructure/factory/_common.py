@@ -29,7 +29,6 @@ class CommonMethods:
         文字列から文字を取り除き少数で返す
         マイナス表記は残す
         """
-        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
         in_str = re.search(r"-{0,1}[0-9]*\.[0-9]+", in_str)
         if in_str is not None:
             out_float = float(in_str.group(0))
@@ -42,7 +41,6 @@ class CommonMethods:
         文字列から文字を取り除き整数で返す
         マイナス表記は残す
         """
-        self.logger.debug(f"called {sys._getframe().f_code.co_name}.")
         try:
             in_str = re.search(r"-{0,1}[0-9]+", in_str)
             out_int = int(in_str.group(0))

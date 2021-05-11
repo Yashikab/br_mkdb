@@ -1,7 +1,9 @@
+import traceback
 from datetime import date
 from typing import Iterator, Union
 
 import numpy as np
+from tqdm import tqdm
 
 from domain.factory import OddsInfoFactory
 from domain.model.info import (
@@ -19,8 +21,11 @@ class OddsInfoFactoryImpl(OddsInfoFactory):
     def each_jyoinfo(
         self, target_date: date, jyo_cd: int, ed_race_no: int
     ) -> Iterator[OddsInfo]:
-        for race_no in range(1, ed_race_no + 1):
-            yield self._raceinfo(target_date, jyo_cd, race_no)
+        for race_no in tqdm(range(1, ed_race_no + 1)):
+            try:
+                yield self._raceinfo(target_date, jyo_cd, race_no)
+            except Exception:
+                self.logger.error(traceback.format_exc())
 
     def _raceinfo(
         self, target_date: date, jyo_cd: int, race_no: int
